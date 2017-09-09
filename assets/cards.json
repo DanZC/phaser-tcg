@@ -1,0 +1,31 @@
+[
+    {
+        "name" : "",
+        "type" : "CardType.UNDEFINED",
+        "color" : "CardColor.NONE"
+    },
+    {
+        "name" : "Josh",
+        "type" : "CardType.MEMBER",
+        "color" : "CardColor.GRN",
+        "lvl" : 2, "hp" : 10, "atk" : 6, "def" : 14,
+        "boost" : "ChannelType.GMG",
+        "nerf" : "ChannelType.MTR",
+        "effect" : {
+            "desc" : "In the Effect Phase, if this card did not take damage in battle in the previous turn, increase two stats of one member in play on your side by 1. If Max HP is increased with this effect, recover 1 point of HP to the member.",
+            "check" : "function(card, ds) {}"
+        }
+    },
+    {
+        "name" : "Martin",
+        "type" : "CardType.MEMBER",
+        "color" : "CardColor.PPL",
+        "lvl" : 2, "hp" : 10, "atk" : 14, "def" : 6,
+        "boost" : "ChannelType.MDA",
+        "nerf" : "ChannelType.MEM",
+        "effect" : {
+            "desc" : "Once per turn, you can recover the HP of members in play on your side by a total of 3 points.",
+            "check" : "function(card, ds) {}"
+        }
+    }
+]
