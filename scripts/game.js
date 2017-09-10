@@ -76,10 +76,10 @@ Game.create = function() {
 
 Game.update = function() {
     var ls = Client;
-    for(i in ls.obj.local) {
-        ls.obj.local[i].update();
+    for(i in this.obj.local) {
+        this.obj.local[i].update();
     }
     for(i in ls.obj.opponent) {
-        ls.obj.opponent[i].update();
+        this.obj.opponent[i].update();
     }
 };

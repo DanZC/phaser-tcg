@@ -10,7 +10,7 @@ Client.askNewPlayer = function(){
 };
 
 Client.sendSelectCard = function(state){
-    Client.socket.emit('select card', state);
+    //Client.socket.emit('select card', state);
 };
 
 Client.newGame = function(type, data) {
@@ -41,6 +41,6 @@ Client.socket.on('matchmake end',function(data){
     Client.load = true;
 });
 
-Client.socket.on('updatestate',function(state){
-    ls.cardsys.duel.remote.update(state);
+Client.socket.on('update state',function(state){
+    Client.cardsys.duel.remote.update(state.local);
 });

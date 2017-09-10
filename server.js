@@ -32,56 +32,75 @@ class Match {
         this.b = b;
         this.spectators = [];
         var x = 0;
-        while(isMatchIDUsed(id)) {
+        do {
             x = getRandomInt(0, 2147483647);
-        }
+        } while(isMatchIDUsed(x));
         this.id = x;
+        this.roomid = "M" + this.id.toString();
     }
 
     sync() {
         io.emit('sync', a);
     }
 
-    destroy() {
-
+    disconnect(socket) {
+        io.to(this.roomid).emit('player left match', socket);
+        a.leave_match();
+        b.leave_match();
     }
 }
 
 function newMatch(a, b) {
     var match = new Match(a, b);
-    match.id = lastMatchID++;
+    match.id = server.lastMatchID++;
     return match;
 }
 
-function newPlayer(socket) {
-    return {
-        id: server.lastPlayerID++,
-        name: "ANON",
-        inMatch: false,
-        waitingForMatch: false,
-        spectating: false,
-        match: null,
-        bot: false,
-        socketID: socket.id
+class Player {
+    constructor(socket) {
+        this.id = server.lastPlayerID++,
+        this.name = "ANON",
+        this.inMatch = false,
+        this.waitingForMatch = false,
+        this.spectating = false,
+        this.match = null,
+        this.bot = false,
+        this.socket = socket;
     }
+
+    leave_match() {}
 }
 
-function newBot() {
-    return {
-        id: server.lastPlayerID++,
-        name: "B",
-        inMatch: false,
-        waitingForMatch: false,
-        spectating: false,
-        match: null,
-        bot: false,
-        socketID: socket.id
+class Bot {
+    constructor() {
+        this.id = server.lastBotID++,
+        this.name = "BOT" + this.id.toString(),
+        this.inMatch = false,
+        this.waitingForMatch = false,
+        this.spectating = false,
+        this.match = null,
+        this.bot = true,
+        this.socketID = -1
+        server.bots.push(this);
     }
+
+    leave_match() { this.match = null; }
+}
+
+function FindFirstIdleBot() {
+    for(i in server.bots) {
+        if(server.bots[i].match !== null) continue;
+        return server.bots[i];
+    }
+    return null;
 }
 
 server.lastPlayerID = 0; // Keep track of the last id assigned to a new player
 server.lastMatchID = 0;
-server.matches = {};
+server.lastBotID = 0;
+server.bots = [];
+server.matches = [];
+server.players = [];
 
 io.on('connection',function(socket){
     socket.on('newplayer',function(){
@@ -94,6 +113,7 @@ io.on('connection',function(socket){
             match: null,
             socketID: socket.id
         };
+        server.players.push(socket.player);
         socket.emit('allplayers',getAllPlayers());
         socket.broadcast.emit('newplayer',socket.player);
         console.log("New player connected!");
@@ -105,14 +125,15 @@ io.on('connection',function(socket){
     });
 
     socket.on('newaigame',function(){
-        socket.player.name = data.name;
-        var AI = {};
-        var match = newMatch(newBot(), player);
+        var bot = FindFirstIdleBot();
+        if(bot === null) {
+            bot = new Bot();
+        }
+        var match = newMatch(bot, socket.player);
         server.matches[match.id] = match;
         socket.player.match = match;
-        op.match = match;
+        bot.match = match;
         var roomid = "M" + match.id.toString();
-        io.sockets.connected[op.socketID].join(roomid)
         socket.join(roomid);
         console.log("Player, " + socket.player.id + ", joined a match vs the AI.");
     });
@@ -131,7 +152,7 @@ io.on('connection',function(socket){
             var op = p[n];
             op.waitingForMatch = false;
             socket.player.waitingForMatch = false;
-            var match = newMatch(op, player);
+            var match = newMatch(op, socket.player);
             server.matches[match.id] = match;
             socket.player.match = match;
             op.match = match;
@@ -156,12 +177,35 @@ io.on('connection',function(socket){
     });
 
     socket.on('select card',function(state){
-        //socket.emit('allplayers',getAllPlayers());
-        socket.broadcast.emit('updatestate',state);
-        console.log("New player connected!");
+        console.log("Player, " + socket.player.id + ", has selected a card.");
+        socket.to(socket.player.match.roomid).broadcast.emit('update state',state);
     });
 
     socket.on('disconnect',function(){
+        var isPlayer = false;
+        var isValidPlayer = false;
+        for(i in socket) {
+            if(i === "player") {
+                isPlayer = true;
+                break;
+            } else continue;
+        }
+        if(!isPlayer) return;
+        for(i in socket.players) {
+            if(socket.player === server.players[i]) {
+                isValidPlayer = true;
+                break;
+            } else continue;
+        }
+        if(!isValidPlayer) return;
+        if(socket.player.match !== null) {
+            socket.player.match.disconnect(socket);
+        }
+        for(room in socket.rooms) {
+            var r = socket.rooms[room];
+            socket.leave(r);
+            io.to(r).emit('player disconnect', socket.player);
+        }
         if(socket.player !== null) {
             io.emit('remove',socket.player.id);
         }

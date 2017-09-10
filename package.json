@@ -1,0 +1,30 @@
+{
+  "name": "phaser-tcg",
+  "version": "0.0.1",
+  "description": "A simple card game server using Node.js, socket.io, and Phaser.",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.15.4",
+    "socket.io": "^2.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DanZC/phaser-tcg.git"
+  },
+  "keywords": [
+    "socketio",
+    "phaser",
+    "tcg"
+  ],
+  "author": "Daniel Christopher",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DanZC/phaser-tcg/issues"
+  },
+  "homepage": "https://github.com/DanZC/phaser-tcg#readme"
+}

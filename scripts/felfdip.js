@@ -7,6 +7,8 @@ const CardType = {
     MEME : 4
 };
 
+const UNDEFINED_CARD_INDEX = 159;
+
 CardIndex = []
 
 const CardColor = {
@@ -71,7 +73,7 @@ class CardObject {
         this.obj = game.add.button(
             game.world.centerX + pos.x, 
             game.world.centerY + pos.y, 
-            'card_' + d.toString(),
+            'cards',
             this.click,
             this
         );
@@ -83,19 +85,25 @@ class CardObject {
         this.card = card;
         this.game = game;
         this.ls = Client;
+        this.state = game.state.getCurrentState();
     }
 
     click() {
-        var sel = this.ls.cardsys.duel.local.selected;
+        var local = this.ls.cardsys.duel.local;
         if(this.isOpponents) return;
-        if(sel === this.card) {
-            this.ls.obj.pv.x = this.game.world.centerX;
-            this.ls.obj.pv.y = this.game.world.centerY;
-            this.ls.obj.pv.key = 'card_' + this.card.index.toString();
+        if(local.selected === this.card) {
+            this.state.obj.pv.x = this.game.world.centerX;
+            this.state.obj.pv.y = this.game.world.centerY;
+            this.state.obj.pv.key = 'cards';
+            if(this.card.index !== 0 || this.card.index > CardIndex.length) {
+                this.state.obj.pv.frame = this.card.index - 1;
+            } else {
+                this.state.obj.pv.frame = UNDEFINED_CARD_INDEX;
+            }
         } else {
-            sel = this.card;
+            local.selected = this.card;
         }
-        Client.updateState(this.ls.cardsys.duel)
+        Client.sendSelectCard(this.ls.cardsys.duel)
     }
 
     move(dest) {
@@ -112,6 +120,11 @@ class CardObject {
     }
 
     update() {
+        if(this.card.index !== 0 || this.card.index > CardIndex.length) {
+            this.obj.frame = this.card.index - 1;
+        } else {
+            this.obj.frame = UNDEFINED_CARD_INDEX;
+        }
         if(this.ls.cardsys.duel.local.selected === this.card) {
             this.obj.tint = 0xFF7F7F;
         } else {

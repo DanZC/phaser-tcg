@@ -16,8 +16,18 @@ Title.preload = function() {
 Title.create = function() {
     var title = this.game.add.image(this.game.world.centerX, this.game.world.centerY, 'title');
     title.anchor.setTo(0.5, 0.5);
-    var bVSAI = this.game.add.button(
+    var bFM = this.game.add.button(
         0,0,
+        'buttons',
+        function() {
+            this.game.state.start("Game",true,false,this.game,{type: GameType.RandomMatch});
+            this.Client.newGame(GameType.RandomMatch);
+        },
+        this
+    );
+    bFM.frame = 0;
+    var bVSAI = this.game.add.button(
+        0,128,
         'buttons',
         function() {
             this.game.state.start("Game",true,false,this.game,{type: GameType.AI});
