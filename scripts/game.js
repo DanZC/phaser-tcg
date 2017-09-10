@@ -25,9 +25,6 @@ Game.init = function(game, data){
 Game.preload = function() {
     this.game.load.spritesheet('cards', 'assets/cards.png',412,562);
     this.game.load.image('logo', 'assets/back_test_new.png');
-    for(var i = 0; i < 3; i++) {
-        this.game.load.image('card_' + i.toString(), 'assets/card_' + i.toString() + '.png');
-    }
 };
 
 Game.create = function() {
