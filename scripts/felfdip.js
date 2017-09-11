@@ -23,15 +23,20 @@ const CardColor = {
     GRY : 8
 }
 
+const CardStatus = {
+    OFFLINE : 0,
+    ONLINE : 1,
+    IDLE : 2,
+    DONOTDISTURB : 3,
+    STREAMING : 4
+}
+
 class Card {
     constructor() {
         this.type = CardType.UNDEFINED;
         this.index = 0;
+        this.role = null; //Role applied to card, if applicable
     }
-
-    onActivate(ds) {};
-    onDiscard(ds) {};
-    passiveEffect(ds) {};
 
     set_index(index) {
         this.index = index;
@@ -47,14 +52,6 @@ class Card {
     }
 }
 
-class MemberCard extends Card {
-    constructor(index) {
-        this.type = CardType.MEMBER;
-        this.index = index;
-        this.color = index.color;
-    }
-}
-
 class CardSystem {
     constructor() {
         this.deck = [random_deck()]; //Plan on having multiple decks available
@@ -66,31 +63,43 @@ class CardSystem {
 }
 
 class CardObject {
-    constructor(pos, card, op) {
+    constructor(slot, card, op) {
         var d = card.index;
         var game = Client.game;
         this.isOpponents = op;
         this.obj = game.add.button(
-            game.world.centerX + pos.x, 
-            game.world.centerY + pos.y, 
+            slot.obj.x, 
+            slot.obj.y, 
             'cards',
             this.click,
             this
         );
         this.obj.anchor.setTo(0.5, 0.5);
-        this.obj.height = 141;
-        this.obj.width = 105;
+        this.obj.height = 140;
+        this.obj.width = 104;
         this.obj.angle = 90;
         if(op) { this.obj.angle *= -1; }
         this.card = card;
         this.game = game;
         this.ls = Client;
+        this.slot = slot;
         this.state = game.state.getCurrentState();
+        this.tween = game.add.tween(this.obj);
     }
 
     click() {
         var local = this.ls.cardsys.duel.local;
-        if(this.isOpponents) return;
+        if(this.isOpponents) {
+            this.state.obj.pv.x = this.game.world.centerX;
+            this.state.obj.pv.y = this.game.world.centerY;
+            this.state.obj.pv.key = 'cards';
+            if(this.card.index !== 0 || this.card.index > CardIndex.length) {
+                this.state.obj.pv.frame = this.card.index - 1;
+            } else {
+                this.state.obj.pv.frame = UNDEFINED_CARD_INDEX;
+            }
+            return;
+        }
         if(local.selected === this.card) {
             this.state.obj.pv.x = this.game.world.centerX;
             this.state.obj.pv.y = this.game.world.centerY;
@@ -103,20 +112,18 @@ class CardObject {
         } else {
             local.selected = this.card;
         }
-        Client.sendSelectCard(this.ls.cardsys.duel)
+        Client.sendMove("SELECT DECK");
     }
 
     move(dest) {
-        var tween = game.add.tween(this.obj);
         var distance = Phaser.Math.distance(this.obj.x, this.obj.y, dest.x, dest.y);
         var duration = distance*10;
-        this.tween = tween;
         this.obj.input.enabled = false;
-        tween.onComplete.add(function(obj, tween) {
+        this.tween.onComplete.add(function(obj, tween) {
             obj.input.enabled = true;
         });
-        tween.to(dest, duration);
-        tween.start();
+        this.tween.to(dest, duration, Phaser.Easing.Quadratic.InOut);
+        this.tween.start();
     }
 
     update() {
@@ -126,7 +133,7 @@ class CardObject {
             this.obj.frame = UNDEFINED_CARD_INDEX;
         }
         if(this.ls.cardsys.duel.local.selected === this.card) {
-            this.obj.tint = 0xFF7F7F;
+            this.obj.tint = 0x7F7FFF;
         } else {
             this.obj.tint = 0xFFFFFF;
         }
@@ -152,6 +159,16 @@ class Deck {
 
     get_top() {
         return this.card[this.card.length - 1]
+    }
+
+    shuffle() {
+        var len = this.card.length;
+        for(i = len-1; i > 1; i--) {
+            j = getRandomInt(0, i+1);
+            var c = this.card[j]; //Move reference into c
+            this.card[j] = this.card[i]; //J references I
+            this.card[i] = c;   //I references C
+        }
     }
 
     update() {
@@ -193,23 +210,30 @@ const SlotType = {
     OFFLINE : 5
 }
 
+const SlotFrame = {
+    UNDEFINED : 0,
+    DISABLED : 1,
+    OPEN : 2
+}
+
 class Slot {
-    constructor(ls, type, pos) {
+    constructor(pos, type, op) {
         this.type = type;
+        this.isOpponents = op;
         this.card = null;
-        var game = ls.game;
+        var game = Client.game;
         this.obj = game.add.image(
             game.world.centerX + pos.x, 
             game.world.centerY + pos.y, 
-            'empty',
-            this.click,
-            this
+            'cardmask'
         );
         this.obj.anchor.setTo(0.5, 0.5);
-        this.obj.height = 141;
-        this.obj.width = 105;
+        this.obj.height = 140;
+        this.obj.width = 104;
         this.obj.angle = 90;
-        this.ls = ls;
+        this.obj.frame = SlotFrame.UNDEFINED;
+        this.name = "";
+        this.ls = Client;
     }
 
     empty() {
@@ -221,8 +245,22 @@ class Slot {
         var player = duel.player;
         if(!duel.myTurn) return;
         if(duel.local.selected !== null) {
-            var sel = this.ls.cardsys.duel.local.selected;
-            sel.move({x: 0,y: 0});
+            var local = duel.local;
+            local.selected.move({x: this.obj.x, y: this.obj.y});
+            this.card = local.selected;
+        }
+    }
+
+    update() {
+        var duel = this.ls.cardsys.duel;
+        var player = duel.player;
+        if(!duel.myTurn) {
+            
+        }
+        if(duel.local.selected !== null) {
+            var local = duel.local;
+            local.selected.move({x: this.obj.x, y: this.obj.y});
+            this.card = local.selected;
         }
     }
 }

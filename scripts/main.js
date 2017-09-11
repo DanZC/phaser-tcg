@@ -1,8 +1,17 @@
 window.onload = function() {
-    var game = new Phaser.Game(1850, 1080, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+
+    var username = getCookie("username");
+
+    var game = new Phaser.Game(1500, 960, Phaser.AUTO, 'game', { preload: preload, create: create, update: update });
     game.state.add('Game',Game);
     game.state.add('Title',Title);
-    Client.askNewPlayer();
+
+    if (username != "") {
+        Client.askReturnPlayer(username);
+    } else {
+        Client.askNewPlayer();
+    }
+
     var ls = Client;
     ls.game = game;
     ls.cardsys = new CardSystem();

@@ -19,12 +19,12 @@ Game.init = function(game, data){
     this.game = game;
     this.game.stage.disableVisibilityChange = true;
     this.type = data.type;
-    this.obj = {};
 };
 
 Game.preload = function() {
     this.game.load.spritesheet('cards', 'assets/cards.png',412,562);
-    this.game.load.image('logo', 'assets/back_test_new.png');
+    this.game.load.spritesheet('cardmask', 'assets/cardmask.png',412,562);
+    this.game.load.image('logo', 'assets/back_test_new3.png');
 };
 
 Game.create = function() {
@@ -39,23 +39,31 @@ Game.create = function() {
     var d = cardsys.player.deck.get_top();
     var d2 = cardsys.duel.opponent.deck.get_top();
     var deckpos = [{
-        x : -420,
-        y : 385
+        x : -438,
+        y : 412
     },{
-        x : 457,
-        y : -392
+        x : 438,
+        y : -364
     }];
     var channelpos = [{
-        x : -420,
-        y : 385
+        x : -440,
+        y : 194
     },{
         x : -420,
         y : 385
     }]
     obj.local = {};
-    obj.local.deck = new CardObject(deckpos[0], d, false);
+    var sdl = new Slot(deckpos[0], SlotType.DECK, false);
+    cardsys.duel.local.slots['DECK'] = sdl;
+    sdl.name = 'DECK';
+    obj.local.deck = new CardObject(sdl, d, false);
+    sdl.card = obj.local.deck;
     obj.opponent = {};
-    obj.opponent.deck = new CardObject(deckpos[1], d2, true);
+    var sdo = new Slot(deckpos[1], SlotType.DECK, true);
+    cardsys.duel.remote.slots['DECK'] = sdo;
+    sdo.name = 'DECK';
+    obj.opponent.deck = new CardObject(sdo, d2, true);
+    sdo.card = obj.opponent.deck;
     //var deckobj = new CardObject(game, deckpos, d);
     obj.pv = game.add.button(
         game.world.centerX, 
@@ -69,6 +77,7 @@ Game.create = function() {
     obj.pv.anchor.setTo(0.5, 0.5);
     obj.pv.x = -1000;
     obj.pv.frame = d.index;
+    Client.chat.write("Joined an AI game.");
 };
 
 Game.update = function() {
@@ -76,7 +85,7 @@ Game.update = function() {
     for(i in this.obj.local) {
         this.obj.local[i].update();
     }
-    for(i in ls.obj.opponent) {
+    for(i in this.obj.opponent) {
         this.obj.opponent[i].update();
     }
 };

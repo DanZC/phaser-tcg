@@ -1,5 +1,14 @@
+const DuelPhase = {
+    WAIT : 0,
+    DRAW : 1,
+    EFFECT : 2,
+    ACTION : 3,
+    BATTLE : 4
+};
+
 class SideState {
     constructor() {
+        this.slots = {};
         this.memes = [
             null,
             null,
@@ -20,14 +29,9 @@ class SideState {
             null,
             null
         ];
+        this.hand = [];
         this.offline = [];
         this.selected = null;
-    }
-
-    update(state) {
-        for(i in state) {
-            this[i] = state[i];
-        }
     }
 }
 
@@ -38,7 +42,8 @@ class DuelState {
         this.isConnected = false;
         this.local = new SideState();
         this.remote = new SideState();
-        this.myTurn = true;
+        this.turn = player;
+        this.phase = DuelPhase.DRAW;
     }
 
     in_deck(card) {
@@ -48,6 +53,24 @@ class DuelState {
             }
         }
         return false;
+    }
+
+    moveCard(card, slot) {
+        card.move({x: slot.obj.x, y: slot.obj.y});
+    }
+
+    doMove(move) {
+        var parts = move.split(" ");
+        if(parts[0] === "MOVE") {
+            this.moveCard(this.local.slots[parts[1]].card, this.local.slots[parts[2]])
+            return;
+        }
+    }
+
+    doMoves(moves) {
+        for(i in moves) {
+
+        }
     }
 
     get_channel(s, index) {

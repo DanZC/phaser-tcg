@@ -1,16 +1,32 @@
 var Client = {};
 Client.ls = {}
+
 Client.socket = io.connect();
 Client.load = false;
 Client.game = null;
 Client.cardsys = null;
 
+Client.chat = {};
+
+Client.chat.write = function(msg) {
+    $('#messages').append($('<li>').text(msg));
+};
+
+Client.chat.clearAll = function() {
+    $('#messages').children().remove();
+};
+
 Client.askNewPlayer = function(){
     Client.socket.emit('newplayer');
 };
 
-Client.sendSelectCard = function(state){
-    //Client.socket.emit('select card', state);
+Client.askReturnPlayer = function(username){
+    Client.socket.emit('oldplayer', username)
+};
+
+Client.sendMove = function(move){
+    Client.chat.write('DEBUG:' + move);
+    //Client.socket.emit('move send', move);
 };
 
 Client.newGame = function(type, data) {
@@ -34,13 +50,21 @@ Client.socket.on('allplayers',function(data){
 });
 
 Client.socket.on('matchmake wait',function(){
-    console.log(data);
+    console.log("Waiting for a match.");
 });
 
 Client.socket.on('matchmake end',function(data){
-    Client.load = true;
+    Client.chat.clearAll();
+    Client.chat.write("Creating a new AI game...");
+    Client.game.state.start("Game",true,false,Client.game,{type: GameType.RandomMatch});
 });
 
-Client.socket.on('update state',function(state){
+Client.socket.on('move callback',function(x){
+    if(x !== null) {
+        //Client.cardsys.duel.remote.update(state.local);
+    }
+});
+
+Client.socket.on('move get',function(state){
     Client.cardsys.duel.remote.update(state.local);
 });

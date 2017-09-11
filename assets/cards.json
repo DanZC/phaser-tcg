@@ -2,30 +2,50 @@
     {
         "name" : "",
         "type" : "CardType.UNDEFINED",
-        "color" : "CardColor.NONE"
+        "color" : "CardColor.NONE",
+        "effect" : {
+            "desc" : "",
+            "frequency" : "NEVER",
+            "function" : "nop"
+        }
     },
     {
         "name" : "Josh",
-        "type" : "CardType.MEMBER",
-        "color" : "CardColor.GRN",
+        "type" : "MEMBER",
+        "color" : "GRN",
         "lvl" : 2, "hp" : 10, "atk" : 6, "def" : 14,
-        "boost" : "ChannelType.GMG",
-        "nerf" : "ChannelType.MTR",
+        "boost" : "GMG",
+        "nerf" : "MTR",
         "effect" : {
             "desc" : "In the Effect Phase, if this card did not take damage in battle in the previous turn, increase two stats of one member in play on your side by 1. If Max HP is increased with this effect, recover 1 point of HP to the member.",
-            "check" : "function(card, ds) {}"
+            "frequency" : "TURN",
+            "function" : "nop"
         }
     },
     {
         "name" : "Martin",
-        "type" : "CardType.MEMBER",
-        "color" : "CardColor.PPL",
+        "type" : "MEMBER",
+        "color" : "PPL",
         "lvl" : 2, "hp" : 10, "atk" : 14, "def" : 6,
-        "boost" : "ChannelType.MDA",
-        "nerf" : "ChannelType.MEM",
+        "boost" : "MDA",
+        "nerf" : "MEM",
         "effect" : {
             "desc" : "Once per turn, you can recover the HP of members in play on your side by a total of 3 points.",
-            "check" : "function(card, ds) {}"
+            "frequency" : "TURN",
+            "function" : "nop"
+        }
+    },
+    {
+        "name" : "Joel",
+        "type" : "MEMBER",
+        "color" : "PPL",
+        "lvl" : 2, "hp" : 10, "atk" : 14, "def" : 6,
+        "boost" : "MDA",
+        "nerf" : "MEM",
+        "effect" : {
+            "desc" : "Once per turn, you can recover the HP of members in play on your side by a total of 3 points.",
+            "frequency" : "TURN",
+            "function" : "nop"
         }
     }
 ]

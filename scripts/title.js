@@ -20,7 +20,6 @@ Title.create = function() {
         0,0,
         'buttons',
         function() {
-            this.game.state.start("Game",true,false,this.game,{type: GameType.RandomMatch});
             this.Client.newGame(GameType.RandomMatch);
         },
         this
@@ -30,7 +29,7 @@ Title.create = function() {
         0,128,
         'buttons',
         function() {
-            this.game.state.start("Game",true,false,this.game,{type: GameType.AI});
+            //this.game.state.start("Game",true,false,this.game,{type: GameType.AI});
             this.Client.newGame(GameType.AI);
         },
         this

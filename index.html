@@ -4,22 +4,153 @@
         <meta charset="UTF-8" />
         <title>FelfdipDiscourse</title>
         <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+
             body {
+                font: 13px Helvetica, Arial;
                 background-color: black;
+            }
+
+            .game {
+                float: left;
+                background-color: black;
+                padding: 0px;
+                top: 0;
+                left: 0;
+                border: none;
+            }
+
+            .chatbox {
+                background-color: #eee;
+            }
+
+            .fixedContainer {
+                position: fixed;
+                padding: 1em;
+                right: 0%;
+                top: 0%;
+                width: 20%;
+                transform: translateX(0%);
+            }
+
+            .username, .channel-tag {
+                font-size: 16px;
+                height: 10%;
+                background-color: #ddd;
+                padding: 10px;
+            }
+
+            form {
+                font-size: 16px;
+                height: 10%;
+                width: 100%;
+                background-color: #ccc;
+                padding: 10px;
+            }
+
+            form input { 
+                border: 0; 
+                padding: 10px; 
+                width: 75%;
+                margin-right: .5%; 
+            }
+
+            form button { 
+                width: 24%;
+                background: rgb(130, 224, 255); 
+                border: none; 
+                padding: 10px; 
+            }
+
+            #messages { 
+                list-style-type: none; 
+                margin: 0; 
+                padding: 0; 
+            }
+
+            #messages li { padding: 5px 10px; }
+            #messages li:nth-child(odd) { background: #eee; }
+
+            #user-opts button {
+                width: 24%;
+                background: rgb(130, 224, 255); 
+                border: 2px; 
+                padding: 10px; 
             }
         </style>
         <script src="//cdn.jsdelivr.net/phaser/2.6.2/phaser.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+        <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+        <script src="scripts/cookie.js"></script>
         <script src="scripts/client.js"></script>
+        <script>
+          $(function () {
+            $('form#m').submit(function(){
+                Client.socket.emit('chat message', $('input#m').val());
+                $('input#m').val('');
+                return false;
+            });
+            $('form#cred').submit(function(){
+                Client.socket.emit('cred', $('input#name').val());
+                $('.username').text('@' + $('input#name').val());
+                return false;
+            });
+            Client.socket.on('chat message', function(msg){
+                $('#messages').append($('<li>').text(msg));
+            });
+            Client.socket.on('cred callback', function(result){
+                if(result) {
+                    var name = getCookie("username");
+                    if(name === "") {
+                        setCookie("username",$('input#name').val(),30);
+                        name = $('input#name').val();
+                    }
+                    $('.username').text('@' + name);
+                    $('#user-opts').show();
+                    $('form#cred').hide();
+                    $('input#m').removeAttr('disabled');
+                }
+            });
+          });
+        </script>
         <script src="scripts/game.js"></script>
         <script src="scripts/title.js"></script>
         <script src="scripts/felfdip.js"></script>
         <script src="scripts/duel.js"></script>
     </head>
     <body>
-        <div class="game">
+        <div class="game" id="game">
             <script type="text/javascript" src="scripts/main.js">
             </script>
+        </div>
+        <div class="fixedContainer">
+            <div class="chatbox">
+                <div id="top">
+                    <div class="channel-tag">
+                        Chat
+                    </div>
+                </div>
+                <div style="overflow-y:auto; height:80vh">
+                    <ul id="messages">
+                        <li>Server: Hello.</li>
+                    </ul>
+                </div>
+                <div id="bottom">
+                    <form id="m" action="">
+                        <input id="m" autocomplete="off" disabled/><button>Send</button>
+                    </form>
+                </div>
+                <div>
+                    <form id="cred" action="">
+                        Select a name:<input id="name" autocomplete="off" /><button>Save</button>
+                    </form>
+                    <div id="user-opts" hidden>
+                        <div class="username">
+                            @ANON
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
 </html>

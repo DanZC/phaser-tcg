@@ -111,7 +111,8 @@ io.on('connection',function(socket){
             waitingForMatch: false,
             spectating: false,
             match: null,
-            socketID: socket.id
+            socketID: socket.id,
+            muted: false
         };
         server.players.push(socket.player);
         socket.emit('allplayers',getAllPlayers());
@@ -119,9 +120,52 @@ io.on('connection',function(socket){
         console.log("New player connected!");
     });
 
-    socket.on('applycred',function(data){
-        socket.player.name = data.name;
+    socket.on('oldplayer',function(name){
+        for(i in socket.players) {
+            if(name === server.players[i].name) {
+                socket.emit('cred callback', false);
+                return;
+            }
+        }
+        socket.player = {
+            id: server.lastPlayerID++,
+            name: name,
+            inMatch: false,
+            waitingForMatch: false,
+            spectating: false,
+            match: null,
+            socketID: socket.id,
+            muted: false
+        };
+        server.players.push(socket.player);
+        socket.emit('allplayers',getAllPlayers());
+        socket.emit('cred callback', true);
+        socket.broadcast.emit('chat message', socket.player.name + " joined the chat.");
+        console.log("Returning player, " + name + ", connected!");
+    });
+
+    socket.on('cred',function(name){
+        for(i in socket.players) {
+            if(name === server.players[i].name) {
+                socket.emit('cred callback', false);
+                return;
+            }
+        }
+        socket.player.name = name;
         console.log("Player, " + socket.player.id + ", updated their credentials.");
+        socket.emit('cred callback',true);
+        socket.broadcast.emit('chat message', socket.player.name + " joined the chat.");
+    });
+
+    socket.on('chat message',function(msg){
+        var fmsg = socket.player.name + ': ' + msg;
+        console.log(fmsg);
+        for(room in socket.rooms) {
+            var r = socket.rooms[room];
+            socket.leave(r);
+            io.to(r).emit('chat message', fmsg);
+        }
+        io.emit('chat message', fmsg);
     });
 
     socket.on('newaigame',function(){
@@ -135,6 +179,7 @@ io.on('connection',function(socket){
         bot.match = match;
         var roomid = "M" + match.id.toString();
         socket.join(roomid);
+        socket.emit('matchmake end');
         console.log("Player, " + socket.player.id + ", joined a match vs the AI.");
     });
 
@@ -176,9 +221,16 @@ io.on('connection',function(socket){
         }
     });
 
-    socket.on('select card',function(state){
-        console.log("Player, " + socket.player.id + ", has selected a card.");
-        socket.to(socket.player.match.roomid).broadcast.emit('update state',state);
+    socket.on('move send',function(move){
+        console.log("Player, " + socket.player.id + ", did move, '" + move + "'");
+        var data = verifyMove(socket.player.match, move);
+        if(data.good) {
+            socket.to(socket.player.match.roomid).broadcast.emit('move get',move);
+            socket.player.match.doMove(move);
+            socket.emit('move callback', move);
+        } else {
+            socket.emit('move callback', null);
+        }
     });
 
     socket.on('disconnect',function(){
