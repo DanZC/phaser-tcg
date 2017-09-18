@@ -3,6 +3,8 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io').listen(server);
 
+//require('./scripts/card.js');
+
 app.use('/css',express.static(__dirname + '/css'));
 app.use('/scripts',express.static(__dirname + '/scripts'));
 app.use('/assets',express.static(__dirname + '/assets'));
@@ -11,13 +13,31 @@ app.get('/',function(req,res){
     res.sendFile(__dirname+'/index.html');
 });
 
+CardIndex = [];
+
+var fs = require('fs');
+fs.readFile( __dirname + '/assets/cards.json', function (err, data) {
+    if (err) {
+        throw err; 
+    }
+    CardIndex = data.toJSON();
+});
+
+usedMatchIDs = [];
+
+Client = {
+    chat: {
+        write: function(str) {
+            Console.log(str);
+        }
+    }
+};
+
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
-
-usedMatchIDs = [];
 
 function isMatchIDUsed(id) {
     for(i in usedMatchIDs) {
@@ -26,17 +46,127 @@ function isMatchIDUsed(id) {
     return false;
 }
 
+const DuelPhase = {
+    WAIT : 0,
+    DRAW : 1,
+    EFFECT : 2,
+    ACTION : 3,
+    BATTLE : 4
+};
+
+class MatchState {
+    constructor() {
+        this.turn = null;
+        this.phase = DuelPhase.DRAW;
+        this.draws = 0;
+        this.a = {
+            deck: [],
+            hand: [],
+            memes: [
+                {index: -1},
+                {index: -1},
+                {index: -1},
+                {index: -1},
+                {index: -1},
+                {index: -1}
+            ],
+            members: [
+                {index: -1},
+                {index: -1},
+                {index: -1},
+                {index: -1},
+                {index: -1},
+                {index: -1}
+            ],
+            channels: [
+                {index: -1, member: 0},
+                {index: -1, member: 0}
+            ],
+            offline: []
+        }
+        this.b = {
+            deck: [],
+            hand: [],
+            memes: [
+                {index: -1},
+                {index: -1},
+                {index: -1},
+                {index: -1},
+                {index: -1},
+                {index: -1}
+            ],
+            members: [
+                {index: -1},
+                {index: -1},
+                {index: -1},
+                {index: -1},
+                {index: -1},
+                {index: -1}
+            ],
+            channels: [
+                {index: -1, member: 0},
+                {index: -1, member: 0}
+            ],
+            offline: []
+        }
+    }
+}
+
+const AIDifficulty = {
+    EASY : 0,
+    NORMAL : 1,
+    HARD : 2
+}
+
+class AI {
+    constructor(bot) {
+        this.difficulty = AIDifficulty.NORMAL;
+    }
+
+    doTurn(state) {
+        server.ai.emit('ai', state)
+    }
+}
+
 class Match {
     constructor(a, b) {
         this.a = a;
         this.b = b;
+        this.state = new MatchState();
         this.spectators = [];
         var x = 0;
         do {
             x = getRandomInt(0, 2147483647);
         } while(isMatchIDUsed(x));
+        usedMatchIDs.push(x);
         this.id = x;
         this.roomid = "M" + this.id.toString();
+    }
+
+    isReady() {
+        return true;
+        if(this.a.deck.length !== 0 && this.b.deck.length !== 0) {
+            return true;
+        }
+        return false;
+    }
+
+    start() {
+        console.log("Starting match between " + this.a.name + " and " + this.b.name + "!");
+        this.state.a.deck = this.a.deck;
+        this.state.b.deck = this.b.deck;
+        this.state.turn = this.b;
+        io.to(this.roomid).emit('matchmake end');
+        if(this.a.bot !== true) {
+            this.a.socket.emit('end turn');
+        }
+        if(this.b.bot === true) {
+            this.b.ai.doTurn(this.state);
+        }
+    }
+
+    doMove() {
+
     }
 
     sync() {
@@ -48,6 +178,16 @@ class Match {
         a.leave_match();
         b.leave_match();
     }
+}
+
+function randomDeck() {
+    var cards = 40;
+    var deck = [];
+    for(i = 0; i < cards; i++) {
+        var n = getRandomInt(1, CardIndex.length);
+        deck.push(n);
+    }
+    return deck;
 }
 
 function newMatch(a, b) {
@@ -80,7 +220,9 @@ class Bot {
         this.spectating = false,
         this.match = null,
         this.bot = true,
-        this.socketID = -1
+        this.socketID = -1;
+        this.deck = randomDeck();
+        this.ai = new AI();
         server.bots.push(this);
     }
 
@@ -99,10 +241,24 @@ server.lastPlayerID = 0; // Keep track of the last id assigned to a new player
 server.lastMatchID = 0;
 server.lastBotID = 0;
 server.bots = [];
+server.ai = null;
 server.matches = [];
 server.players = [];
 
+var ln = io.of('/local');
+ln.on('connection',function(socket){
+    socket.on('ai ready',function(){
+        socket.join('ai');
+        server.ai = socket;
+    });
+
+    socket.on('ai callback',function(match, moves){
+        
+    });
+});
+
 io.on('connection',function(socket){
+
     socket.on('newplayer',function(){
         socket.player = {
             id: server.lastPlayerID++,
@@ -160,12 +316,14 @@ io.on('connection',function(socket){
     socket.on('chat message',function(msg){
         var fmsg = socket.player.name + ': ' + msg;
         console.log(fmsg);
-        for(room in socket.rooms) {
-            var r = socket.rooms[room];
-            socket.leave(r);
-            io.to(r).emit('chat message', fmsg);
+        if(socket.rooms.length > 0) {
+            for(room in socket.rooms) {
+                var r = socket.rooms[room];
+                io.to(r).emit('chat message', fmsg);
+            }
+        } else {
+            io.emit('chat message', fmsg);
         }
-        io.emit('chat message', fmsg);
     });
 
     socket.on('newaigame',function(){
@@ -177,9 +335,16 @@ io.on('connection',function(socket){
         server.matches[match.id] = match;
         socket.player.match = match;
         bot.match = match;
-        var roomid = "M" + match.id.toString();
+        var roomid = match.roomid;
         socket.join(roomid);
-        socket.emit('matchmake end');
+        socket.emit('request info', (info) => {
+            console.log('Received info from ' + socket.player.id + ".");
+            socket.player.deck = info.deck;
+            console.log('Deck length: ' + socket.player.deck.length);
+            if(socket.player.match.isReady()) {
+                socket.player.match.start();
+            }
+        });
         console.log("Player, " + socket.player.id + ", joined a match vs the AI.");
     });
 
@@ -223,7 +388,8 @@ io.on('connection',function(socket){
 
     socket.on('move send',function(move){
         console.log("Player, " + socket.player.id + ", did move, '" + move + "'");
-        var data = verifyMove(socket.player.match, move);
+        //var data = verifyMove(socket.player.match, move);
+        var data = { good:true };
         if(data.good) {
             socket.to(socket.player.match.roomid).broadcast.emit('move get',move);
             socket.player.match.doMove(move);

@@ -35,5 +35,14 @@ Title.create = function() {
         this
     );
     bVSAI.frame = 2;
+    var bDB = this.game.add.button(
+        0,256,
+        'buttons',
+        function() {
+            this.game.state.start("Builder",true,false,this.game);
+        },
+        this
+    );
+    bDB.frame = 3;
 }
 

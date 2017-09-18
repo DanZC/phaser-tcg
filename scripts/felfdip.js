@@ -1,57 +1,3 @@
-//Bad "enum", because Javascript doesn't have bultin enums.
-const CardType = {
-    UNDEFINED : 0,
-    MEMBER : 1,
-    ROLE : 2,
-    CHANNEL : 3,
-    MEME : 4
-};
-
-const UNDEFINED_CARD_INDEX = 159;
-
-CardIndex = []
-
-const CardColor = {
-    NONE : 0,
-    RED : 1,
-    ORN : 2,
-    YLW : 3,
-    GRN : 4,
-    BLU : 5,
-    PPL : 6,
-    PNK : 7,
-    GRY : 8
-}
-
-const CardStatus = {
-    OFFLINE : 0,
-    ONLINE : 1,
-    IDLE : 2,
-    DONOTDISTURB : 3,
-    STREAMING : 4
-}
-
-class Card {
-    constructor() {
-        this.type = CardType.UNDEFINED;
-        this.index = 0;
-        this.role = null; //Role applied to card, if applicable
-    }
-
-    set_index(index) {
-        this.index = index;
-    }
-
-    //Makes the instance card a copy of a card defined in CardIndex, giving the instance
-    //card the CardIndex's property values.
-    update() {
-        var protocard = CardIndex[this.index];
-        for(var prop in protocard) {
-            this[prop] = protocard[prop]; //Copies over the properties from the protocard
-        }
-    }
-}
-
 class CardSystem {
     constructor() {
         this.deck = [random_deck()]; //Plan on having multiple decks available
@@ -63,9 +9,10 @@ class CardSystem {
 }
 
 class CardObject {
-    constructor(slot, card, op) {
+    constructor(slot, card, op, parent) {
         var d = card.index;
         var game = Client.game;
+        this.parent = parent;
         this.isOpponents = op;
         this.obj = game.add.button(
             slot.obj.x, 
@@ -80,15 +27,17 @@ class CardObject {
         this.obj.angle = 90;
         if(op) { this.obj.angle *= -1; }
         this.card = card;
+        card.obj = this;
         this.game = game;
         this.ls = Client;
         this.slot = slot;
         this.state = game.state.getCurrentState();
-        this.tween = game.add.tween(this.obj);
+        this.parent.add(this.obj);
     }
 
     click() {
         var local = this.ls.cardsys.duel.local;
+        var duel = this.ls.cardsys.duel;
         if(this.isOpponents) {
             this.state.obj.pv.x = this.game.world.centerX;
             this.state.obj.pv.y = this.game.world.centerY;
@@ -97,6 +46,14 @@ class CardObject {
                 this.state.obj.pv.frame = this.card.index - 1;
             } else {
                 this.state.obj.pv.frame = UNDEFINED_CARD_INDEX;
+            }
+            return;
+        }
+        if(duel.phase === DuelPhase.DRAW) {
+            if(this.slot.type === SlotType.DECK) {
+                if(duel.draws < 5) {
+                    this.draw();
+                }
             }
             return;
         }
@@ -112,22 +69,50 @@ class CardObject {
         } else {
             local.selected = this.card;
         }
-        Client.sendMove("SELECT DECK");
+        if(this.slot !== null) {
+            Client.sendMove("SELECT " + this.slot.name);
+        }
+    }
+
+    draw() {
+        var duel = this.ls.cardsys.duel;
+        if(this.isOpponents) {
+            duel.opponent.deck.draw();
+        } else {
+            duel.player.deck.draw();
+            var next = new CardObject(this.slot, duel.player.deck.get_top(), this.isOpponents, this.parent);
+            this.parent.bringToTop(this.obj);
+            this.state.obj.local.deck = next;
+            this.move({
+                x: 104,
+                y: (duel.local.hand.length * 104) + 132
+            });
+            duel.local.hand.push(this);
+            this.slot = null;
+            duel.draws++;
+            if(duel.draws >= 5) {
+                duel.phase++;
+                duel.effectPhase();
+            }
+        }
+        Client.sendMove("DRAW");
     }
 
     move(dest) {
-        var distance = Phaser.Math.distance(this.obj.x, this.obj.y, dest.x, dest.y);
-        var duration = distance*10;
+        //var distance = Phaser.Math.distance(this.obj.x, this.obj.y, dest.x, dest.y);
+        var duration = 300;
+        var local = this.ls.cardsys.duel.local;
+        local.selected = null;
         this.obj.input.enabled = false;
-        this.tween.onComplete.add(function(obj, tween) {
+        var tween = this.game.add.tween(this.obj).to(dest, duration, Phaser.Easing.Quadratic.InOut);
+        tween.onComplete.addOnce(function(obj, tween) {
             obj.input.enabled = true;
         });
-        this.tween.to(dest, duration, Phaser.Easing.Quadratic.InOut);
-        this.tween.start();
+        tween.start();
     }
 
     update() {
-        if(this.card.index !== 0 || this.card.index > CardIndex.length) {
+        if(this.card.index > 0 && this.card.index < CardIndex.length) {
             this.obj.frame = this.card.index - 1;
         } else {
             this.obj.frame = UNDEFINED_CARD_INDEX;
@@ -141,41 +126,12 @@ class CardObject {
 }
 
 const ChannelType = {
+    NON : 0,
     SRS : 1,
     GMG : 2,
     MDA : 3,
     MTR : 4,
     MEM : 5
-}
-
-class Deck {
-    constructor() {
-        this.card = [];
-    }
-
-    add(card) {
-        this.card.push(card);
-    }
-
-    get_top() {
-        return this.card[this.card.length - 1]
-    }
-
-    shuffle() {
-        var len = this.card.length;
-        for(i = len-1; i > 1; i--) {
-            j = getRandomInt(0, i+1);
-            var c = this.card[j]; //Move reference into c
-            this.card[j] = this.card[i]; //J references I
-            this.card[i] = c;   //I references C
-        }
-    }
-
-    update() {
-        for(var i in this.card) {
-            this.card[i].update();
-        }
-    }
 }
 
 function getRandomInt(min, max) {
@@ -184,12 +140,18 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
+function calcDamage(atk, def) {
+    var dmg = (atk * 1.5) - (def * 1.5);
+    if(dmg < 1) dmg = 1;
+    return dmg;
+}
+
 //Returns a random deck
 function random_deck() {
     var cards = 40;
     var deck = new Deck();
     for(i = 0; i < cards; i++) {
-        var n = getRandomInt(1, 3);
+        var n = getRandomInt(1, 5);
         var c = new Card();
         c.set_index(n);
         deck.add(c);
@@ -222,10 +184,12 @@ class Slot {
         this.isOpponents = op;
         this.card = null;
         var game = Client.game;
-        this.obj = game.add.image(
+        this.obj = game.add.button(
             game.world.centerX + pos.x, 
             game.world.centerY + pos.y, 
-            'cardmask'
+            'cardmask',
+            this.click,
+            this
         );
         this.obj.anchor.setTo(0.5, 0.5);
         this.obj.height = 140;
@@ -243,24 +207,21 @@ class Slot {
     click() {
         var duel = this.ls.cardsys.duel;
         var player = duel.player;
-        if(!duel.myTurn) return;
+        if(duel.turn !== player) return;
         if(duel.local.selected !== null) {
             var local = duel.local;
-            local.selected.move({x: this.obj.x, y: this.obj.y});
-            this.card = local.selected;
+            var cobj = local.selected.obj;
+            cobj.move({x: this.obj.x, y: this.obj.y});
+            this.card = cobj;
+            cobj.slot = this;
         }
     }
 
     update() {
         var duel = this.ls.cardsys.duel;
         var player = duel.player;
-        if(!duel.myTurn) {
-            
-        }
-        if(duel.local.selected !== null) {
-            var local = duel.local;
-            local.selected.move({x: this.obj.x, y: this.obj.y});
-            this.card = local.selected;
+        if(duel.turn !== player) {
+            this.obj.frame = 1;
         }
     }
 }

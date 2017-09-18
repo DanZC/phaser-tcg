@@ -5,6 +5,7 @@ window.onload = function() {
     var game = new Phaser.Game(1500, 960, Phaser.AUTO, 'game', { preload: preload, create: create, update: update });
     game.state.add('Game',Game);
     game.state.add('Title',Title);
+    game.state.add('Builder',Builder);
 
     if (username != "") {
         Client.askReturnPlayer(username);

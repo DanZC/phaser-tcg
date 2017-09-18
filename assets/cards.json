@@ -6,10 +6,14 @@
         "effect" : {
             "desc" : "",
             "frequency" : "NEVER",
-            "function" : "nop"
+            "function" : "none"
+        },
+        "cmeffect" : {
+            "desc" : "Once per turn, you can recover the HP of members in play on your side by a total of 3 points.",
+            "frequency" : "TURN",
+            "function" : "none"
         }
-    },
-    {
+    },{
         "name" : "Josh",
         "type" : "MEMBER",
         "color" : "GRN",
@@ -17,12 +21,17 @@
         "boost" : "GMG",
         "nerf" : "MTR",
         "effect" : {
+            "name" : "Bikdip's Glory",
             "desc" : "In the Effect Phase, if this card did not take damage in battle in the previous turn, increase two stats of one member in play on your side by 1. If Max HP is increased with this effect, recover 1 point of HP to the member.",
-            "frequency" : "TURN",
-            "function" : "nop"
+            "frequency" : "EFFECT",
+            "function" : "BikdipGlory"
+        },
+        "cmeffect" : {
+            "desc" : "You can always set this card to Streaming. Whenever this card is set to Streaming, all other members set to Streaming are set to Online.",
+            "frequency" : "ONSTREAM",
+            "function" : "AttentionGrabber"
         }
-    },
-    {
+    },{
         "name" : "Martin",
         "type" : "MEMBER",
         "color" : "PPL",
@@ -30,22 +39,51 @@
         "boost" : "MDA",
         "nerf" : "MEM",
         "effect" : {
+            "name" : "Charisma",
             "desc" : "Once per turn, you can recover the HP of members in play on your side by a total of 3 points.",
             "frequency" : "TURN",
-            "function" : "nop"
+            "function" : "none"
+        },
+        "cmeffect" : {
+            "desc" : "You can always set this card to Streaming. Whenever this card is set to Streaming, all other members set to Streaming are set to Online.",
+            "frequency" : "ONSTREAM",
+            "function" : "AttentionGrabber"
         }
-    },
-    {
+    },{
         "name" : "Joel",
         "type" : "MEMBER",
         "color" : "PPL",
-        "lvl" : 2, "hp" : 10, "atk" : 14, "def" : 6,
-        "boost" : "MDA",
-        "nerf" : "MEM",
+        "lvl" : 2, "hp" : 9, "atk" : 14, "def" : 7,
+        "boost" : "GMG",
+        "nerf" : "MTR",
         "effect" : {
-            "desc" : "Once per turn, you can recover the HP of members in play on your side by a total of 3 points.",
+            "desc" : "If Josh or Martin attack while set to Streaming, half of this card's ATK, rounded down, is added to any damage dealt by their attack.",
+            "frequency" : "ONATTACK",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "If this card causes an opposing member to go offline in battle, your opponent cannot attack Josh or Martin during their next turn if they are set to Streaming.",
+            "frequency" : "ONDEFEAT",
+            "function" : ""
+        }
+    },{
+        "name" : "Admin FlusteredCustard",
+        "type" : "MEMBER",
+        "color" : "GRN",
+        "lvl" : 2, "hp" : 12, "atk" : 10, "def" : 10,
+        "boost" : "GMG",
+        "nerf" : "NON",
+        "effect" : {
+            "desc" : "Once per turn, you can discard any Channel Card in play on your side to play another Channel Card from your hand in its place. This card cannot have disadvantage.",
             "frequency" : "TURN",
-            "function" : "nop"
+            "restriction" : "ONCE",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "Once per turn, if the opponent attacks this card, you can change the target of the attack to be any other member in play on your side.",
+            "frequency" : "ONDEFEND",
+            "restriction" : "ONCE",
+            "function" : ""
         }
     }
 ]

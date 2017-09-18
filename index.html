@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <title>FelfdipDiscourse</title>
+        <title>Felfdip Discourse</title>
         <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -33,14 +33,45 @@
                 transform: translateX(0%);
             }
 
-            .username, .channel-tag {
+            .fixedContainer#opts {
+                position: fixed;
+                padding: 2em;
+                left: 100%;
+                top: 14%;
+                width: 100%;
+                transform: translate(-50%,-50%);
+            }
+
+            #optmenu {
+                font-size: 16px;
+                width: 240px;
+                background-color: #ddd;
+                padding: 10px;
+            }
+
+            .channel-tag {
                 font-size: 16px;
                 height: 10%;
                 background-color: #ddd;
                 padding: 10px;
             }
 
-            form {
+            #box-footer {
+                font-size: 16px;
+                height: 10%;
+                background-color: #ddd;
+                padding: 10px;
+            }
+
+            .username {
+                font-size: 16px;
+                height: 10%;
+                background-color: #ddd;
+                padding: 10px;
+                float: left;
+            }
+
+            form#m, form#cred {
                 font-size: 16px;
                 height: 10%;
                 width: 100%;
@@ -48,17 +79,30 @@
                 padding: 10px;
             }
 
-            form input { 
+            form#m input, form#cred input { 
                 border: 0; 
                 padding: 10px; 
                 width: 75%;
                 margin-right: .5%; 
             }
 
-            form button { 
+            form#m button, form#cred button { 
                 width: 24%;
                 background: rgb(130, 224, 255); 
                 border: none; 
+                padding: 10px; 
+            }
+
+            form#options {
+                font-size: 16px;
+                height: 10%;
+                width: 100%;
+                background-color: #ccc;
+                padding: 10px;
+            }
+
+            form#options input {
+                border: 0; 
                 padding: 10px; 
             }
 
@@ -73,9 +117,8 @@
 
             #user-opts button {
                 width: 24%;
-                background: rgb(130, 224, 255); 
                 border: 2px; 
-                padding: 10px; 
+                padding: 2px; 
             }
         </style>
         <script src="//cdn.jsdelivr.net/phaser/2.6.2/phaser.js"></script>
@@ -85,6 +128,14 @@
         <script src="scripts/client.js"></script>
         <script>
           $(function () {
+            $('button#options').click(function(){
+                $('#opts').show();
+                return false;
+            });
+            $('button#close-menu').click(function(){
+                $('#opts').hide();
+                return false;
+            });
             $('form#m').submit(function(){
                 Client.socket.emit('chat message', $('input#m').val());
                 $('input#m').val('');
@@ -115,13 +166,15 @@
         </script>
         <script src="scripts/game.js"></script>
         <script src="scripts/title.js"></script>
+        <script src="scripts/deckbuilder.js"></script>
+        <script src="scripts/card.js"></script>
         <script src="scripts/felfdip.js"></script>
         <script src="scripts/duel.js"></script>
+        <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
     </head>
     <body>
         <div class="game" id="game">
-            <script type="text/javascript" src="scripts/main.js">
-            </script>
+            <script type="text/javascript" src="scripts/main.js"></script>
         </div>
         <div class="fixedContainer">
             <div class="chatbox">
@@ -129,10 +182,17 @@
                     <div class="channel-tag">
                         Chat
                     </div>
+                    <div class="players" hidden>
+                        Online players:
+                    </div>
                 </div>
                 <div style="overflow-y:auto; height:80vh">
                     <ul id="messages">
                         <li>Server: Hello.</li>
+                    </ul>
+                </div>
+                <div style="overflow-y:auto; height:80vh" hidden>
+                    <ul id="players">
                     </ul>
                 </div>
                 <div id="bottom">
@@ -140,16 +200,32 @@
                         <input id="m" autocomplete="off" disabled/><button>Send</button>
                     </form>
                 </div>
-                <div>
+                <div id="box-footer">
                     <form id="cred" action="">
                         Select a name:<input id="name" autocomplete="off" /><button>Save</button>
                     </form>
                     <div id="user-opts" hidden>
                         <div class="username">
-                            @ANON
+                            @ANON 
+                        </div>
+                        <div style="padding-left: 16px">
+                            <button id="options">
+                                <img src="assets/cogwheel.png"/>
+                            </button>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div id="opts" class="fixedContainer" hidden>
+            <div id="optmenu">
+                Options
+                <form id="options">
+                    <p>Mute <input type="checkbox" name="Mute" id=""/></p>
+                    <button id="close-menu">
+                        Save
+                    </button>
+                </form>
             </div>
         </div>
     </body>

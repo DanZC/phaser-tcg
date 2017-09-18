@@ -50,7 +50,15 @@ Client.socket.on('allplayers',function(data){
 });
 
 Client.socket.on('matchmake wait',function(){
-    console.log("Waiting for a match.");
+    Client.chat.write("Waiting for a match...");
+});
+
+Client.socket.on('matchmake callback',function(data){
+    if(data.name !== "ANON") {
+        Client.chat.write("Match found! Starting match vs @" + data.name + "...");
+    } else {
+        Client.chat.write("Match found! Starting match vs Player#" + data.id + "...");
+    }
 });
 
 Client.socket.on('matchmake end',function(data){
@@ -67,4 +75,14 @@ Client.socket.on('move callback',function(x){
 
 Client.socket.on('move get',function(state){
     Client.cardsys.duel.remote.update(state.local);
+});
+
+Client.socket.on('request info', (fn) => {
+    fn({
+        deck: Client.cardsys.duel.player.deck.rawcopy()
+    });
+});
+
+Client.socket.on('disconnect',function(){
+    Client.chat.write("Oops... There seems to be a connection issue.");
 });

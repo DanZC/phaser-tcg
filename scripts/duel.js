@@ -44,6 +44,7 @@ class DuelState {
         this.remote = new SideState();
         this.turn = player;
         this.phase = DuelPhase.DRAW;
+        this.draws = 0;
     }
 
     in_deck(card) {
@@ -65,6 +66,10 @@ class DuelState {
             this.moveCard(this.local.slots[parts[1]].card, this.local.slots[parts[2]])
             return;
         }
+    }
+
+    effectPhase() {
+        
     }
 
     doMoves(moves) {
