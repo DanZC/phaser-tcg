@@ -48,10 +48,10 @@ Game.create = function() {
     var channelpos = [
     [{
         x : -440,
-        y : 194
+        y : 193
     },{
         x : -440,
-        y : 0
+        y : -141
     }],[{
         x : -440,
         y : 194
@@ -60,6 +60,13 @@ Game.create = function() {
         y : 385
     }]
     ];
+    var offlinepos = [{
+        x : -440,
+        y : -365
+    },{
+        x : 438,
+        y : -364
+    }];
     var handrect = {
         x: 0,
         y: 0,
@@ -80,9 +87,16 @@ Game.create = function() {
         new Slot(channelpos[0][1], SlotType.CHANNEL, false)
     ];
     cardsys.duel.local.slots['CH0'] = scl[0];
-    scl.name = 'CH0';
+    scl[0].name = 'CH0';
+    cardsys.duel.local.slots['CH1'] = scl[1];
+    scl[1].name = 'CH1';
     slots.add(scl[0].obj);
     slots.add(scl[1].obj);
+
+    var soll = new Slot(offlinepos[0], SlotType.OFFLINE, false);
+    cardsys.duel.local.slots['OFFLINE'] = soll;
+    soll.name = 'OFFLINE';
+    slots.add(soll.obj);
 
     cards = game.add.group(game.world, "cards", false, false, false);
 

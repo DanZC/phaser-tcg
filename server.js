@@ -253,7 +253,6 @@ ln.on('connection',function(socket){
     });
 
     socket.on('ai callback',function(match, moves){
-        
     });
 });
 

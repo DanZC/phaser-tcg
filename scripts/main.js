@@ -24,6 +24,13 @@ window.onload = function() {
 
     function create () {
         CardIndex = game.cache.getJSON('card_data');
+        for(i in CardIndex) {
+            var c = CardIndex[i];
+            c.type = CardType[c.type];
+            if(c.type === CardType.MEMBER || c.type === CardType.ROLE) {
+                c.color = CardColor[c.color];
+            }
+        }
         game.stage.disableVisibilityChange = true;
         game.state.start('Title',true,false,game);
     }
