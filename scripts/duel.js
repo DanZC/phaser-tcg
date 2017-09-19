@@ -33,6 +33,16 @@ class SideState {
         this.offline = [];
         this.selected = null;
     }
+
+    getLevelOneMembers() {
+        members = [];
+        for(i in this.members) {
+            if(this.members[i] !== null) {
+                members.push(this.members[i]);
+            }
+        }
+        return members;
+    }
 }
 
 class DuelState {

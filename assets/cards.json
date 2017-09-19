@@ -1,15 +1,15 @@
 [
     {
-        "name" : "",
-        "type" : "CardType.UNDEFINED",
-        "color" : "CardColor.NONE",
+        "name" : "0",
+        "type" : "UNDEFINED",
+        "color" : "NON",
         "effect" : {
             "desc" : "",
             "frequency" : "NEVER",
             "function" : "none"
         },
         "cmeffect" : {
-            "desc" : "Once per turn, you can recover the HP of members in play on your side by a total of 3 points.",
+            "desc" : "",
             "frequency" : "TURN",
             "function" : "none"
         }
@@ -85,5 +85,875 @@
             "restriction" : "ONCE",
             "function" : ""
         }
+    },{
+        "name" : "Mod Snivy",
+        "type" : "MEMBER",
+        "color" : "GRN",
+        "lvl" : 2, "hp" : 10, "atk" : 10, "def" : 10,
+        "boost" : "GMG",
+        "nerf" : "MTR",
+        "effect" : {
+            "desc" : "In your End Phase, points are added or subtracted from this card's Max HP, ATK, and DEF so that they are their average value (rounded down).",
+            "frequency" : "END",
+            "restriction" : "ONCE",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "Once per turn, you can invert the relative stat changes of an effect that would apply to this card, except for those which were caused by the effect of this card.",
+            "frequency" : "TURN",
+            "restriction" : "ONCE",
+            "function" : ""
+        }
+    },{
+        "name" : "123AwesomeDude",
+        "type" : "MEMBER",
+        "color" : "GRN",
+        "lvl" : 1, "hp" : 7, "atk" : 9, "def" : 10,
+        "boost" : "GMG",
+        "nerf" : "SRS",
+        "effect" : {
+            "desc" : "Once per turn, you can discard 2 cards to play a level 1 member with a base stat total of less than 24 directly from your deck, then shuffle it.",
+            "frequency" : "TURN",
+            "restriction" : "ONCE",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "Once per turn, if another member in play on your side has an effect applied to them by the opponent, you can lower the ATK of 2 opposing members by 1.",
+            "frequency" : "TURN",
+            "restriction" : "ONCE",
+            "function" : ""
+        }
+    },{
+        "name" : "Cameron",
+        "type" : "MEMBER",
+        "color" : "BLU",
+        "lvl" : 1, "hp" : 7, "atk" : 15, "def" : 3,
+        "boost" : "MDA",
+        "nerf" : "SRS",
+        "effect" : {
+            "desc" : "If this card goes offline in battle, damage is dealt to the last member that attacked it equal to half of that member's Max HP.",
+            "frequency" : "ONOFFLINE",
+            "restriction" : "ONCE",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "While this card is in play, members in play on your side are not affected by disadvantage.",
+            "frequency" : "ALWAYS",
+            "function" : ""
+        }
+    },{
+        "name" : "Jarate",
+        "type" : "MEMBER",
+        "color" : "YLW",
+        "lvl" : 1, "hp" : 15, "atk" : 3, "def" : 10,
+        "boost" : "MEM",
+        "nerf" : "MDA",
+        "effect" : {
+            "desc" : "This card takes half damage, rounded down, when set to Streaming.",
+            "frequency" : "ONSTREAM",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "In the Effect Phase, you can choose to decrease this card's DEF by any amount and add it to the ATK of another member on your side. Half of this amount, rounded up, is also dealt as damage to this card's HP, unless there is more than one Role Card with a color match assigned to it.",
+            "frequency" : "EFFECT",
+            "restriction" : "ONCE",
+            "function" : ""
+        }
+    },{
+        "name" : "Lord Redstar",
+        "type" : "MEMBER",
+        "color" : "RED",
+        "lvl" : 1, "hp" : 9, "atk" : 12, "def" : 7,
+        "boost" : "MDA",
+        "nerf" : "SRS",
+        "effect" : {
+            "desc" : "When this card is played, you can draw cards until you find a RED role or member, add it to your hand, and shuffle the rest of the cards you drew back into the deck.",
+            "frequency" : "ONPLAY",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "The ATK of all RED members in play on your side is increased by their level.",
+            "frequency" : "ALWAYS",
+            "function" : ""
+        }
+    },{
+        "name" : "Alex",
+        "type" : "MEMBER",
+        "color" : "PNK",
+        "lvl" : 1, "hp" : 8, "atk" : 8, "def" : 8,
+        "boost" : "MTR",
+        "nerf" : "MDA",
+        "effect" : {
+            "desc" : "In the Effect Phase, if iteitpoket is in play on your side, increase one of this card's stats by 1. If this card's effect increases Max HP, recover 1 HP as well.",
+            "frequency" : "EFFECT",
+            "restriction" : "ONCE",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "Stat increases applied to this card by its effect are also every other PNK member in play on your side.",
+            "frequency" : "ALWAYS",
+            "restriction" : "OTHER",
+            "function" : ""
+        }
+    },{
+        "name" : "April",
+        "type" : "MEMBER",
+        "color" : "RED",
+        "lvl" : 1, "hp" : 8, "atk" : 4, "def" : 15,
+        "boost" : "GMG",
+        "nerf" : "MDA",
+        "effect" : {
+            "desc" : "All roles assigned to this card are treated as giving a Color Match.",
+            "frequency" : "ALWAYS",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "If this card attacks an opposing member and it was attacked by that member in the previous turn, it can choose to do the same amount of damage to them.",
+            "frequency" : "ONATTACK",
+            "function" : ""
+        }
+    },{
+        "name" : "Cheese",
+        "type" : "MEMBER",
+        "color" : "BLU",
+        "lvl" : 1, "hp" : 14, "atk" : 2, "def" : 12,
+        "boost" : "MTR",
+        "nerf" : "MEM",
+        "effect" : {
+            "desc" : "When this card is in a MTR channel, all members in that channel have their DEF increased by 2. Once per turn, if this card is in a MTR channel and a card is played in the same channel, that card's ATK is increased by 2. This card has disadvantage in vaganias.",
+            "frequency" : "ALWAYS",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "While this card is in a MTR channel, its DEF is increased by 3 points. During the End Phase, if this card is in a MTR channel, it can recover 1 HP.",
+            "frequency" : "TURN",
+            "restriction" : "ONCE",
+            "function" : ""
+        }
+    },{
+        "name" : "Claire",
+        "type" : "MEMBER",
+        "color" : "GRY",
+        "lvl" : 1, "hp" : 8, "atk" : 7, "def" : 9,
+        "boost" : "GMG",
+        "nerf" : "SRS",
+        "effect" : {
+            "desc" : "If this member makes an opposing member go offline in battle and the damage dealt was less than the maximum considering both members' stats and any active effects, this member can deal the difference in damage to another opposing member with the same or less DEF than the member that was attacked.",
+            "frequency" : "ONDEFEAT",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "If this member attacks an opposing member, and any random element is involved, you can choose the outcome of the random selection.",
+            "frequency" : "ONATTACK",
+            "function" : ""
+        }
+    },{
+        "name" : "MrLuigiFan",
+        "type" : "MEMBER",
+        "color" : "BLU",
+        "lvl" : 1, "hp" : 8, "atk" : 10, "def" : 9,
+        "boost" : "MTR",
+        "nerf" : "MEM",
+        "effect" : {
+            "desc" : "Once per turn, you can swap the base ATK and DEF of 1 member in a MTR channel.",
+            "frequency" : "TURN",
+            "restriction" : "ONCE",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "This card treats opposing members as if they have no stat increases, unless the member has MTR advantage.",
+            "frequency" : "ALWAYS",
+            "function" : ""
+        }
+    },{
+        "name" : "Rise",
+        "type" : "MEMBER",
+        "color" : "BLU",
+        "lvl" : 1, "hp" : 13, "atk" : 7, "def" : 6,
+        "boost" : "MEM",
+        "nerf" : "SRS",
+        "effect" : {
+            "desc" : "When this card is played, you can draw cards until you find a meme card, then add it to your hand and shuffle the rest of the cards you drew back into the deck. While not in play, this card is treated as if it were a meme card as well as a member card.",
+            "frequency" : "ONPLAY",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "A random stat on this card is increased by 2. If Max HP is increased with this effect, this card also recovers 2 HP.",
+            "frequency" : "ONCM",
+            "function" : ""
+        }
+    },{
+        "name" : "Dan",
+        "type" : "MEMBER",
+        "color" : "GRN",
+        "lvl" : 1, "hp" : 13, "atk" : 3, "def" : 11,
+        "boost" : "SRS",
+        "nerf" : "MEM",
+        "effect" : {
+            "desc" : "This card has advantage in compy-386. While this card is in play on your side, your opponent cannot see the cards in your hand or deck through any card effects.",
+            "frequency" : "ALWAYS",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "While this card is in compy-386, all other members in the channel have their DEF increased by 3.",
+            "frequency" : "ALWAYS",
+            "function" : ""
+        }
+    },{
+        "name" : "ElectroTerra",
+        "type" : "MEMBER",
+        "color" : "YLW",
+        "effect" : {
+            "desc" : "",
+            "frequency" : "NEVER",
+            "function" : "none"
+        },
+        "cmeffect" : {
+            "desc" : "",
+            "frequency" : "NEVER",
+            "function" : "none"
+        }
+    },{
+        "name" : "18","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "19","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "20","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "21","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "22","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "23","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "24","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "25","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "Autumn",
+        "type" : "MEMBER",
+        "color" : "PPL",
+        "lvl" : 1, "hp" : 11, "atk" : 8, "def" : 6,
+        "boost" : "GMG",
+        "nerf" : "MTR",
+        "effect" : {
+            "desc" : "This card does not receive disadvantage in danglescussion. This card receives advantage in collab.",
+            "frequency" : "ALWAYS",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "If this card was attacked more than once in the previous turn, this card can attack every card that attacked it.",
+            "frequency" : "TURN",
+            "function" : ""
+        }
+    },{
+        "name" : "27","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "28","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "29","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "30","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "31","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "32","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "33","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "34","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "35","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "36","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "37","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "38","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "39","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "Polaris",
+        "type" : "MEMBER",
+        "color" : "PNK",
+        "lvl" : 1, "hp" : 9, "atk" : 6, "def" : 11,
+        "boost" : "MDA",
+        "nerf" : "MEM",
+        "effect" : {
+            "desc" : "During the Effect Phase, if this card is in a MEM or SRS channel, this card's ATK is increased by 1 and its DEF is decreased by 1. In the End Phase, if this card recovered any HP during the turn, this card recovers another 1 HP.",
+            "frequency" : "TURN",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "During the End Phase, you can deal damage to this card's HP to recover or deal damage to the HP of another member on either side equal to the amount of points dealt to this card, even if it would set this card to Offline.",
+            "frequency" : "TURN",
+            "function" : ""
+        }
+    },{
+        "name" : "41","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "Koiba",
+        "type" : "MEMBER",
+        "color" : "ORN",
+        "lvl" : 1, "hp" : 14, "atk" : 8, "def" : 6,
+        "boost" : "MTR",
+        "nerf" : "MEM",
+        "effect" : {
+            "desc" : "While this card is in play, all ORN members in play on your side have their ATK and DEF increased by their level.",
+            "frequency" : "ALWAYS",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "During the Effect Phase, you can discard 1 card from your hand to select one non-ORN member in play on your side. It will be treated as an ORN member until it goes offline.",
+            "frequency" : "EFFECT",
+            "function" : ""
+        }
+    },{
+        "name" : "43","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "44","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "45","type" : "UNDEFINED","color" : "NON",
+        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "da-rules",
+        "type" : "CHANNEL",
+        "subject" : "SRS",
+        "effect": {
+            "desc" : "Members in this channel with no roles assigned have their ATK increased by 2. When in play on your side, this card can be discarded to allow another Channel Card to be played in its place. Members in this channel with a SRS advantage do not gain advantage."
+        },
+        "adv" : {
+            "type" : "STATCHG",
+            "stat" : "ATK",
+            "amount" : 1
+        },
+        "disadv" : {
+            "type" : "STATCHG",
+            "stat" : "ATK",
+            "amount" : -1
+        }
+    },{
+        "name" : "bus-driver-chat",
+        "type" : "CHANNEL",
+        "subject" : "SRS",
+        "effect": {
+            "desc" : "Roles in this channel can also be assigned to members not in this channel. Members in this channel with a SRS advantage do not gain advantage."
+        },
+        "adv" : {
+            "desc" : "While an affected member is in play in this channel, more than one role can be played in this channel in the same turn.",
+            "type" : "EFFECT",
+            "name" : "ROLEPLUS"
+        },
+        "disadv" : {
+            "desc" : "While an affected member is in play in this channel, roles cannot be played.",
+            "type" : "EFFECT",
+            "name" : "NOROLE"
+        }
+    },{
+        "name" : "ultimatechatofcoolstuff",
+        "type" : "CHANNEL",
+        "subject" : "OTR",
+        "effect": {
+            "desc" : "Members in this channel set to 'Streaming' cannot be attacked by every opposing member in one turn."
+        },
+        "adv" : {
+            "desc" : "If there is exactly one other member in play on your side set to Streaming, an affected member can be set to Streaming anyway.",
+            "type" : "EFFECT",
+            "name" : "STREAM"
+        },
+        "disadv" : {
+            "desc" : "Affected members cannot be set to Streaming. If they are already set to Streaming, they are set to Online.",
+            "type" : "EFFECT",
+            "name" : "NOSTREAM"
+        }
+    },{
+        "name" : "49","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "50","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "51","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "52","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "53","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "54","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "55","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "56","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "57","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "58","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "59","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "60","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "61","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "62","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "63","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "64","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "65","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "66","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "67","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "68","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "69","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "70","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "71","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "72","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "73","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "74","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "75","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "76","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "77","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "78","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "79","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "80","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "81","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "82","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "83","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "84","type" : "CHANNEL","subject" : "OTR",
+        "effect": {"desc" : ""},
+        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
+        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+    },{
+        "name" : "3/4ths cup difficulty 2 out of 5",
+        "type" : "ROLE",
+        "color" : "RED",
+        "effect": {
+            "desc" : "Members with this role have their ATK increased by 2, but can only attack the opposing member/s with the most remaining HP.",
+            "type" : "STATCHG",
+            "stat" : "ATK",
+            "amount" : 2
+        }
+    },{
+        "name" : "Sliced Bread",
+        "type" : "ROLE",
+        "color" : "RED",
+        "effect": {
+            "desc" : "In the End Phase, if a member with this role recovered HP during the turn, they recover 1HP.",
+            "type" : "EFFECT",
+            "name" : "HEALONE"
+        }
+    },{
+        "name" : "Pierogi Dealer",
+        "type" : "ROLE",
+        "color" : "RED",
+        "effect": {
+            "desc" : "During the End Phase, if a member with this role did not attack during the turn, you can recover 2 points of HP to one member in play on your side.",
+            "type" : "EFFECT",
+            "name" : ""
+        }
+    },{
+        "name" : "88","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "89","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "90","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "91","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "92","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "93","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "94","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "95","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "96","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "97","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "98","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "99","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "100","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "101","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "102","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "103","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "104","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "105","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "106","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "107","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "108","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "109","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "110","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "111","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "112","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "113","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "114","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "115","type" : "ROLE","color" : "RED",
+        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+    },{
+        "name" : "Pauline",
+        "type" : "MEME",
+        "category" : "NML",
+        "effect" : {
+            "desc" : "When this card is played, search your deck for Pauline, add it to your hand, and shuffle your deck."
+        }
+    },{
+        "name" : "*shrugs*",
+        "type" : "MEME",
+        "category" : "RSP",
+        "effect" : {
+            "desc" : "Cancel the application of an effect."
+        }
+    },{
+        "name" : "Least Favorite Name",
+        "type" : "MEME",
+        "category" : "RSP",
+        "effect" : {
+            "desc" : "Select one member in play on your opponent's side. They no longer have a name."
+        }
+    },{
+        "name" : "SeeS",
+        "type" : "MEME",
+        "category" : "NML",
+        "effect" : {
+            "desc" : "If you and your opponent have the same number of cards in your hands (not counting this card), show each other your hands."
+        }
+    },{
+        "name" : "Pierogi Dealership",
+        "type" : "MEME",
+        "category" : "NML",
+        "effect" : {
+            "desc" : "Select one member in play on your side. It cannot attack for the rest of the turn. Recover HP to all other members in play on your side equal to the level of the selected member."
+        }
+    },{
+        "name" : "What Would It Be Like If House?",
+        "type" : "MEME",
+        "category" : "CTN",
+        "effect" : {
+            "desc" : "Select one member. For the next 3 turns, its advantages and disadvantages are swapped."
+        }
+    },{
+        "name" : "Goodra Waifu",
+        "type" : "MEME",
+        "category" : "CTN",
+        "effect" : {
+            "desc" : "When this card is played, a virtual member is played. It is PPL, at level 2, with 9 Max HP, 10 ATK, and 11 DEF. If Snivy is in play on your side, increase his ATK and DEF by 2.",
+            "member" : {
+                "color" : "PPL",
+                "lvl" : 2, "hp" : 9, "atk" : 10, "def" : 11
+            }
+        }
+    },{
+        "name" : "Eggman's Glorious Tongue Face",
+        "type" : "MEME",
+        "category" : "RSP",
+        "effect" : {
+            "desc" : "Activate in response to an opposing member attacking a member in play on your side. The opposing member gains disadvantage in the channel they are in, and lose any advantage they already have in that channel, for 3 turns."
+        }
+    },{
+        "name" : "Bepsi",
+        "type" : "MEME",
+        "category" : "NML",
+        "effect" : {
+            "desc" : "Fully recover the HP of one member in play on your side."
+        }
+    },{
+        "name" : "125","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "126","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "127","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "128","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "129","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "130","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "131","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "132","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "133","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "134","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "135","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "136","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "137","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "138","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "139","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "140","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "141","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "142","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "143","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "144","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "145","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "146","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "147","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "148","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "149","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "150","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
+    },{
+        "name" : "151","type" : "MEME","category" : "NML",
+        "effect" : {"desc" : ""}
     }
 ]

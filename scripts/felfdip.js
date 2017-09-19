@@ -27,6 +27,7 @@ class CardObject {
         this.obj.angle = 90;
         if(op) { this.obj.angle *= -1; }
         this.card = card;
+        this.revealed = !this.isOpponents;
         card.obj = this;
         this.game = game;
         this.ls = Client;
@@ -39,6 +40,7 @@ class CardObject {
         var local = this.ls.cardsys.duel.local;
         var duel = this.ls.cardsys.duel;
         if(this.isOpponents) {
+            if(!this.revealed) return;
             this.state.obj.pv.x = this.game.world.centerX;
             this.state.obj.pv.y = this.game.world.centerY;
             this.state.obj.pv.key = 'cards';
@@ -112,6 +114,10 @@ class CardObject {
     }
 
     update() {
+        if(this.revealed !== true) {
+            this.obj.frame = UNDEFINED_CARD_INDEX;
+            return;
+        }
         if(this.card.index > 0 && this.card.index < CardIndex.length) {
             this.obj.frame = this.card.index - 1;
         } else {
@@ -141,7 +147,7 @@ function getRandomInt(min, max) {
 }
 
 function calcDamage(atk, def) {
-    var dmg = (atk * 1.5) - (def * 1.5);
+    var dmg = Math.round((atk * 1.5) - (def * 1.5));
     if(dmg < 1) dmg = 1;
     return dmg;
 }
@@ -151,7 +157,7 @@ function random_deck() {
     var cards = 40;
     var deck = new Deck();
     for(i = 0; i < cards; i++) {
-        var n = getRandomInt(1, 5);
+        var n = getRandomInt(1, 152);
         var c = new Card();
         c.set_index(n);
         deck.add(c);
@@ -161,6 +167,23 @@ function random_deck() {
 
 function loadCardData(str) {
     CardIndex = JSON.parse(str);
+}
+
+function validSlot(card, slot, duel) {
+    if(!slot.empty()) return false;
+    if(card.type === CardType.CHANNEL && slot.type === SlotType.CHANNEL) {
+        return true;
+    }
+    if((card.type === CardType.ROLE || card.type === CardType.MEMBER) && 
+        slot.type === SlotType.MEMROLE
+    ) {
+        if(card.type === CardType.MEMBER && 
+            card.lvl > 1) return (
+                duel.local.getLevelOneMembers().length > card.lvl - 2
+            );
+        return true; 
+    }
+    return false;
 }
 
 const SlotType = {
@@ -211,9 +234,12 @@ class Slot {
         if(duel.local.selected !== null) {
             var local = duel.local;
             var cobj = local.selected.obj;
-            cobj.move({x: this.obj.x, y: this.obj.y});
-            this.card = cobj;
-            cobj.slot = this;
+            var c = local.selected;
+            if(validSlot(c, this, duel)) {
+                cobj.move({x: this.obj.x, y: this.obj.y});
+                this.card = cobj;
+                cobj.slot = this;
+            }
         }
     }
 
@@ -222,6 +248,17 @@ class Slot {
         var player = duel.player;
         if(duel.turn !== player) {
             this.obj.frame = 1;
+        }
+        if(duel.local.selected !== null) {
+            if(duel.local.selected === this.card) {
+                this.obj.frame = 0;
+                return;
+            }
+            if(validSlot(duel.local.selected, this, duel)) {
+                this.obj.frame = 2;
+            } else {
+                this.obj.frame = 1;
+            }
         }
     }
 }
