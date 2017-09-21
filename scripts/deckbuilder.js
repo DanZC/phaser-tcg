@@ -28,7 +28,7 @@ Builder.create = function() {
     Builder.cards = game.add.group(game.world, "cards", false, false, false);
     obj = [];
 
-    var deck = Client.cardsys.player.deck;
+    var deck = Client.cardsys.deck[0];
     if(deck.card.length >= 40) {
         pageMax = 3;
     } else {

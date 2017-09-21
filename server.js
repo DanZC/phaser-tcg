@@ -5,12 +5,18 @@ var io = require('socket.io').listen(server);
 
 //require('./scripts/card.js');
 
+//Setup static directories.
 app.use('/css',express.static(__dirname + '/css'));
 app.use('/scripts',express.static(__dirname + '/scripts'));
 app.use('/assets',express.static(__dirname + '/assets'));
 
+//Set root domain as index.html
 app.get('/',function(req,res){
     res.sendFile(__dirname+'/index.html');
+});
+
+var ai = require('child_process').fork('./ai.js', [], {
+    stdio: 'pipe'
 });
 
 CardIndex = [];
@@ -46,6 +52,15 @@ function isMatchIDUsed(id) {
     return false;
 }
 
+function copy(obj) {
+    if (null == obj || "object" != typeof obj) return obj;
+    var copy = obj.constructor();
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    }
+    return copy;
+}
+
 const DuelPhase = {
     WAIT : 0,
     DRAW : 1,
@@ -71,12 +86,12 @@ class MatchState {
                 {index: -1}
             ],
             members: [
-                {index: -1},
-                {index: -1},
-                {index: -1},
-                {index: -1},
-                {index: -1},
-                {index: -1}
+                {index: -1, role: -1},
+                {index: -1, role: -1},
+                {index: -1, role: -1},
+                {index: -1, role: -1},
+                {index: -1, role: -1},
+                {index: -1, role: -1}
             ],
             channels: [
                 {index: -1, member: 0},
@@ -96,12 +111,12 @@ class MatchState {
                 {index: -1}
             ],
             members: [
-                {index: -1},
-                {index: -1},
-                {index: -1},
-                {index: -1},
-                {index: -1},
-                {index: -1}
+                {index: -1, role: -1},
+                {index: -1, role: -1},
+                {index: -1, role: -1},
+                {index: -1, role: -1},
+                {index: -1, role: -1},
+                {index: -1, role: -1}
             ],
             channels: [
                 {index: -1, member: 0},
@@ -121,10 +136,23 @@ const AIDifficulty = {
 class AI {
     constructor(bot) {
         this.difficulty = AIDifficulty.NORMAL;
+        this.bot = bot;
     }
 
-    doTurn(state) {
-        server.ai.emit('ai', state)
+    doTurn(state, id) {
+        var oid = 'b';
+        if(id === 'b') oid = 'a';
+        ai.send({
+            type: 'ai',
+            match: {
+                id: this.bot.match.id
+            },
+            state: {
+                self: copy(state[id]),
+                opponent: copy(state[oid]),
+                phase: state.phase
+            }
+        })
     }
 }
 
@@ -161,7 +189,7 @@ class Match {
             this.a.socket.emit('end turn');
         }
         if(this.b.bot === true) {
-            this.b.ai.doTurn(this.state);
+            this.b.ai.doTurn(this.state, "b");
         }
     }
 
@@ -245,14 +273,18 @@ server.ai = null;
 server.matches = [];
 server.players = [];
 
-var ln = io.of('/local');
-ln.on('connection',function(socket){
-    socket.on('ai ready',function(){
-        socket.join('ai');
-        server.ai = socket;
-    });
+ai.on('message', function(data){
+if(data.type === 'handshake') {
+    console.log('Handshake with ai server.');
+} else if(data.type === 'ai callback') {
+    console.log('AI Callback.')
+}
+});
 
-    socket.on('ai callback',function(match, moves){
+ai.on('close', (code) => {
+    console.log('ai module closed with a code of ' + code);
+    ai = fork('./ai.js', [], {
+        stdio: 'pipe'
     });
 });
 

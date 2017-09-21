@@ -79,7 +79,8 @@ class DuelState {
     }
 
     effectPhase() {
-        
+        Client.chat.write('DEBUG: Skipping effect phase...')
+        this.phase = DuelPhase.ACTION;
     }
 
     doMoves(moves) {
