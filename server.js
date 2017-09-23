@@ -350,10 +350,10 @@ io.on('connection',function(socket){
         if(socket.rooms.length > 0) {
             for(room in socket.rooms) {
                 var r = socket.rooms[room];
-                io.to(r).emit('chat message', fmsg);
+                io.to(r).emit('chat message', socket.player.name, msg);
             }
         } else {
-            io.emit('chat message', fmsg);
+            io.emit('chat message', socket.player.name, msg);
         }
     });
 

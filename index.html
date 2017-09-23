@@ -146,8 +146,12 @@
                 $('.username').text('@' + $('input#name').val());
                 return false;
             });
-            Client.socket.on('chat message', function(msg){
-                $('#messages').append($('<li>').text(msg));
+            Client.socket.on('chat message', function(player, msg){
+                $('#messages').append(
+                    $('<li>').append(
+                        $('<b>').text(player)
+                    ).append(': ' + msg)
+                );
             });
             Client.socket.on('cred callback', function(result){
                 if(result) {

@@ -60,6 +60,88 @@ Game.create = function() {
         y : 385
     }]
     ];
+
+    //Woah that's a big list of coordinates!
+    var mbpos = [
+    [{
+        x : -330,
+        y : 304
+    },{
+        x : -288,
+        y : 192
+    },{
+        x : -330,
+        y : 80
+    },{
+        x : -330,
+        y : -28
+    },{
+        x : -288,
+        y : -140
+    },{
+        x : -330,
+        y : -252
+    }],[{
+        x : -440,
+        y : 193
+    },{
+        x : -440,
+        y : -141
+    },{
+        x : -440,
+        y : -141
+    },{
+        x : -440,
+        y : -141
+    },{
+        x : -440,
+        y : -141
+    },{
+        x : -440,
+        y : -141
+    }]
+    ];
+
+    var mempos = [
+    [{
+        x : -177,
+        y : 302
+    },{
+        x : -135,
+        y : 190
+    },{
+        x : -177,
+        y : 78
+    },{
+        x : -177,
+        y : -31
+    },{
+        x : -135,
+        y : -143
+    },{
+        x : -177,
+        y : -255
+    }],[{
+        x : -440,
+        y : 193
+    },{
+        x : -440,
+        y : -141
+    },{
+        x : -440,
+        y : -141
+    },{
+        x : -440,
+        y : -141
+    },{
+        x : -440,
+        y : -141
+    },{
+        x : -440,
+        y : -141
+    }]
+    ];
+
     var offlinepos = [{
         x : -440,
         y : -365
@@ -97,6 +179,34 @@ Game.create = function() {
     cardsys.duel.local.slots['OFFLINE'] = soll;
     soll.name = 'OFFLINE';
     slots.add(soll.obj);
+
+    var smbl = [
+        new Slot(mbpos[0][0], SlotType.MEMROLE, false),
+        new Slot(mbpos[0][1], SlotType.MEMROLE, false),
+        new Slot(mbpos[0][2], SlotType.MEMROLE, false),
+        new Slot(mbpos[0][3], SlotType.MEMROLE, false),
+        new Slot(mbpos[0][4], SlotType.MEMROLE, false),
+        new Slot(mbpos[0][5], SlotType.MEMROLE, false)
+    ];
+    for( i in smbl ) {
+        cardsys.duel.local.slots['MEM' + i] = smbl[i];
+        smbl[i].name = 'MEM' + i;
+        slots.add(smbl[i].obj);
+    }
+
+    var smml = [
+        new Slot(mempos[0][0], SlotType.MEME, false),
+        new Slot(mempos[0][1], SlotType.MEME, false),
+        new Slot(mempos[0][2], SlotType.MEME, false),
+        new Slot(mempos[0][3], SlotType.MEME, false),
+        new Slot(mempos[0][4], SlotType.MEME, false),
+        new Slot(mempos[0][5], SlotType.MEME, false)
+    ];
+    for( i in smml ) {
+        cardsys.duel.local.slots['MEME' + i] = smml[i];
+        smml[i].name = 'MEME' + i;
+        slots.add(smml[i].obj);
+    }
 
     cards = game.add.group(game.world, "cards", false, false, false);
 

@@ -9,7 +9,17 @@ Client.cardsys = null;
 Client.chat = {};
 
 Client.chat.write = function(msg) {
-    $('#messages').append($('<li>').text(msg));
+    $('#messages').append(
+        $('<li>').append(
+            $('<i>').text(msg)
+        )
+    );
+};
+
+Client.chat.writeDebug = function(msg) {
+    $('#messages').append(
+        $('<li>').text(msg)
+    );
 };
 
 Client.chat.clearAll = function() {

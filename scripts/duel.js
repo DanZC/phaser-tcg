@@ -35,13 +35,13 @@ class SideState {
     }
 
     getLevelOneMembers() {
-        members = [];
+        var mems = [];
         for(i in this.members) {
             if(this.members[i] !== null) {
-                members.push(this.members[i]);
+                mems.push(this.members[i]);
             }
         }
-        return members;
+        return mems;
     }
 }
 

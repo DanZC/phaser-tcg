@@ -32,6 +32,7 @@ class CardObject {
         this.game = game;
         this.ls = Client;
         this.slot = slot;
+        this.channel = null;
         this.state = game.state.getCurrentState();
         this.parent.add(this.obj);
     }
@@ -102,7 +103,7 @@ class CardObject {
 
     move(dest) {
         //var distance = Phaser.Math.distance(this.obj.x, this.obj.y, dest.x, dest.y);
-        var duration = 300;
+        var duration = 250;
         var local = this.ls.cardsys.duel.local;
         local.selected = null;
         this.obj.input.enabled = false;
@@ -238,7 +239,11 @@ class Slot {
             if(validSlot(c, this, duel)) {
                 cobj.move({x: this.obj.x, y: this.obj.y});
                 this.card = cobj;
+                if(cobj.slot !== null) {
+                    cobj.slot.card = null;
+                }
                 cobj.slot = this;
+                local.selected = null;
             }
         }
     }
@@ -259,6 +264,8 @@ class Slot {
             } else {
                 this.obj.frame = 1;
             }
+        } else {
+            this.obj.frame = 0;
         }
     }
 }
