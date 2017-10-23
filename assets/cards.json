@@ -24,12 +24,28 @@
             "name" : "Bikdip's Glory",
             "desc" : "In the Effect Phase, if this card did not take damage in battle in the previous turn, increase two stats of one member in play on your side by 1. If Max HP is increased with this effect, recover 1 point of HP to the member.",
             "frequency" : "EFFECT",
-            "function" : "BikdipGlory"
+            "function" : {
+                "onPlay":0,
+                "onAttack":0,
+                "onDefend":0,
+                "effect":1,
+                "onDefeat":0,
+                "onOffline":0,
+                "onStream":0
+            }
         },
         "cmeffect" : {
             "desc" : "You can always set this card to Streaming. Whenever this card is set to Streaming, all other members set to Streaming are set to Online.",
             "frequency" : "ONSTREAM",
-            "function" : "AttentionGrabber"
+            "function" : {
+                "onPlay":0,
+                "onAttack":0,
+                "onDefend":0,
+                "effect":1,
+                "onDefeat":0,
+                "onOffline":0,
+                "onStream":2
+            }
         }
     },{
         "name" : "Martin",
@@ -303,48 +319,83 @@
         "name" : "ElectroTerra",
         "type" : "MEMBER",
         "color" : "YLW",
-        "effect" : {
-            "desc" : "",
-            "frequency" : "NEVER",
-            "function" : "none"
-        },
-        "cmeffect" : {
-            "desc" : "",
-            "frequency" : "NEVER",
-            "function" : "none"
-        }
-    },{
-        "name" : "18","type" : "UNDEFINED","color" : "NON",
+        "lvl" : 1, "hp" : 10, "atk" : 8, "def" : 10,
+        "boost" : "MDA",
+        "nerf" : "SRS",
         "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
         "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "19","type" : "UNDEFINED","color" : "NON",
+        "name" : "Kif",
+        "type" : "MEMBER",
+        "color" : "PPL",
+        "lvl" : 1, "hp" : 6, "atk" : 13, "def" : 8,
+        "boost" : "MTR",
+        "nerf" : "MDA",
         "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
         "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "20","type" : "UNDEFINED","color" : "NON",
+        "name" : "Steak",
+        "type" : "MEMBER",
+        "color" : "NON",
+        "lvl" : 1, "hp" : 15, "atk" : 5, "def" : 8,
+        "boost" : "MTR",
+        "nerf" : "MDA",
         "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
         "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "21","type" : "UNDEFINED","color" : "NON",
+        "name" : "Jade",
+        "type" : "MEMBER",
+        "color" : "PNK",
+        "lvl" : 1, "hp" : 8, "atk" : 8, "def" : 10,
+        "boost" : "MDA",
+        "nerf" : "MTR",
         "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
         "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "22","type" : "UNDEFINED","color" : "NON",
+        "name" : "Jirachibi",
+        "type" : "MEMBER",
+        "color" : "RED",
+        "lvl" : 1, "hp" : 6, "atk" : 12, "def" : 6,
+        "boost" : "MTR",
+        "nerf" : "SRS",
         "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
         "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "23","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "Juanson",
+        "type" : "MEMBER",
+        "color" : "PPL",
+        "lvl" : 1, "hp" : 15, "atk" : 12, "def" : 1,
+        "boost" : "GMG",
+        "nerf" : "MTR",
+        "effect" : {"desc" : "When this card is played, you can select one opposing member. All of their stat changes are halved.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "Once per turn, you can change the target of this card's main effect.","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "24","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "FL4SHK",
+        "type" : "MEMBER",
+        "color" : "ORN",
+        "lvl" : 1, "hp" : 9, "atk" : 8, "def" : 8,
+        "boost" : "compy386",
+        "nerf" : "MTR",
+        "effect" : {"desc" : "If this card causes an opposing member to go offline, you can draw cards until you draw a role card that matches color with this card, add it to your hand, and shuffle the rest of the cards you drew back into the deck.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "In the End Phase, if this card is not online, its ATK is increased by the number of times advantage effects were applied on your side, and it is decreased by the number of times disadvantage effects were applied on your side, including any caused by this card.","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "25","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "MathPhysicsNerd",
+        "type" : "MEMBER",
+        "color" : "BLU",
+        "lvl" : 1, "hp" : 12, "atk" : 4, "def" : 8,
+        "boost" : "SRS",
+        "nerf" : "MEM",
+        "effect" : {"desc" : "When this card is played, two random members in play have two of their stats swapped at random.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "Once every opponent's turn, this card can change the target of an effect applied by a member in play on their side.","frequency" : "NEVER","function" : "none"}
+    },{
+        "name" : "Luzu",
+        "type" : "MEMBER",
+        "color" : "ORN",
+        "lvl" : 1, "hp" : 11, "atk" : 5, "def" : 11,
+        "boost" : "SRS",
+        "nerf" : "MTR",
+        "effect" : {"desc" : "Every turn, this card can attack as many times as there are roles assigned to it, +1.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "If this card makes an opposing member go offline in battle, you can draw cards until you draw a role, add it to your hand, and shuffle the rest of the cards you drew back into the deck.","frequency" : "NEVER","function" : "none"}
     },{
         "name" : "Autumn",
         "type" : "MEMBER",
@@ -367,7 +418,12 @@
         "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
         "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "28","type" : "UNDEFINED","color" : "NON",
+        "name" : "Nico Beans",
+        "type" : "MEMBER",
+        "color" : "PPL",
+        "lvl" : 1, "hp" : 13, "atk" : 10, "def" : 5,
+        "boost" : "MEM",
+        "nerf" : "SRS",
         "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
         "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
     },{
@@ -955,5 +1011,21 @@
     },{
         "name" : "151","type" : "MEME","category" : "NML",
         "effect" : {"desc" : ""}
+    },{
+        "name" : "Bargo the Bikdip",
+        "color" : "GRN",
+        "lvl" : 3, "hp" : 10, "atk" : 16, "def" : 2,
+        "boost" : "MDA",
+        "nerf" : "SRS",
+        "effect" : {
+            "desc" : "Twice per game, in the End Phase, you can choose to fully recover this card's HP.",
+            "frequency" : "NEVER",
+            "function" : "none"
+        },
+        "cmeffect" : {
+            "desc" : "",
+            "frequency" : "NEVER",
+            "function" : "none"
+        }
     }
 ]

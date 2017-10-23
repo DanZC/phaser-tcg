@@ -111,7 +111,10 @@ if(m.type === 'ai'){
         return moves;
     }
     var moves = doAI(m.state);
-    emit('ai callback', { match:m.match, moves:moves });
+    emit('ai callback', { 
+        match: m.match, 
+        moves: moves
+    });
 }});
 
 process.send({type: 'handshake'});

@@ -11,14 +11,14 @@ Client.chat = {};
 Client.chat.write = function(msg) {
     $('#messages').append(
         $('<li>').append(
-            $('<i>').text(msg)
+            $('<i>').text(escapeHtml(msg))
         )
     );
 };
 
 Client.chat.writeDebug = function(msg) {
     $('#messages').append(
-        $('<li>').text(msg)
+        $('<li>').text(escapeHtml(msg))
     );
 };
 
@@ -74,6 +74,7 @@ Client.socket.on('matchmake callback',function(data){
 Client.socket.on('matchmake end',function(data){
     Client.chat.clearAll();
     Client.chat.write("Creating a new AI game...");
+    Client.cardsys.duel = new DuelState(Client.cardsys.player, new Player());
     Client.game.state.start("Game",true,false,Client.game,{type: GameType.RandomMatch});
 });
 
@@ -89,7 +90,7 @@ Client.socket.on('move get',function(state){
 
 Client.socket.on('request info', (fn) => {
     fn({
-        deck: Client.cardsys.duel.player.deck.rawcopy()
+        deck: Client.cardsys.player.deck.rawcopy()
     });
 });
 

@@ -125,6 +125,13 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
         <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
         <script src="scripts/cookie.js"></script>
+        <script>
+            // Use the browser's built-in functionality to quickly and safely escape
+            // the string
+            function escapeHtml(str) {
+                return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+            }
+        </script>
         <script src="scripts/client.js"></script>
         <script>
           $(function () {
@@ -149,8 +156,8 @@
             Client.socket.on('chat message', function(player, msg){
                 $('#messages').append(
                     $('<li>').append(
-                        $('<b>').text(player)
-                    ).append(': ' + msg)
+                        $('<b>').text(escapeHtml(player))
+                    ).append(': ' + escapeHtml(msg))
                 );
             });
             Client.socket.on('cred callback', function(result){
