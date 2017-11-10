@@ -24,6 +24,9 @@ Game.init = function(game, data){
 Game.preload = function() {
     this.game.load.spritesheet('cards', 'assets/cards.png',412,562);
     this.game.load.spritesheet('cardmask', 'assets/cardmask.png',412,562);
+    this.game.load.spritesheet('buttons3', 'assets/buttons3.png',248,77);
+    this.game.load.image('prompt1', 'assets/Prompt1.png');
+    this.game.load.image('close', 'assets/close.png');
     this.game.load.image('logo', 'assets/back_test_new3.png');
 };
 
@@ -224,13 +227,56 @@ Game.create = function() {
         game.world.centerY, 
         'cards',
         function() {
-            this.x = -1000;
+            obj.pv.x = -1000;
         },
-        obj.pv
+        this
     );
     obj.pv.anchor.setTo(0.5, 0.5);
     obj.pv.x = -1000;
     obj.pv.frame = d.index;
+
+    var prompt = game.add.sprite(game.world.centerX, game.world.centerY, 'prompt1');
+    prompt.anchor.setTo(0.5, 0.5);
+    prompt.x = -900;
+    prompt.yes = game.add.button(
+        game.world.centerX - (248 / 2),
+        game.world.centerY + 77,
+        'buttons3',
+        function() {
+            Client.game.state.start('Title',true,false,game);
+        },
+        prompt.yes
+    )
+    prompt.yes.anchor.setTo(0.5, 0.5);
+    prompt.yes.x = -900;
+    prompt.yes.frame = 1;
+    prompt.no = game.add.button(
+        game.world.centerX + (248 / 2),
+        game.world.centerY + 77,
+        'buttons3',
+        function() {
+            prompt.x = -900;
+            prompt.yes.x = -900;
+            prompt.no.x = -900;
+        },
+        this
+    )
+    prompt.no.anchor.setTo(0.5, 0.5);
+    prompt.no.x = -900;
+    prompt.no.frame = 2;
+
+    obj.close = game.add.button(
+        0, 
+        0, 
+        'close',
+        function() {
+            prompt.x = game.world.centerX;
+            prompt.yes.x = game.world.centerX - (248 / 2);
+            prompt.no.x = game.world.centerX + (248 / 2);
+        },
+        this
+    );
+
     Client.chat.write("Joined an AI game.");
 };
 
