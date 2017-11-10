@@ -75,7 +75,7 @@ class Deck {
         for(i in this.card) {
             var c = new Card();
             c.set_index(this.card[i].index);
-            add(c);
+            d.add(c);
         }
         return d;
     }

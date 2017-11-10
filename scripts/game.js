@@ -244,6 +244,7 @@ Game.create = function() {
         'buttons3',
         function() {
             Client.game.state.start('Title',true,false,game);
+            Client.cardsys.reset();
         },
         prompt.yes
     )
