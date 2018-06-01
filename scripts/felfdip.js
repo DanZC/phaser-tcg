@@ -153,6 +153,7 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
+//Damage calculation function
 function calcDamage(atk, def) {
     var dmg = Math.round((atk * 1.5) - (def * 1.5));
     if(dmg < 1) dmg = 1;
@@ -176,6 +177,7 @@ function loadCardData(str) {
     CardIndex = JSON.parse(str);
 }
 
+//Returns whether a card can be moved to a slot.
 function validSlot(card, slot, duel) {
     if(!slot.empty()) return false;
     if(card.type === CardType.CHANNEL && slot.type === SlotType.CHANNEL) {
@@ -208,12 +210,19 @@ const SlotFrame = {
     OPEN : 2
 }
 
+//Card slot object.
 class Slot {
     constructor(pos, type, op) {
         this.type = type;
+		
+		//Whether the slot is controlled by the opponent.
         this.isOpponents = op;
+		
+		//The card that is in this slot.
         this.card = null;
         var game = Client.game;
+		
+		//The button object.
         this.obj = game.add.button(
             game.world.centerX + pos.x, 
             game.world.centerY + pos.y, 
@@ -226,14 +235,18 @@ class Slot {
         this.obj.width = 104;
         this.obj.angle = 90;
         this.obj.frame = SlotFrame.UNDEFINED;
+		
+		//The name of the slot.
         this.name = "";
         this.ls = Client;
     }
 
+	//Returns true if a card is not in this slot. False otherwise.
     empty() {
         return (this.card === null);
     }
 
+	//Called when the user clicks the card slot.
     click() {
         var duel = this.ls.cardsys.duel;
         var player = duel.player;
@@ -276,10 +289,16 @@ class Slot {
     }
 }
 
+//Player data object.
 class Player {
     constructor() {
+		//The player's active deck.
         this.deck = random_deck();
+		
+		//The player's current active duel.
         this.duel = null;
+		
+		//The player's registered name.
         this.name = null;
     }
 }

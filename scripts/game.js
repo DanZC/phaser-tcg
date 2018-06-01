@@ -21,6 +21,7 @@ Game.init = function(game, data){
     this.type = data.type;
 };
 
+//Preloads data from files.
 Game.preload = function() {
     this.game.load.spritesheet('cards', 'assets/cards.png',412,562);
     this.game.load.spritesheet('cardmask', 'assets/cardmask.png',412,562);

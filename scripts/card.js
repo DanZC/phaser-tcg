@@ -7,8 +7,10 @@ const CardType = {
     MEME : 4
 };
 
+//The bottom left-most card in cards.png. It is the same texture rect used for facedown cards.
 const UNDEFINED_CARD_INDEX = 159;
 
+//Empty list populated at runtime by the cards defined in assets/cards.json
 CardIndex = []
 
 const CardColor = {
@@ -45,6 +47,7 @@ class Card {
         };
     }
 
+	//Sets the card index.
     set_index(index) {
         this.index = index;
         this.update();
@@ -70,6 +73,7 @@ class Deck {
         this.card = [];
     }
 
+	//Creates a copy of the deck.
     copy() {
         var d = new Deck();
         for(i in this.card) {
@@ -80,6 +84,7 @@ class Deck {
         return d;
     }
 
+	//Create a raw copy of a list of cards in the deck.
     rawcopy() {
         var d = [];
         for(i in this.card) {
@@ -96,14 +101,17 @@ class Deck {
         }
     }
 
+	//Pushes a card into the deck.
     add(card) {
         this.card.push(card);
     }
 
+	//Returns the top of the deck.
     get_top() {
         return this.card[this.card.length - 1]
     }
 
+	//Shuffles the deck.
     shuffle() {
         var len = this.card.length;
         for(i = len-1; i > 1; i--) {
@@ -114,10 +122,12 @@ class Deck {
         }
     }
 
+	//Removes the card at the top of the deck and returns it.
     draw() {
         return this.card.pop();
     }
 
+	//Updates the cards.
     update() {
         for(var i in this.card) {
             this.card[i].update();

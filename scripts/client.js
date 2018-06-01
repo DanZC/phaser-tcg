@@ -1,6 +1,8 @@
+//Creates a client object.
 var Client = {};
 Client.ls = {}
 
+//Connects to the server.
 Client.socket = io.connect();
 Client.load = false;
 Client.game = null;
@@ -94,6 +96,7 @@ Client.socket.on('request info', (fn) => {
     });
 });
 
+//When the client disconnects with the server.
 Client.socket.on('disconnect',function(){
     Client.chat.write("Oops... There seems to be a connection issue.");
 });

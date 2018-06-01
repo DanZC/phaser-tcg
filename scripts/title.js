@@ -44,5 +44,14 @@ Title.create = function() {
         this
     );
     bDB.frame = 3;
+	var bDB = this.game.add.button(
+        0,384,
+        'buttons',
+        function() {
+            this.game.state.start("Rulebook",true,false,this.game);
+        },
+        this
+    );
+    bDB.frame = 4;
 }
 

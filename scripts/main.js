@@ -6,6 +6,7 @@ window.onload = function() {
     game.state.add('Game',Game);
     game.state.add('Title',Title);
     game.state.add('Builder',Builder);
+	game.state.add('Rulebook',Rulebook);
 
     if (username != "") {
         Client.askReturnPlayer(username);
