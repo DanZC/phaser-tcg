@@ -26,6 +26,7 @@ Game.preload = function() {
     this.game.load.spritesheet('cards', 'assets/cards.png',412,562);
     this.game.load.spritesheet('cardmask', 'assets/cardmask.png',412,562);
     this.game.load.spritesheet('buttons3', 'assets/buttons3.png',248,77);
+    this.game.load.spritesheet('battlebtn', 'assets/battlebtns.png',128,128);
     this.game.load.image('prompt1', 'assets/Prompt1.png');
     this.game.load.image('close', 'assets/close.png');
     this.game.load.image('logo', 'assets/back_test_new3.png');
@@ -235,6 +236,8 @@ Game.create = function() {
     obj.pv.anchor.setTo(0.5, 0.5);
     obj.pv.x = -1000;
     obj.pv.frame = d.index;
+
+    var battle_button = game.add.sprite(32,0, 'battlebtn');
 
     var prompt = game.add.sprite(game.world.centerX, game.world.centerY, 'prompt1');
     prompt.anchor.setTo(0.5, 0.5);

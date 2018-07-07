@@ -17,7 +17,7 @@ Rulebook.preload = function() {
 Rulebook.create = function() {
     var game = this.game;
     page = 0;
-    pageMax = 6;
+    pageMax = 5;
 
     logo = game.add.sprite(game.world.centerX, game.world.centerY, 'rulebook');
     logo.anchor.setTo(0.5, 0.5);
@@ -92,9 +92,11 @@ Rulebook.create = function() {
         obj.push(nc);
     } */
 
+    var borigin = {x:695, y:900};
+
     var backpage = {
         obj:game.add.button(
-            395,695,
+            borigin.x,borigin.y,
             'harrows',
             function() { page--; },
             this
@@ -111,7 +113,7 @@ Rulebook.create = function() {
     }
     obj.push(backpage);
 
-    pagecntr = game.add.text(430, 695, "1/1", {
+    pagecntr = game.add.text(borigin.x+35, borigin.y, "1/1", {
         font: "32px Impact",
         fill: "#ffff44",
         align: "left"
@@ -119,7 +121,7 @@ Rulebook.create = function() {
 
     var nextpage = {
         obj:game.add.button(
-            495,695,
+            borigin.x+100,borigin.y,
             'harrows',
             function() { page++; },
             this

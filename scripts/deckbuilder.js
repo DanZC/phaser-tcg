@@ -2,6 +2,7 @@ Builder = {};
 
 Builder.Client = Client;
 Builder.game = null;
+Builder.selected = 0;
 
 Builder.init = function(game){
     this.game = game;
@@ -27,38 +28,50 @@ Builder.create = function() {
     Builder.menu = game.add.group(game.world, "menu", false, false, false);
     Builder.cards = game.add.group(game.world, "cards", false, false, false);
     obj = [];
-
     var deck = Client.cardsys.deck[0];
     if(deck.card.length >= 40) {
-        pageMax = 3;
+        pageMax = 1;
     } else {
-        pageMax = Math.floor((deck.card.length+(1)) / 10);
+        pageMax = Math.floor((deck.card.length+(1)) / 40);
     }
+    Builder.selected = 0;
+
     {
         var o = {
             x: 55,
             y: 105,
         }
-        for(i = 0; i < 10; i++) {
+        for(i = 0; i < 40; i++) {
             var c = {
                 index: i,
-                obj:game.add.image(
-                    o.x + (206 * (i % 5)),
-                    o.y + (281 * Math.floor(i / 5)),
-                    'cards'
-                ),
                 update: function() {
                     var deck = Client.cardsys.player.deck;
-                    if(page * 10 + this.index < deck.card.length) {
+                    if(Builder.selected == this.index) {
+                        this.obj.tint = 0xFFFF00;
+                    } else {
+                        this.obj.tint = 0xFFFFFF;
+                    }
+                    if(page * 40 + this.index < deck.card.length) {
                         this.obj.visible = true;
-                        this.obj.frame = deck.card[(page * 10) + this.index].index - 1;
+                        this.obj.frame = deck.card[(page * 40) + this.index].index - 1;
                     } else {
                         this.obj.visible = false;
                     }
                 }
             }
-            c.obj.width /= 2;
-            c.obj.height /= 2;
+            c.obj = game.add.button(
+                o.x + ((206 / 2) * (i % 10)),
+                o.y + ((281 / 2) * Math.floor(i / 10)),
+                'cards',
+                function() { 
+                    console.log(this);
+                    Builder.selected = this.index; 
+                },
+                //},
+                c
+            );
+            c.obj.width /= 4;
+            c.obj.height /= 4;
             c.obj.frame = deck.card[i].index - 1;
             Builder.cards.add(c.obj);
             obj.push(c);
@@ -69,29 +82,55 @@ Builder.create = function() {
                 y: o.y
             },
             obj: game.add.button(
-                o.x + (206 * (0 % 5)),
-                o.y + (281 * Math.floor(0 / 5)),
+                o.x + ((206 / 2) * (0 % 10)),
+                o.y + ((281 / 2) * Math.floor(0 / 10)),
                 'newcard',
                 function() {},
                 this
             ),
             update: function() {
                 var deck = Client.cardsys.player.deck;
-                if(page === pageMax && deck.card.length % 10 !== 0) {
+                if(page === pageMax && deck.card.length % 40 !== 0) {
                     this.obj.inputEnabled = true;
                     this.obj.visible = true;
-                    var i = deck.card.length % 10;
-                    this.obj.x = this.origin.x + (206 * (i % 5));
-                    this.obj.y = this.origin.y + (281 * Math.floor(i / 5));
+                    var i = deck.card.length % 40;
+                    this.obj.x = this.origin.x + ((206/2) * (i % 10));
+                    this.obj.y = this.origin.y + ((281/2) * Math.floor(i / 10));
                 } else {
                     this.obj.inputEnabled = false;
                     this.obj.visible = false;
                 }
             }
         };
-        nc.obj.width /= 2;
-        nc.obj.height /= 2;
+        nc.obj.width /= 4;
+        nc.obj.height /= 4;
         obj.push(nc);
+    }
+    {
+        var o = {
+            x: 1150,
+            y: 100,
+        }
+        var c = {
+            obj: game.add.image(
+                o.x,
+                o.y,
+                'cards'
+            ),
+            update: function() {
+                var deck = Client.cardsys.player.deck;
+                if(deck.card[Builder.selected] !== undefined) {
+                    this.obj.visible = true;
+                    this.obj.frame = deck.card[Builder.selected].index - 1;
+                } else {
+                    this.obj.visible = false;
+                }
+            }
+        }
+        c.obj.width /= 1.25;
+        c.obj.height /= 1.25;
+        c.obj.frame = deck.card[Builder.selected].index - 1;
+        obj.push(c);
     }
 
     var backpage = {
@@ -154,5 +193,5 @@ Builder.update = function() {
 }
 
 Builder.addCard = function(index) {
-    pageMax = Math.floor((deck.card.length+1) / 10);
+    pageMax = Math.floor((deck.card.length+1) / 40);
 }

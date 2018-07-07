@@ -40,6 +40,7 @@ class Card {
         this.index = 0;
         this.role = null; //Role applied to card, if applicable
         this.obj = null;
+        this.currentHP = 0;
         this.mod = {
             hp: 0,
             atk: 0,
@@ -56,6 +57,10 @@ class Card {
 
     boost(stat, amt) {
         this.mod[stat] += amt;
+    }
+
+    nerf(stat, amt) {
+        this.mod[stat] -= amt;
     }
 
     //Makes the instance card a copy of a card defined in CardIndex, giving the instance

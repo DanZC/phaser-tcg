@@ -32,7 +32,23 @@ class CardObject {
         this.obj.width = 104;
         this.obj.angle = 90;
         if(op) { this.obj.angle *= -1; }
+        
+        this.text = game.add.text(
+            slot.obj.x, 
+            slot.obj.y, 
+            "HP   0/ 0\nATK  0\nDEF  0", {
+            font: "16px Courier New",
+            fill: "#ffffff",
+            stroke: '#000000',
+            align: "left"
+        });
+        this.text.strokeThickness = 4;
+        this.text.anchor.setTo(0.5, 0.5);
+
         this.card = card;
+        if(this.card.type != CardType.MEMBER) {
+            this.text.text = "";
+        }
         this.revealed = !this.isOpponents;
         card.obj = this;
         this.game = game;
@@ -118,11 +134,17 @@ class CardObject {
             obj.input.enabled = true;
         });
         tween.start();
+
+        var tween2 = this.game.add.tween(this.text).to(dest, duration, Phaser.Easing.Quadratic.InOut);
+        tween2.onComplete.addOnce(function(obj, tween2) {
+        });
+        tween2.start();
     }
 
     update() {
         if(this.revealed !== true) {
             this.obj.frame = UNDEFINED_CARD_INDEX;
+            this.text.text = "";
             return;
         }
         if(this.card.index > 0 && this.card.index < CardIndex.length) {
@@ -134,6 +156,9 @@ class CardObject {
             this.obj.tint = 0x7F7FFF;
         } else {
             this.obj.tint = 0xFFFFFF;
+        }
+        if(this.card.type == CardType.MEMBER) {
+            this.text.text = "HP  " + this.card.hp + "/ " + this.card.hp + "\nATK " + this.card.atk + "\nDEF " + this.card.def;
         }
     }
 }
@@ -230,6 +255,7 @@ class Slot {
             this.click,
             this
         );
+
         this.obj.anchor.setTo(0.5, 0.5);
         this.obj.height = 140;
         this.obj.width = 104;
