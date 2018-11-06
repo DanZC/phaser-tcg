@@ -307,8 +307,8 @@ Game.create = function() {
     slots.add(scl[0].obj);
     slots.add(scl[1].obj);
 	var sco = [
-        new Slot(channelpos[1][0], SlotType.CHANNEL, false),
-        new Slot(channelpos[1][1], SlotType.CHANNEL, false)
+        new Slot(channelpos[1][0], SlotType.CHANNEL, true),
+        new Slot(channelpos[1][1], SlotType.CHANNEL, true)
     ];
     cardsys.duel.remote.slots['CH0'] = sco[0];
     sco[0].name = 'CH0';
