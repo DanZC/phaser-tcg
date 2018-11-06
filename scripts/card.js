@@ -7,6 +7,17 @@ const CardType = {
     MEME : 4
 };
 
+const AnimType = {
+	NONE: 0,
+	TARGET: 1,
+	EFFECT: 2,
+	SHUFFLE: 3,
+	DESTROY: 4,
+	BOUNCE: 5,
+	ATTACK: 6,
+	TOPGRAVE: 7
+};
+
 //The bottom left-most card in cards.png. It is the same texture rect used for facedown cards.
 const UNDEFINED_CARD_INDEX = 159;
 
@@ -28,6 +39,12 @@ const CardColor = {
     GRY : 8
 }
 
+const MemeCategory = {
+	NML : 0,
+	CTN : 1,
+	RSP : 2
+}
+
 const CardStatus = {
     OFFLINE : 0,
     ONLINE : 1,
@@ -39,6 +56,7 @@ const CardStatus = {
 class Card {
     constructor() {
         this.type = CardType.UNDEFINED;
+		this.category = MemeCategory.CTN;
         this.status = CardStatus.ONLINE;
         this.index = 0;
         this.role = null; //Role applied to card, if applicable
