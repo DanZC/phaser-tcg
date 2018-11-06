@@ -13,6 +13,9 @@ const UNDEFINED_CARD_INDEX = 159;
 //Empty list populated at runtime by the cards defined in assets/cards.json
 CardIndex = []
 
+//Empty list populated at runtime by the deck defined in assets/dummy_deck.json
+DummyDeck = []
+
 const CardColor = {
     NONE : 0,
     RED : 1,
@@ -102,7 +105,7 @@ class Deck {
         for(i in json) {
             var c = new Card();
             c.set_index(json[i]);
-            add(c);
+            this.add(c);
         }
     }
 
@@ -120,12 +123,17 @@ class Deck {
     shuffle() {
         var len = this.card.length;
         for(i = len-1; i > 1; i--) {
-            j = getRandomInt(0, i+1);
+            var j = getRandomInt(0, i+1);
             var c = this.card[j]; //Move reference into c
             this.card[j] = this.card[i]; //J references I
             this.card[i] = c;   //I references C
         }
     }
+	
+	//Sorts deck
+	sort() {
+		this.card.sort(function(a,b){ return a.index - b.index; });
+	}
 
 	//Removes the card at the top of the deck and returns it.
     draw() {

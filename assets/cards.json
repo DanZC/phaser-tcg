@@ -414,34 +414,59 @@
             "function" : ""
         }
     },{
-        "name" : "27","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "ExplosiveNewt",
+        "type" : "MEMBER",
+        "color" : "BLU",
+        "lvl" : 1, "hp" : 7, "atk" : 9, "def" : 6,
+        "boost" : "GMG",
+        "nerf" : "SRS",
+        "effect" : {"desc" : "If a RSP meme is used , this card's ATK is increased by 1.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "This role cannot Any memes on your side that affect a member with this role may not have have their effects nullifies.","frequency" : "NEVER","function" : "none"}
     },{
         "name" : "Nico Beans",
         "type" : "MEMBER",
-        "color" : "PPL",
+        "color" : "GRY",
         "lvl" : 1, "hp" : 13, "atk" : 10, "def" : 5,
         "boost" : "MEM",
         "nerf" : "SRS",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "effect" : {"desc" : "When this card is played, one opposing non-offline member of your choice will have no effect. If that member goes offline, another opposing member may be selected to apply this effect to.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "This card's DEF is increased by 5.","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "29","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "PokemonGod777",
+        "type" : "MEMBER",
+        "color" : "PNK",
+        "lvl" : 1, "hp" : 10, "atk" : 4, "def" : 10,
+        "boost" : "GMG",
+        "nerf" : "SRS",
+        "effect" : {"desc" : "When this card is played, you can play another level 1 member in the same channel in the same turn.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "This card's DEF is increased by the sum of the levels of the members in play on your side.","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "30","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "Pon",
+        "type" : "MEMBER",
+        "color" : "RED",
+        "lvl" : 1, "hp" : 8, "atk" : 5, "def" : 10,
+        "boost" : "MTR",
+        "nerf" : "SRS",
+        "effect" : {"desc" : "This card can freely move to any MTR channel on your side with enough free spaces for it and any Role Cards assigned to it.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "In the End Phase, if this card was not involved in any battles that turn, this card has its Max HP increased by 1, and it recovers 1 HP.","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "31","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "Paint",
+        "type" : "MEMBER",
+        "color" : "RED",
+        "lvl" : 1, "hp" : 6, "atk" : 13, "def" : 4,
+        "boost" : "MEM",
+        "nerf" : "SRS",
+        "effect" : {"desc" : "This card can freely move to and from creepy-castle. While this card is in creepy-castle, if it has more than 1 HP remaining and is hit with an attack that would make it go offine, instead reduce its HP to 1.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "If this card makes an opposing member go offline, you can take one creepy-castle channel card from your deck and add it to your hand, shuffling the deck afterwards.","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "32","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "Tristana",
+        "type" : "MEMBER",
+        "color" : "PNK",
+        "lvl" : 1, "hp" : 8, "atk" : 10, "def" : 8,
+        "boost" : "GMG",
+        "nerf" : "SRS",
+        "effect" : {"desc" : "This card can attack twice every turn as long as neither attack would cause the target to go offline.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "If a member in play on your side goes offline, increase the ATK of this card by 1.","frequency" : "NEVER","function" : "none"}
     },{
         "name" : "33","type" : "UNDEFINED","color" : "NON",
         "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
@@ -451,25 +476,50 @@
         "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
         "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "35","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "Can",
+        "type" : "MEMBER",
+        "color" : "GRY",
+        "lvl" : 1, "hp" : 4, "atk" : 1, "def" : 6,
+        "boost" : "GMG",
+        "nerf" : "SRS",
+        "effect" : {"desc" : "Once per turn, if your opponent applies a card effect, to a member on your side, it can be redirected to apply to this card. When this card goes offline in battle, you can add one level 1 member with a base stat total of 24 or less from your deck to your hand, then shuffle it. Making this card go offline in battle does not award a Prize Token.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "This card cannot be destroyed by a card effect.","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "36","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "Mason",
+        "type" : "MEMBER",
+        "color" : "GRN",
+        "lvl" : 1, "hp" : 10, "atk" : 3, "def" : 8,
+        "boost" : "MDA",
+        "nerf" : "MEM",
+        "effect" : {"desc" : "If this card is in a MDA channel, other members in play on your side can freely move to that channel.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "This card's Max HP, ATK, and DEF are increased by the number of members in play on your side. Whenever this effect increases this card's Max HP, it recovers 1 HP.","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "37","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "Nova Spirit",
+        "type" : "MEMBER",
+        "color" : "RED",
+        "lvl" : 1, "hp" : 7, "atk" : 5, "def" : 9,
+        "boost" : "SRS",
+        "nerf" : "MEM",
+        "effect" : {"desc" : "When this card goes offline in battle, the ATK of all opposing members is decreased by 1. In the End Phase, if this card is the only card that would go to your Offline Space, it is instead set back to online.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "If this card attacks an opposing member, and that member made another member in play on your side go offline in battle in the previous turn, this card's ATK increases to 15 until the end of the Battle Phase.","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "38","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "Mia",
+        "type" : "MEMBER",
+        "color" : "PNK",
+        "lvl" : 1, "hp" : 6, "atk" : 11, "def" : 11,
+        "boost" : "GMG",
+        "nerf" : "SRS",
+        "effect" : {"desc" : "This card is treated as if its base ATK is 16, except in battle. This card's ATK cannot be decreased to lower than 16.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "Once per turn, you can select one member with less than half of its Max HP remaining and set it to Offline. This does not award a Prize Token.","frequency" : "NEVER","function" : "none"}
     },{
-        "name" : "39","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "Pokehero",
+        "type" : "MEMBER",
+        "color" : "RED",
+        "lvl" : 1, "hp" : 11, "atk" : 7, "def" : 10,
+        "boost" : "MDA",
+        "nerf" : "SRS",
+        "effect" : {"desc" : "Once per turn, this card can change the target of an opposing member's attack from another member in play on your side to itself.","frequency" : "NEVER","function" : "none"},
+        "cmeffect" : {"desc" : "Once per turn, if your opponent attacks this card, this card can attack first. If you apply this effect, this card cannot attack during your next turn.","frequency" : "NEVER","function" : "none"}
     },{
         "name" : "Polaris",
         "type" : "MEMBER",
@@ -488,9 +538,22 @@
             "function" : ""
         }
     },{
-        "name" : "41","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "Road",
+        "type" : "MEMBER",
+        "color" : "PPL",
+        "lvl" : 1, "hp" : 9, "atk" : 8, "def" : 10,
+        "boost" : "GMG",
+        "nerf" : "MTR",
+        "effect" : {
+            "desc" : "When this card is played, its ATK is reduced to 3/4, rounded down. Every Effect Phase after that, its ATK increases by 1.",
+            "frequency" : "TURN",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "When this card makes an opposing member go offline in battle, you can choose to return this card and its assigned roles to your hand.",
+            "frequency" : "TURN",
+            "function" : ""
+        }
     },{
         "name" : "Koiba",
         "type" : "MEMBER",
@@ -509,17 +572,56 @@
             "function" : ""
         }
     },{
-        "name" : "43","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "IceCream",
+        "type" : "MEMBER",
+        "color" : "PPL",
+        "lvl" : 1, "hp" : 6, "atk" : 17, "def" : 5,
+        "boost" : "SRS",
+        "nerf" : "GMG",
+        "effect" : {
+            "desc" : "If this card is in soj, it receives advantage rather than disadvantage.",
+            "frequency" : "ALWAYS",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "While this card is in an OTR channel, its ATK and DEF are swapped. While this card is in a SRS channel, its base ATK and DEF are changed to 20 and 2 respectively.",
+            "frequency" : "EFFECT",
+            "function" : ""
+        }
     },{
-        "name" : "44","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "Serena",
+        "type" : "MEMBER",
+        "color" : "PPL",
+        "lvl" : 1, "hp" : 12, "atk" : 3, "def" : 10,
+        "boost" : "GMG",
+        "nerf" : "MTR",
+        "effect" : {
+            "desc" : "While this card is in play, members in play on your side cannot have disadvantages not intrinsic to their card.",
+            "frequency" : "ALWAYS",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "During the Effect Phase, if this card has half of its Max HP or lower remaining, it can be returned to your hand, with any roles it has assigned to it sent to the Offline Space.",
+            "frequency" : "EFFECT",
+            "function" : ""
+        }
     },{
-        "name" : "45","type" : "UNDEFINED","color" : "NON",
-        "effect" : {"desc" : "","frequency" : "NEVER","function" : "none"},
-        "cmeffect" : {"desc" : "","frequency" : "NEVER","function" : "none"}
+        "name" : "Wet Otters",
+        "type" : "MEMBER",
+        "color" : "PPL",
+        "lvl" : 1, "hp" : 8, "atk" : 1, "def" : 18,
+        "boost" : "SRS",
+        "nerf" : "MEM",
+        "effect" : {
+            "desc" : "Other members in this channel with SRS advantage have their base DEF set to the same as this card's base DEF. If a member in this channel has MEM advantage, reduce this card's base DEF to 1.",
+            "frequency" : "ALWAYS",
+            "function" : ""
+        },
+        "cmeffect" : {
+            "desc" : "Once per turn, an attack on another PPL member in play on your side can be negated.",
+            "frequency" : "EFFECT",
+            "function" : ""
+        }
     },{
         "name" : "da-rules",
         "type" : "CHANNEL",
@@ -528,11 +630,13 @@
             "desc" : "Members in this channel with no roles assigned have their ATK increased by 2. When in play on your side, this card can be discarded to allow another Channel Card to be played in its place. Members in this channel with a SRS advantage do not gain advantage."
         },
         "adv" : {
+			"desc" : "Affected members have their ATK increased by 1.",
             "type" : "STATCHG",
             "stat" : "ATK",
             "amount" : 1
         },
         "disadv" : {
+			"desc" : "Affected members have their ATK decreased by 1.",
             "type" : "STATCHG",
             "stat" : "ATK",
             "amount" : -1
@@ -572,110 +676,362 @@
             "name" : "NOSTREAM"
         }
     },{
-        "name" : "49","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "voice-chat",
+		"type" : "CHANNEL",
+		"subject" : "OTR",
+        "effect": {
+			"desc" : "Members in this channel have their DEF increased by 2 points for every member in this channel."
+		},
+        "adv" : {
+			"desc" : "Affected members can never have their DEF lowered.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "Affected members have their DEF cut in half, rounded down.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "50","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "vidjagames",
+		"type" : "CHANNEL",
+		"subject" : "GMG",
+        "effect": {
+			"desc" : "This channel has a virtual Member/Role Space over its Channel Space."
+		},
+        "adv" : {
+			"desc" : "Affected members have one stat of your choice increased by 1.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "Affected members have once stat of your opponent's choice decreased by 1.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "51","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "videos",
+		"type" : "CHANNEL",
+		"subject" : "MDA",
+        "effect": {
+			"desc" : "Members in this channel can attack even if they are prevented from doing so by a card effect."
+		},
+        "adv" : {
+			"desc" : "Members in this channel with a card effect that would prevent them from attacking have their ATK increased by 2.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "Members in this channel that have a card effect that would prevent them from attacking have their ATK decreased by 2.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "52","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "iteitpoket",
+		"type" : "CHANNEL",
+		"subject" : "GMG",
+        "effect": {
+			"desc" : "Members in this channel can only be attacked up to as many times every turn as there are members in this channel."
+		},
+        "adv" : {
+			"desc" : "If an opposing member attacks an affected member, the affected member can swap spaces with any other member in play on your side, causing them to become the target of the attack instead. In the End Phase, if both members are still in play and neither are set to offline, then they can swap back. Performing this effect sends any roles assigned to the two members to the Offline Space.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "If an opposing member attacks an affected member and there is another member in play that would take more damage from the attack if they were to swap spaces and have any roles assigned to them sent to the Offline Space, you must do this.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "53","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "lonks-awonkening",
+		"type" : "CHANNEL",
+		"subject" : "GMG",
+        "effect": {
+			"desc" : "Members in this channel that have been offline at any point during the game have their ATK increased by 2 points."
+		},
+        "adv" : {
+			"desc" : "While an affected member is in play on your side in this channel, when any other member in play on your side goes offline, deal 1 point of damage to the HP of the member that attacked them.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "While an affected member is in play on your side in this channel, when any other member in play on your side goes offline, recover 1 point of HP to the member that attacked them.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "54","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "hot-beats-and-also-more-temperate-ones",
+		"type" : "CHANNEL",
+		"subject" : "MDA",
+        "effect": {
+			"desc" : "You can choose to do the same amount of damage in battle with one member as any other member in this channel has this turn."
+		},
+        "adv" : {
+			"desc" : "In the End Phase, if the channel has 3 members in it and they all dealt the same amount of damage to opposing members during a Battle Phase, the DEF of the affected member is increased by 1.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "In the End Phase, if the affected member attacked and did not deal the same amount of damage as every opposing member that attacked in the previous turn dealt, their DEF is decreased by 1.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "55","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "weeb-city",
+		"type" : "CHANNEL",
+		"subject" : "MDA",
+        "effect": {
+			"desc" : "If a member in this channel causes an opposing member to go offline in battle, their level increases by 1."
+		},
+        "adv" : {
+			"desc" : "The ATK of an affected member is increased by their level.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "The DEF of an affected member is decreased by their level.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "56","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "feeling-zone",
+		"type" : "CHANNEL",
+		"subject" : "SRS",
+        "effect": {
+			"desc" : "If a member in this channel goes offline, increase the DEF of every other member in play on your side by 1."
+		},
+        "adv" : {
+			"desc" : "If an affected member attacks an opposing member, decrease the opposing member's DEF by 1.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "If an affected member attacks an opposing member, increase the opposing member's DEF by 1.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "57","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "animal-sanctuary",
+		"type" : "CHANNEL",
+		"subject" : "OTR",
+        "effect": {
+			"desc" : "If there is more than one member in this channel, the one with the lowest stat total cannot be attacked."
+		},
+        "adv" : {
+			"desc" : "If there is more than one member in this channel, the one with the lowest stat total has their Max HP increased by the number of other members in the channel, and they recover HP equal to the number of other members in the channel.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "If there is more than one member in this channel, the one with the lowest stat total has their Max HP decreased by the number of other members in the channel.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "58","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "makeout-point",
+		"type" : "CHANNEL",
+		"subject" : "MTR",
+        "effect": {
+			"desc" : "If at least one member in this channel has advantage, every other member in this channel also gets advantage."
+		},
+        "adv" : {
+			"desc" : "In the End Phase, affected members have their HP recovered by the number of members in this channel.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "In the End Phase, affected members take damage equal to the number of members in this channel.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "59","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "arguments-etc",
+		"type" : "CHANNEL",
+		"subject" : "SRS",
+        "effect": {
+			"desc" : "If an opposing member attacks a member in this channel, and they are left with more than 0 HP, they can attack back in the same turn."
+		},
+        "adv" : {
+			"desc" : "If an affected member is attacked, treat all attacks your opponent makes that turn as if the member they were against were in this channel.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "If an affected member attacks an opposing member, treat all attacks you make that turn as if they were against members in an opponent-controlled arguments-etc channel.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "60","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "politiks",
+		"type" : "CHANNEL",
+		"subject" : "SRS",
+        "effect": {
+			"desc" : "Members in this channel have their ATK increased by 2 points and their DEF decreased by 2 points."
+		},
+        "adv" : {
+			"desc" : "Affected members can attack an extra time every turn.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "One member in play on your opponent's side can attack an extra time every turn.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "61","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "immature",
+		"type" : "CHANNEL",
+		"subject" : "MEM",
+        "effect": {
+			"desc" : "When a member in this channel makes an opposing member go offline in battle, you can force your opponent to discard 1 meme of your choosing from their hand."
+		},
+        "adv" : {
+			"desc" : "Once per turn, you can make the effect of a normal meme occur twice.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "You cannot play meme cards.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "62","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "memetown",
+		"type" : "CHANNEL",
+		"subject" : "MEM",
+        "effect": {
+			"desc" : "When a member in this channel makes an opposing member go offline in battle, one continuous meme in play can be sent to the Offline Space."
+		},
+        "adv" : {
+			"desc" : "Memes you play cannot have their effects nullified.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "You cannot nullify the effects of your opponent's memes.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "63","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "flavor-town",
+		"type" : "CHANNEL",
+		"subject" : "OTR",
+        "effect": {
+			"desc" : "In the End Phase, members in this channel recover 2 HP."
+		},
+        "adv" : {
+			"desc" : "In the End Phase, affected members recover another 2 HP.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "In the End Phase, affected members take 2HP of damage.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "64","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "collab",
+		"type" : "CHANNEL",
+		"subject" : "OTR",
+        "effect": {
+			"desc" : "\"Josh\", \"Martin\", and \"Joel\" cannot be played in this channel. The ATK of members in this channel is increased by the number of members in this channel."
+		},
+        "adv" : {
+			"desc" : "Any damage dealt by affected members is increased by half the number of opposing members that did not attack the affected member in the previous turn, rounded down.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "Any damage dealt by affected members is decreased by half the number of opposing members that attacked the affected member in the previous turn, rounded down.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "65","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "creepy-castle",
+		"type" : "CHANNEL",
+		"subject" : "MDA",
+        "effect": {
+			"desc" : "If a card is sent to the Offline Space, members in this channel recover 1 HP."
+		},
+        "adv" : {
+			"desc" : "Each attack after the first in a single turn against affected members will have the damage dealt decreased by the number of attacks that preceded it.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "Each attack after the first in a single turn against affected members will have the damage dealt increased by the number of attacks that preceded it.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "66","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "yiffbots-house",
+		"type" : "CHANNEL",
+		"subject" : "MEM",
+        "effect": {
+			"desc" : "If a member in this channel makes an opposing member go offline in battle, you can draw 1 card from the top of your deck."
+		},
+        "adv" : {
+			"desc" : "During the End Phase, for every affected card that was attacked in the previous turn, you can draw 1 card from your deck.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "During the End Phase, for every affected card that was attacked in the previous turn, your opponent can discard 1 unseen card from your hand.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "67","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "ziffbot-zone",
+		"type" : "CHANNEL",
+		"subject" : "OTR",
+        "effect": {
+			"desc" : "During the Effect Phase, if a Member in this channel was attacked in the previous turn, you can increase their DEF by 1."
+		},
+        "adv" : {
+			"desc" : "During the Effect Phase, if another member in this channel than the one affected by this effect was attacked in the previous turn, you can increase the ATK of the affected member by 1.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "During the Effect Phase, if another member in this channel than the one affected by this effect was attacked in the previous turn, decrease the ATK of the affected member by 1.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "68","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "theroom",
+		"type" : "CHANNEL",
+		"subject" : "MDA",
+        "effect": {
+			"desc" : "During the Effect Phase, flip a coin. If heads, members in this channel with no MDA advantage or disadvantage gain one for 1 turn, and you must flip another coin. If heads, they gain advantage, and if tails, they gain disadvantage."
+		},
+        "adv" : {
+			"desc" : "Affected members have their Max HP and DEF increased by 1, and recover 1 HP. If an affected member makes an opposing member go offline in battle, increase their ATK by 1.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "Affected members have their Max HP and DEF decreased by 1. If an affected member goes offline in battle, decrease the opposing member's ATK by 1.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
-        "name" : "69","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "compy-386",
+		"type" : "CHANNEL",
+		"subject" : "OTR",
+        "effect": {
+			"desc" : "If a member in this channel makes an opposing member go offline in battle, you can look at your opponent's current hand."
+		},
+        "adv" : {
+			"desc" : "If an affected member makes an opposing member go offline in battle, you can force your opponent to discard unseen 1 card from their hand.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "If your opponent makes a member in play on your side go offline in battle, your opponent can force you to discard one unseen card from your hand.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
         "name" : "70","type" : "CHANNEL","subject" : "OTR",
         "effect": {"desc" : ""},
@@ -717,10 +1073,22 @@
         "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
         "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
     },{
-        "name" : "78","type" : "CHANNEL","subject" : "OTR",
-        "effect": {"desc" : ""},
-        "adv" : {"desc" : "","type" : "EFFECT","name" : "NONE"},
-        "disadv" : {"desc" : "","type" : "EFFECT","name" : "NONE"}
+        "name" : "soj",
+		"type" : "CHANNEL",
+		"subject" : "GMG",
+        "effect": {
+			"desc" : "Members in this channel share common HP that is equal to the sum of the HP of all members in this channel. When this common HP is reduced to 0, all members in this channel go offline."
+		},
+        "adv" : {
+			"desc" : "When a member in play on your side receives damage and does not go offline as a result, affected members have their DEF increased by 1.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		},
+        "disadv" : {
+			"desc" : "When a member in play on your side receives damage and does not go offline as a result, affected members have their DEF decreased by 1.",
+			"type" : "EFFECT",
+			"name" : "NONE"
+		}
     },{
         "name" : "79","type" : "CHANNEL","subject" : "OTR",
         "effect": {"desc" : ""},
@@ -780,44 +1148,122 @@
             "name" : ""
         }
     },{
-        "name" : "88","type" : "ROLE","color" : "RED",
-        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+        "name" : "Kraid Wearing A Sombrero",
+        "type" : "ROLE",
+        "color" : "RED",
+        "effect": {
+            "desc" : "Damage taken by members with this role from opposing RED, ORN, or YLW members is halved, rounded down.",
+            "type" : "EFFECT",
+            "name" : ""
+        }
     },{
-        "name" : "89","type" : "ROLE","color" : "RED",
-        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+        "name" : "Door Hinge",
+        "type" : "ROLE",
+        "color" : "ORN",
+        "effect": {
+            "desc" : "Members with this role have their ATK and DEF swapped.",
+            "type" : "EFFECT",
+            "name" : ""
+        }
     },{
-        "name" : "90","type" : "ROLE","color" : "RED",
-        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+        "name" : "Big Hosue In The Sky",
+        "type" : "ROLE",
+        "color" : "ORN",
+        "effect": {
+            "desc" : "When a member with this role makes an opposing member go offline in battle, you can draw cards until you draw a channel card, add it to your hand, and shuffle the rest of the cards you drew back into your deck.",
+            "type" : "EFFECT",
+            "name" : ""
+        }
     },{
-        "name" : "91","type" : "ROLE","color" : "RED",
-        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+        "name" : "The Steve",
+        "type" : "ROLE",
+        "color" : "YLW",
+        "effect": {
+            "desc" : "When a member with this role is attacked, deal 1 point of damage to the HP of the member that attacked them.",
+            "type" : "EFFECT",
+            "name" : ""
+        }
     },{
-        "name" : "92","type" : "ROLE","color" : "RED",
-        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+        "name" : "A Million Cheese Wheels",
+        "type" : "ROLE",
+        "color" : "YLW",
+        "effect": {
+            "desc" : "Your opponent cannot prevent effects from recovering the HP of a member with this role.",
+            "type" : "EFFECT",
+            "name" : ""
+        }
     },{
-        "name" : "93","type" : "ROLE","color" : "RED",
-        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+        "name" : "Felf",
+        "type" : "ROLE",
+        "color" : "GRN",
+        "effect": {
+            "desc" : "Members with this role have all status increases and decreases applied to them reversed.",
+            "type" : "EFFECT",
+            "name" : ""
+        }
     },{
-        "name" : "94","type" : "ROLE","color" : "RED",
-        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+        "name" : "The Last Mimzy",
+        "type" : "ROLE",
+        "color" : "GRN",
+        "effect": {
+            "desc" : "Once per turn, a member with this role can delay the application of an effect by 1 turn.",
+            "type" : "EFFECT",
+            "name" : ""
+        }
     },{
-        "name" : "95","type" : "ROLE","color" : "RED",
-        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+        "name" : "Corner Salad",
+        "type" : "ROLE",
+        "color" : "GRN",
+        "effect": {
+            "desc" : "In the End Phase, if a member with this role recovered HP during the turn, they recover 1HP.",
+            "type" : "EFFECT",
+            "name" : ""
+        }
     },{
-        "name" : "96","type" : "ROLE","color" : "RED",
-        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+        "name" : "Authentic Ice Cube Experience",
+        "type" : "ROLE",
+        "color" : "BLU",
+        "effect": {
+            "desc" : "If a member with this role makes an opposing member go offline in battle and they were the only member in their channel, the channel is sent to the Offline Space.",
+            "type" : "EFFECT",
+            "name" : ""
+        }
     },{
-        "name" : "97","type" : "ROLE","color" : "RED",
-        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+        "name" : "Bucket Boss",
+        "type" : "ROLE",
+        "color" : "BLU",
+        "effect": {
+            "desc" : "Members with this role have their ATK and DEF increased by their level.",
+            "type" : "EFFECT",
+            "name" : ""
+        }
     },{
-        "name" : "98","type" : "ROLE","color" : "RED",
-        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+        "name" : "Markov Chain",
+        "type" : "ROLE",
+        "color" : "BLU",
+        "effect": {
+            "desc" : "If a member with this role takes damage in battle, their HP, ATK, and DEF are increased or decreased by random numbers between 1 and 3.",
+            "type" : "EFFECT",
+            "name" : ""
+        }
     },{
-        "name" : "99","type" : "ROLE","color" : "RED",
-        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+        "name" : "Bad enough dudes",
+        "type" : "ROLE",
+        "color" : "BLU",
+        "effect": {
+            "desc" : "Members with this role have their ATK increased by 3, but must attack every turn. If there are no opposing members a member with this role can deal damage to with an attack, they must attack themself or another member in play on your side.",
+            "type" : "EFFECT",
+            "name" : ""
+        }
     },{
-        "name" : "100","type" : "ROLE","color" : "RED",
-        "effect": {"desc" : "","type" : "EFFECT","name" : ""}
+        "name" : "Dominos Pizza Tracker",
+        "type" : "ROLE",
+        "color" : "PPL",
+        "effect": {
+            "desc" : "Once per turn, members with this role can steal a HP-recovery effect from the opponent",
+            "type" : "EFFECT",
+            "name" : ""
+        }
     },{
         "name" : "101","type" : "ROLE","color" : "RED",
         "effect": {"desc" : "","type" : "EFFECT","name" : ""}
@@ -934,83 +1380,199 @@
         "name" : "125","type" : "MEME","category" : "NML",
         "effect" : {"desc" : ""}
     },{
-        "name" : "126","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "Brest",
+        "type" : "MEME",
+        "category" : "NML",
+        "effect" : {
+            "desc" : "Add one MTR channel from your deck to your hand."
+        }
     },{
-        "name" : "127","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "Mentos",
+        "type" : "MEME",
+        "category" : "RSP",
+        "effect" : {
+            "desc" : "Activate in response to your opponent applying the effect of Bepsi. Decrease the ATK of the affected member by 5."
+        }
     },{
-        "name" : "128","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "X 2: X Harder",
+        "type" : "MEME",
+        "category" : "RSP",
+        "effect" : {
+            "desc" : "If an opposing member attacks a member in play on your side, and that member attacked the opposing member in the previous turn, increase your member's ATK by 2."
+        }
     },{
-        "name" : "129","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "OwO What's This?",
+        "type" : "MEME",
+        "category" : "RSP",
+        "effect" : {
+            "desc" : "If your opponent draws cards because of a card effect, you can look at them."
+        }
     },{
-        "name" : "130","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "Turnbull",
+        "type" : "MEME",
+        "category" : "CTN",
+        "effect" : {
+            "desc" : "Level 1 members cannot attack until your opponent's next End Phase."
+        }
     },{
-        "name" : "131","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "The Pit Clan",
+        "type" : "MEME",
+        "category" : "RSP",
+        "effect" : {
+            "desc" : "If an opposing member attacks a member in play on your side and has a higher ATK than your member's DEF, you can change the target of the attack to any member in play on your side with higher DEF than the opposing member's ATK."
+        }
     },{
-        "name" : "132","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "Haha Long Boy",
+        "type" : "MEME",
+        "category" : "NML",
+        "effect" : {
+            "desc" : "Select 1 CTN meme with a turn limit in play on your side. Extend the turn limit by 2 turns."
+        }
     },{
-        "name" : "133","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "Squirmy Boys",
+        "type" : "MEME",
+        "category" : "CTN",
+        "effect" : {
+            "desc" : "Once per turn, if a member in play on your side's attack is prevented by the status of the opposing member or by card effect, and no other attack that you could do this turn would be able to damage that member, the attack will instead be successful."
+        }
     },{
-        "name" : "134","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "GolfClap",
+        "type" : "MEME",
+        "category" : "RSP",
+        "effect" : {
+            "desc" : "Activate in response to your opponent dealing damage to one of their own members. For the rest of the turn, any effect that this damage would've activated cannot activate."
+        }
     },{
-        "name" : "135","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "Saw You At Best Buy",
+        "type" : "MEME",
+        "category" : "CTN",
+        "effect" : {
+            "desc" : "When you play this card, you can look at the top 3 cards of your opponent's deck. Until all 3 have been drawn, your opponent cannot shuffle their deck as the result of a card effect."
+        }
     },{
-        "name" : "136","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "But Mother, I Love Him",
+        "type" : "MEME",
+        "category" : "RSP",
+        "effect" : {
+            "desc" : "If an opponent's card effect would cause one of their members to go offline, the effect is not applied and they cannot cause that member to go offline for the rest of the turn."
+        }
     },{
-        "name" : "137","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "Flat Earth Jesus",
+        "type" : "MEME",
+        "category" : "CTN",
+        "effect" : {
+            "desc" : "When this card is played, a virtual member is played. It is YLW, at level 1, with 5 Max HP, 5 ATK, and 5 DEF.",
+			"member" : {
+                "color" : "YLW",
+                "lvl" : 1, "hp" : 5, "atk" : 5, "def" : 5
+            }
+        }
     },{
-        "name" : "138","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "Coconut Gun",
+        "type" : "MEME",
+        "category" : "NML",
+        "effect" : {
+            "desc" : "Deal 1 point of damage to an opposing member and decrease their DEF by 1."
+        }
     },{
-        "name" : "139","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "Beaned",
+        "type" : "MEME",
+        "category" : "RSP",
+        "effect" : {
+            "desc" : "Activate in response to an opposing member having their HP recovered. Their defense will be cut in half (rounded down) until the end of the opponent's next turn."
+        }
     },{
-        "name" : "140","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "crouton.net",
+        "type" : "MEME",
+        "category" : "CTN",
+        "effect" : {
+            "desc" : "When this card is played, a virtual member is played. It is ORN, with no advantage or disadvantage, at level 1, with 6 Max HP, 1 ATK, and 3 DEF.",
+			"member" : {
+                "color" : "ORN",
+                "lvl" : 1, "hp" : 6, "atk" : 1, "def" : 3
+            }
+        }
     },{
-        "name" : "141","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "Albuquerque",
+        "type" : "MEME",
+        "category" : "CTN",
+        "effect" : {
+            "desc" : "Advantages and disadvantages are swapped on your side."
+        }
     },{
-        "name" : "142","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "PINGAS",
+        "type" : "MEME",
+        "category" : "RSP",
+        "effect" : {
+            "desc" : "Activate in response to an opponent's meme that applies its effect to a member. Change the target of the effect."
+        }
     },{
-        "name" : "143","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "The Magician?",
+        "type" : "MEME",
+        "category" : "CTN",
+        "effect" : {
+            "desc" : "Discard 1 card to search your deck for 1 card and place it face down in a Blue Space. In 2 turns, during your Effect Phase, you can add it to your hand."
+        }
     },{
-        "name" : "144","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "Derpydino",
+        "type" : "MEME",
+        "category" : "CTN",
+        "effect" : {
+            "desc" : "When this card is played, a virtual member is played. It is GRY, with no advantage or disadvantage, at level 1, with 10 HP, 0 ATK, and 10 DEF. ",
+			"member" : {
+                "color" : "GRY",
+                "lvl" : 1, "hp" : 10, "atk" : 0, "def" : 10
+            }
+        }
     },{
-        "name" : "145","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "The Entire First Chapter of Bargo the Bikdip",
+		"type" : "MEME",
+		"category" : "CTN",
+        "effect" : {
+			"desc" : "No members can attack for 3 turns."
+		}
     },{
-        "name" : "146","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "NarpasSwordOf1000Truths",
+		"type" : "MEME",
+		"category" : "CTN",
+        "effect" : {
+			"desc" : "You can set 1 opposing member to offline. You cannot attack for the rest of the turn. For 5 turns, all members in play, including those played after the application of this effect, have their DEF cut in half."
+		}
     },{
-        "name" : "147","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "JustinBaileyIsReal2041",
+		"type" : "MEME",
+		"category" : "NML",
+        "effect" : {
+			"desc" : "Discard 1 role to draw cards until you draw a member or role of the same color as the role you discarded. Add it to your hand and shuffle the rest of the cards you drew back into your deck."
+		}
     },{
-        "name" : "148","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "okaywe'reending",
+		"type" : "MEME",
+		"category" : "RSP",
+        "effect" : {
+			"desc" : "Activate in response to your opponent playing a meme card during their turn. After the effect applies, their turn ends."
+		}
     },{
-        "name" : "149","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "Electric Boogaloo",
+		"type" : "MEME",
+		"category" : "NML",
+        "effect" : {
+			"desc" : "If there is a level 2 or higher member in your hand, and you have already played that member earlier in the game, you can play it."
+		}
     },{
-        "name" : "150","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "All Pokémon In National Pokédex Order",
+		"type" : "MEME",
+		"category" : "NML",
+        "effect" : {
+			"desc" : "If there is at least 1 member in play on your opponent's side and you have none in play on your side, you can play 1 level 1 member from your deck."
+		}
     },{
-        "name" : "151","type" : "MEME","category" : "NML",
-        "effect" : {"desc" : ""}
+        "name" : "Mew Under A Truck",
+		"type" : "MEME",
+		"category" : "CTN",
+        "effect" : {
+			"desc" : "When this card is played, a virtual member is played. It is GRY, with no advantage or disadvantage, at level 1, with 1 HP, 1 ATK, and 1 DEF. In the End Phase, if Josh or Martin are in play on your side, it becomes PNK, level 2, with 10 HP, 10 ATK, and 10 DEF, and awards a prize token if sent to the Offline Zone in this state."
+		}
     },{
         "name" : "Bargo the Bikdip",
         "color" : "GRN",

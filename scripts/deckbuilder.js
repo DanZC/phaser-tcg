@@ -7,6 +7,7 @@ Builder.selected = 0;
 Builder.init = function(game){
     this.game = game;
     this.game.stage.disableVisibilityChange = true;
+	this.deck = Client.cardsys.deck[0].copy();
 };
 
 Builder.preload = function() {
@@ -28,24 +29,26 @@ Builder.create = function() {
     Builder.menu = game.add.group(game.world, "menu", false, false, false);
     Builder.cards = game.add.group(game.world, "cards", false, false, false);
     obj = [];
-    var deck = Client.cardsys.deck[0];
-    if(deck.card.length >= 40) {
+	
+	this.deck.sort();
+    //var deck = Client.cardsys.deck[0];
+    if(this.deck.card.length >= 40) {
         pageMax = 1;
     } else {
-        pageMax = Math.floor((deck.card.length+(1)) / 40);
+        pageMax = Math.floor((this.deck.card.length+(1)) / 40);
     }
     Builder.selected = 0;
 
     {
         var o = {
-            x: 55,
-            y: 105,
+            x: 54,
+            y: 104,
         }
         for(i = 0; i < 40; i++) {
             var c = {
                 index: i,
-                update: function() {
-                    var deck = Client.cardsys.player.deck;
+                update: function(deck) {
+                    //var deck = Client.cardsys.player.deck;
                     if(Builder.selected == this.index) {
                         this.obj.tint = 0xFFFF00;
                     } else {
@@ -60,8 +63,8 @@ Builder.create = function() {
                 }
             }
             c.obj = game.add.button(
-                o.x + ((206 / 2) * (i % 10)),
-                o.y + ((281 / 2) * Math.floor(i / 10)),
+                o.x + (((206 / 2) + 1) * (i % 10)),
+                o.y + (((281 / 2) + 1) * Math.floor(i / 10)),
                 'cards',
                 function() { 
                     console.log(this);
@@ -72,7 +75,7 @@ Builder.create = function() {
             );
             c.obj.width /= 4;
             c.obj.height /= 4;
-            c.obj.frame = deck.card[i].index - 1;
+            c.obj.frame = this.deck.card[i].index - 1;
             Builder.cards.add(c.obj);
             obj.push(c);
         }
@@ -88,8 +91,8 @@ Builder.create = function() {
                 function() {},
                 this
             ),
-            update: function() {
-                var deck = Client.cardsys.player.deck;
+            update: function(deck) {
+                //var deck = Client.cardsys.player.deck;
                 if(page === pageMax && deck.card.length % 40 !== 0) {
                     this.obj.inputEnabled = true;
                     this.obj.visible = true;
@@ -108,20 +111,42 @@ Builder.create = function() {
     }
     {
         var o = {
-            x: 1150,
+            x: 1100,
             y: 100,
         }
         var c = {
             obj: game.add.image(
-                o.x,
+                o.x + 35,
                 o.y,
                 'cards'
             ),
-            update: function() {
-                var deck = Client.cardsys.player.deck;
+			txt: game.add.text(o.x, o.y + 458, "???", {
+				font: "24px Impact",
+				fill: "#ffff44",
+				align: "center"
+			}),
+			txteff: game.add.text(o.x, o.y + 486, "Effect:", {
+				font: "16px Impact",
+				fill: "#ffff44",
+				align: "left",
+				wordWrap: true,
+				wordWrapWidth: 400
+			}),
+            update: function(deck) {
+                //var deck = Client.cardsys.player.deck;
                 if(deck.card[Builder.selected] !== undefined) {
                     this.obj.visible = true;
                     this.obj.frame = deck.card[Builder.selected].index - 1;
+					this.txt.setText(CardIndex[deck.card[Builder.selected].index].name);
+					if(CardIndex[deck.card[Builder.selected].index].type == CardType.MEMBER) {
+						this.txteff.setText("Effect: " + CardIndex[deck.card[Builder.selected].index].effect.desc + "\n\nCM Effect: " + CardIndex[deck.card[Builder.selected].index].cmeffect.desc);
+					} else if(CardIndex[deck.card[Builder.selected].index].type == CardType.CHANNEL) {
+						this.txteff.setText("Effect: " + CardIndex[deck.card[Builder.selected].index].effect.desc
+						+ "\n\n+Effect: " + CardIndex[deck.card[Builder.selected].index].adv.desc
+						+ "\n\n-Effect: " + CardIndex[deck.card[Builder.selected].index].disadv.desc);
+					} else {
+						this.txteff.setText("Effect: " + CardIndex[deck.card[Builder.selected].index].effect.desc);
+					}
                 } else {
                     this.obj.visible = false;
                 }
@@ -129,11 +154,13 @@ Builder.create = function() {
         }
         c.obj.width /= 1.25;
         c.obj.height /= 1.25;
-        c.obj.frame = deck.card[Builder.selected].index - 1;
+        c.obj.frame = this.deck.card[Builder.selected].index - 1;
+		c.txt.setText(CardIndex[this.deck.card[Builder.selected].index].name);
+		c.txteff.setText("Effect: " + CardIndex[this.deck.card[Builder.selected].index].effect.desc);
         obj.push(c);
     }
 
-    var backpage = {
+    /*var backpage = {
         obj:game.add.button(
             395,695,
             'harrows',
@@ -175,7 +202,7 @@ Builder.create = function() {
             }
         }
     }
-    obj.push(nextpage);
+    obj.push(nextpage);*/
 
     var backbutton = game.add.button(
         43,874,
@@ -187,9 +214,9 @@ Builder.create = function() {
 
 Builder.update = function() {
     for(i in obj) {
-        obj[i].update();
+        obj[i].update(this.deck);
     }
-    pagecntr.setText((page+1) + ' / ' + (pageMax+1));
+    //pagecntr.setText((page+1) + ' / ' + (pageMax+1));
 }
 
 Builder.addCard = function(index) {

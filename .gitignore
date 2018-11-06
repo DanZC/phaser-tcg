@@ -6,6 +6,12 @@ __pycache__/
 node_modules/*
 
 *.bat
+*.tmx
+*.tsx
+*.rtf
+*.pdn
+*_o.png
+assets/objecttypes.xml
 
 # C extensions
 *.so

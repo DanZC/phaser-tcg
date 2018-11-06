@@ -1,3 +1,4 @@
+//The current phase
 const DuelPhase = {
     WAIT : 0,
     DRAW : 1,
@@ -6,6 +7,7 @@ const DuelPhase = {
     BATTLE : 4
 };
 
+//Each half of the board is created in a side state. 
 class SideState {
     constructor() {
 		//Slots on the game board.
@@ -57,6 +59,10 @@ class SideState {
         return mems;
     }
 	
+	getHand() {
+		return this.hand;
+	}
+	
 	//Returns the indexed channel.
 	get_channel(index) {
 		return this.channels[index];
@@ -83,6 +89,9 @@ class DuelState {
 		
 		//A reference to the player whose turn it is. 
         this.turn = player;
+		
+		//Whether the client is waiting for the server. Used to prevent input.
+		this.waiting = false;
 		
 		//The current phase
         this.phase = DuelPhase.DRAW;
@@ -127,7 +136,7 @@ class DuelState {
 	//Does a series of moves in a list.
     doMoves(moves) {
         for(i in moves) {
-
+			this.doMove(moves[i]);
         }
     }
 

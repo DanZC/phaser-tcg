@@ -2,7 +2,7 @@ window.onload = function() {
 
     var username = getCookie("username");
 
-    var game = new Phaser.Game(1500, 960, Phaser.AUTO, 'game', { preload: preload, create: create, update: update });
+    var game = new Phaser.Game(1500, 960, Phaser.AUTO, 'game', { preload: preload, create: create, update: update, render: render  });
     game.state.add('Game',Game);
     game.state.add('Title',Title);
     game.state.add('Builder',Builder);
@@ -21,6 +21,7 @@ window.onload = function() {
 
     function preload () {
         game.load.json('card_data','assets/cards.json');
+		game.load.json('dummy_deck','assets/dummy_deck.json');
     }
 
     function create () {
@@ -32,9 +33,14 @@ window.onload = function() {
                 c.color = CardColor[c.color];
             }
         }
+		DummyDeck = game.cache.getJSON('dummy_deck');
+		ls.cardsys.player.deck = dummy_deck();
         game.stage.disableVisibilityChange = true;
         game.state.start('Title',true,false,game);
     }
 
     function update(){}
+	function render(){
+		game.debug.pointer( game.input.activePointer );
+	}
 };

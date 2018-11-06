@@ -142,7 +142,7 @@ class CardObject {
     }
 
     update() {
-        if(this.revealed !== true) {
+        if(!this.revealed) {
             this.obj.frame = UNDEFINED_CARD_INDEX;
             this.text.text = "";
             return;
@@ -160,6 +160,223 @@ class CardObject {
         if(this.card.type == CardType.MEMBER) {
             this.text.text = "HP  " + this.card.hp + "/ " + this.card.hp + "\nATK " + this.card.atk + "\nDEF " + this.card.def;
         }
+    }
+}
+
+class DeckObject {
+    constructor(slot, card, op, parent) {
+        var d = card.index;
+        var game = Client.game;
+        this.parent = parent;
+        this.isOpponents = op;
+        this.obj = game.add.button(
+            slot.obj.x, 
+            slot.obj.y, 
+            'cards',
+            this.click,
+            this
+        );
+        this.obj.anchor.setTo(0.5, 0.5);
+        this.obj.height = 140;
+        this.obj.width = 104;
+        this.obj.angle = 90;
+        if(op) { this.obj.angle *= -1; }
+        
+        this.text = game.add.text(
+            slot.obj.x, 
+            slot.obj.y, 
+            "HP   0/ 0\nATK  0\nDEF  0", {
+            font: "16px Courier New",
+            fill: "#ffffff",
+            stroke: '#000000',
+            align: "left"
+        });
+        this.text.strokeThickness = 4;
+        this.text.anchor.setTo(0.5, 0.5);
+
+        this.card = card;
+        if(this.card.type != CardType.MEMBER) {
+            this.text.text = "";
+        }
+        this.revealed = !this.isOpponents;
+        card.obj = this;
+        this.game = game;
+        this.ls = Client;
+        this.slot = slot;
+        this.channel = null;
+        this.state = game.state.getCurrentState();
+        this.parent.add(this.obj);
+    }
+
+    click() {
+        var local = this.ls.cardsys.duel.local;
+        var duel = this.ls.cardsys.duel;
+        if(this.isOpponents) {
+            this.draw();
+			return;
+        }
+        if(duel.phase === DuelPhase.DRAW) {
+            if(this.slot.type === SlotType.DECK) {
+                if(duel.draws < 5) {
+                    this.draw();
+                }
+            }
+            return;
+        }
+        if(this.slot !== null) {
+            Client.sendMove("SURRENDER");
+        }
+    }
+
+    draw() {
+        var duel = this.ls.cardsys.duel;
+		var game = this.ls.game;
+        if(this.isOpponents) {
+			var next = new CardObject(this.slot, duel.opponent.deck.get_top(), this.isOpponents, this.parent);
+			next.revealed = false;
+			this.parent.bringToTop(next.obj);
+			//obj.remote.hand.push(next);
+			//obj.remote.hand.updateHandPositions();
+			duel.remote.hand.push(next);
+			Game.addToHand(next, this.isOpponents);
+			Game.updateHand();
+			//duel.remote.hand.updateHandPositions();
+            next.slot = null;
+            duel.opponent.deck.draw();
+        } else {
+            var next = new CardObject(this.slot, duel.player.deck.get_top(), this.isOpponents, this.parent);
+            this.parent.bringToTop(next.obj);
+            //this.state.obj.local.deck = next;
+            //next.move({
+            //    x: 104,
+            //    y: (duel.local.hand.length * 104) + 132
+            //});
+			//obj.local.hand.push(next);
+			//obj.local.hand.updateHandPositions();
+            duel.local.hand.push(next);
+			Game.addToHand(next, this.isOpponents);
+			Game.updateHand();
+			//duel.local.hand.updateHandPositions();
+            next.slot = null;
+			duel.player.deck.draw();
+            duel.draws++;
+            if(duel.draws >= 5) {
+                duel.phase++;
+                duel.effectPhase();
+            }
+        }
+        Client.sendMove("DRAW");
+    }
+
+    move(dest) {
+        //var distance = Phaser.Math.distance(this.obj.x, this.obj.y, dest.x, dest.y);
+        var duration = 250;
+        var local = this.ls.cardsys.duel.local;
+        local.selected = null;
+        this.obj.input.enabled = false;
+        var tween = this.game.add.tween(this.obj).to(dest, duration, Phaser.Easing.Quadratic.InOut);
+        tween.onComplete.addOnce(function(obj, tween) {
+            obj.input.enabled = true;
+        });
+        tween.start();
+
+        var tween2 = this.game.add.tween(this.text).to(dest, duration, Phaser.Easing.Quadratic.InOut);
+        tween2.onComplete.addOnce(function(obj, tween2) {
+        });
+        tween2.start();
+    }
+
+    update() {
+        this.obj.frame = UNDEFINED_CARD_INDEX;
+        this.text.text = "";
+    }
+}
+
+class HandObject {
+    constructor(p, op, parent) {
+        var game = Client.game;
+        this.parent = parent;
+        this.isOpponents = op;
+        this.objs = [];
+        
+        this.pos = {
+            x: p.x, 
+            y: p.y, 
+        };
+        this.revealed = !this.isOpponents;
+        this.game = game;
+        this.ls = Client;
+        this.state = game.state.getCurrentState();
+    }
+	
+	updateHandPositions() {
+		var duration = 250;
+        var local = this.ls.cardsys.duel.local;
+        local.selected = null;
+		var tweens = [];
+		for(i in this.objs) {
+			var dest = {x: this.pos.x, y: (this.pos.y + (104 * (i - this.objs.length / 2)))}
+			Client.chat.write("X=" + dest.x + ",Y=" + dest.y);
+			this.objs[i].obj.input.enabled = false;
+			var tween = this.game.add.tween(this.objs[i].obj).to(dest, duration, Phaser.Easing.Quadratic.InOut);
+			tween.onComplete.addOnce(function(obj, tween) {
+				obj.input.enabled = true;
+			});
+			tween.start();
+			tweens.push(tween);
+
+			var tween2 = this.game.add.tween(this.objs[i].text).to(dest, duration, Phaser.Easing.Quadratic.InOut);
+			tween2.onComplete.addOnce(function(obj, tween2) {
+			});
+			tween2.start();
+			tweens.push(tween2);
+		}
+	}
+	
+	push(o) {
+		this.objs.push(o);
+		this.parent.add(o.obj);
+	}
+	
+	remove(o) {
+		var j = -1;
+		for(i in this.objs) {
+			if(this.objs[i] === o) 
+				j = i;
+		}
+		if(j !== -1) {
+			this.objs.splice(j, 1);
+		}
+		//this.parent.add(o.obj);
+	}
+
+    /*click() {}
+
+    draw() {
+    }
+
+    move(dest) {
+        //var distance = Phaser.Math.distance(this.obj.x, this.obj.y, dest.x, dest.y);
+        var duration = 250;
+        var local = this.ls.cardsys.duel.local;
+        local.selected = null;
+        this.obj.input.enabled = false;
+        var tween = this.game.add.tween(this.obj).to(dest, duration, Phaser.Easing.Quadratic.InOut);
+        tween.onComplete.addOnce(function(obj, tween) {
+            obj.input.enabled = true;
+        });
+        tween.start();
+
+        var tween2 = this.game.add.tween(this.text).to(dest, duration, Phaser.Easing.Quadratic.InOut);
+        tween2.onComplete.addOnce(function(obj, tween2) {
+        });
+        tween2.start();
+    }*/
+
+    update() {
+		for(i in this.objs) {
+			this.objs[i].update();
+		}
     }
 }
 
@@ -198,6 +415,32 @@ function random_deck() {
     return deck;
 }
 
+//Returns a random deck that is guarenteed to be playable
+function random_playable_deck() {
+	var cards = 40;
+    var deck = new Deck();
+    for(i = 0; i < cards; i++) {
+        var n = getRandomInt(1, 152);
+        var c = new Card();
+        c.set_index(n);
+        deck.add(c);
+    }
+    return deck;
+}
+
+//Returns a dummy deck used for testing
+function dummy_deck() {
+	var cards = 40;
+    var deck = new Deck();
+    for(i = 0; i < cards; i++) {
+        var n = DummyDeck[i];
+        var c = new Card();
+        c.set_index(n);
+        deck.add(c);
+    }
+    return deck;
+}
+
 function loadCardData(str) {
     CardIndex = JSON.parse(str);
 }
@@ -205,6 +448,7 @@ function loadCardData(str) {
 //Returns whether a card can be moved to a slot.
 function validSlot(card, slot, duel) {
     if(!slot.empty()) return false;
+	if(slot.isOpponents) return false;
     if(card.type === CardType.CHANNEL && slot.type === SlotType.CHANNEL) {
         return true;
     }
@@ -249,8 +493,8 @@ class Slot {
 		
 		//The button object.
         this.obj = game.add.button(
-            game.world.centerX + pos.x, 
-            game.world.centerY + pos.y, 
+            pos.x + 70, 
+            pos.y + 51, 
             'cardmask',
             this.click,
             this
@@ -287,8 +531,10 @@ class Slot {
                 if(cobj.slot !== null) {
                     cobj.slot.card = null;
                 }
-                cobj.slot = this;
+				cobj.slot = this;
                 local.selected = null;
+				Game.removeFromHand(cobj, false);
+				Game.updateHand();
             }
         }
     }
@@ -312,6 +558,9 @@ class Slot {
         } else {
             this.obj.frame = 0;
         }
+		if(this.card !== null) {
+			this.card.update();
+		}
     }
 }
 
@@ -326,5 +575,8 @@ class Player {
 		
 		//The player's registered name.
         this.name = null;
+		
+		//The player's rank.
+		this.rank = 0;
     }
 }
