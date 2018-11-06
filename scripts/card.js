@@ -42,7 +42,8 @@ const CardColor = {
 const MemeCategory = {
 	NML : 0,
 	CTN : 1,
-	RSP : 2
+    RSP : 2,
+    VRT : 3
 }
 
 const CardStatus = {

@@ -37,9 +37,9 @@ window.onload = function() {
 		ls.sounds['card1'] = new Phaser.Sound(game, 'se_card1');
 		ls.sounds['card2'] = new Phaser.Sound(game, 'se_card2');
 		ls.sounds['card3'] = new Phaser.Sound(game, 'se_card3');
-		ls.sounds['effect'] = new Phaser.Sound(game, 'se_effect');
+        ls.sounds['effect'] = new Phaser.Sound(game, 'se_effect', 0.5);
 		ls.sounds['tograve'] = new Phaser.Sound(game, 'se_tograve');
-		ls.sounds['target'] = new Phaser.Sound(game, 'se_target');
+        ls.sounds['target'] = new Phaser.Sound(game, 'se_target', 0.9);
         CardIndex = game.cache.getJSON('card_data');
         for(i in CardIndex) {
             var c = CardIndex[i];
