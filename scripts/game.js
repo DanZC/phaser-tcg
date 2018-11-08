@@ -15,6 +15,7 @@ Client.game = Game;
 Game.cardsys = Client.cardsys;
 Game.obj = {};
 Game.waitAnim = false;
+Game.inputLayer = 0;
 Game.animCB = null;
 Game.animTargets = [];
 Game.animQueue = [];
@@ -33,6 +34,7 @@ Game.preload = function() {
     this.game.load.spritesheet('battlebtn', 'assets/battlebtns.png',128,128);
 	this.game.load.spritesheet('targetmask', 'assets/targetmask.png',412,562);
     this.game.load.image('prompt1', 'assets/Prompt1.png');
+    this.game.load.image('promptsc', 'assets/cardselectprompt.png');
     this.game.load.image('close', 'assets/close.png');
     this.game.load.image('logo', 'assets/back_test_new3.png');
 	this.game.load.json('duel_layout','assets/duel_layout.json');
@@ -43,8 +45,10 @@ Game.create = function() {
     var cardsys = Client.cardsys;
     var obj = this.obj;
     var ls = Client;
-	DuelLayout = game.cache.getJSON('duel_layout');
+    DuelLayout = game.cache.getJSON('duel_layout');
+    Game.inputLayer = 0;
 
+    this.cardsys = cardsys;
     cardsys.player.deck.update();
 	cardsys.player.deck.shuffle();
     var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
@@ -168,6 +172,26 @@ Game.create = function() {
         width: 140,
         height: 104
     }
+
+    var promptscpos = {
+        x: DuelLayout.layers[3].objects[0].x,
+        y: DuelLayout.layers[3].objects[0].y,
+        width: DuelLayout.layers[3].objects[0].width,
+        height: DuelLayout.layers[3].objects[0].height,
+        text: {
+            x: DuelLayout.layers[3].objects[1].x,
+            y: DuelLayout.layers[3].objects[1].y,
+            pxsize: DuelLayout.layers[3].objects[1].text.pixelsize
+        },
+        card: {
+            x: DuelLayout.layers[3].objects[2].x,
+            y: DuelLayout.layers[3].objects[2].y
+        },
+        button: {
+            x: DuelLayout.layers[3].objects[3].x,
+            y: DuelLayout.layers[3].objects[3].y
+        }
+    }
 	//Client.chat.write("DEBUG: DECK PLACED AT X=" + deckpos[0].x);
     slots = game.add.group(game.world, "slots", false, false, false);
     var sdl = new Slot(deckpos[0], SlotType.DECK, false);
@@ -280,7 +304,9 @@ Game.create = function() {
 	obj.targetmsk.anchor.setTo(0.5, 0.5);
 	obj.targetmsk.width = 104;
 	obj.targetmsk.height = 140;
-	obj.targetmsk.angle = 90;
+    obj.targetmsk.angle = 90;
+    
+    obj.promptsc = new SelectCardPrompt(promptscpos);
 
     //var deckobj = new CardObject(game, deckpos, d);
     obj.pv = game.add.button(
@@ -344,9 +370,17 @@ Game.create = function() {
     Client.chat.write("Joined an AI game.");
 };
 
+Game.getCurrentDuel = function() {
+    return this.cardsys.duel;
+}
+
+Game.getLocalPlayer = function() {
+    return this.cardsys.player;
+}
+
 Game.updateHand = function() {
-	Game.obj.lhand.updateHandPositions();
-	Game.obj.ohand.updateHandPositions();
+	Game.obj.lhand.updateHandPositions(function(c){});
+	Game.obj.ohand.updateHandPositions(function(c){});
 }
 
 Game.addToHand = function(card, op) {
@@ -355,6 +389,48 @@ Game.addToHand = function(card, op) {
 	} else {
 		Game.obj.ohand.push(card);
 	}
+}
+
+Game.promptSelectCard = function(msg, loc, filter, callback) {
+    var game = this.game;
+    if(loc == CardLocation.DECK) {
+        var cardList = Game.getCurrentDuel().getFilteredList(loc, filter, false);
+        var promptsc = Game.obj.promptsc;
+        promptsc.clear();
+        for(i in cardList) {
+            Client.chat.write(cardList[i].getName());
+            promptsc.add(cardList[i]);
+        }
+        promptsc.setMsg(msg);
+        promptsc.setConfirmCallback(callback);
+        promptsc.show();
+        Game.inputLayer = 1;
+    }
+}
+
+Game.addCardToHand = function(loc, op, filter) {
+    if(loc == CardLocation.DECK) {
+        if(!op) {
+            Game.promptSelectCard("Select a card to add to your hand.", loc, filter, function(c){
+                var next = new CardObject(Game.obj.local.deck, c, false, Game.obj.local.deck.parent);
+                Game.getCurrentDuel().player.deck.remove(c);
+                next.revealed = false;
+                Game.obj.local.deck.parent.bringToTop(next.obj);
+                Client.sounds['card0'].play();
+                next.slot = null;
+                Game.addToHand(next, false);
+                Game.obj.lhand.updateHandPositions(function(n){
+                    var tgts = [n];
+                    Game.playAnimation(AnimType.FLIPUP, tgts, false, function(card, op){
+                    });
+                    Game.queueAnimation(AnimType.TARGET, tgts, false, function(card, op){
+                    });
+                    //Game.queueAnimation(AnimType.FLIPDOWN, tgts, false, function(card, op){
+                    //});
+                });
+            });
+        }
+    }
 }
 
 Game.removeFromHand = function(card, op) {
@@ -385,7 +461,7 @@ Game.playAnimation = function(animid, targets, op, callback) {
 		obj.pv.alpha = 0;
 		obj.pv.inputEnabled = false;
 		obj.pv.key = 'cards'
-		obj.pv.frame = targets[0].card.card.index - 1;
+		obj.pv.frame = targets[0].card.index - 1;
 		obj.pv.x = game.world.centerX;
 		Client.sounds['effect'].play();
 		var tween = game.add.tween(obj.pv).to( { alpha: 1 }, 100, Phaser.Easing.Linear.None, true, 0);
@@ -409,8 +485,8 @@ Game.playAnimation = function(animid, targets, op, callback) {
 	} else if(animid == AnimType.TARGET) {
 		var mask = obj.targetmsk;
 		mask.alpha = 0;
-		mask.x = targets[0].card.obj.x;
-		mask.y = targets[0].card.obj.y;
+		mask.x = targets[0].obj.x;
+		mask.y = targets[0].obj.y;
 		Client.sounds['target'].play();
 		var tween = game.add.tween(mask).to( { alpha: 1 }, 50, Phaser.Easing.Linear.None, true, 0);
 		var tween2 = game.add.tween(mask).to( { alpha: 1 }, 1, Phaser.Easing.Linear.None, false, 999);
@@ -430,6 +506,27 @@ Game.playAnimation = function(animid, targets, op, callback) {
 		});
 		tween.start();
 	} else if(animid == AnimType.TOPGRAVE) {
+	} else if(animid == AnimType.FLIPUP) {
+        var obj = targets[0].obj;
+        targets[0].revealed = false;
+        var w = obj.width;
+        Client.sounds['card3'].play();
+        var tween = game.add.tween(obj).to( { width: 0 }, 100, Phaser.Easing.Linear.None, false, 0);
+		var tween2 = game.add.tween(obj).to( { width: w }, 100, Phaser.Easing.Linear.None, false, 0);
+        tween.onComplete.addOnce(function(obj, tween){
+            targets[0].revealed = true;
+        });
+        tween2.onComplete.addOnce(function(obj, tween){
+            Game.waitAnim = false;
+            if(cb !== undefined)
+				cb(Game.animTargets[0], op);
+			if(Game.animQueue.length > 0) {
+				var next = Game.animQueue.shift();
+				Game.playAnimation(next['animid'], next['targets'], next['op'], next['callback']);
+			}
+        });
+        tween.chain(tween2);
+        tween.start();
 	}
 }
 
@@ -444,9 +541,11 @@ Game.queueAnimation = function(animid, targets, op, callback) {
 
 Game.sendToGrave = function(card, op) {
 	if(!op) {
-		this.obj.loffline.push(card);
-		card.slot.card = null;
-		card.slot = null;
+        this.obj.loffline.push(card);
+        if(card.slot !== null) {
+		    card.slot.card = null;
+            card.slot = null;
+        }
 		card.parent.bringToTop(card);
 		Client.sounds['tograve'].play();
 		this.obj.loffline.updatePositions();
@@ -457,14 +556,18 @@ Game.sendToGrave = function(card, op) {
 Game.playCard = function(card, op) {
 	if(card.card.type == CardType.MEME) {
 		Client.chat.write("DEBUG: The effect of " + card.card.name + " activates.");
-		this.playAnimation(AnimType.EFFECT, [card.slot], op, function(card, op){
-			if(card.card.card.category !== MemeCategory.CTN)
-				Game.sendToGrave(card.card, op);
+		this.playAnimation(AnimType.EFFECT, [card], op, function(card, op){
+			if(card.card.category !== MemeCategory.CTN) {
+                Game.sendToGrave(card, op);
+                Game.addCardToHand(CardLocation.DECK, false, function(c){return c.isMeme();});
+            } else {
+                Game.addCardToHand(CardLocation.DECK, false, function(c){return c.isMeme();});
+            }
 		});
 	}
 	if(card.card.type == CardType.CHANNEL) {
 		Client.chat.write("DEBUG: The effect of " + card.card.name + " activates.");
-		var tgs = [card.slot];
+		var tgs = [card];
 		this.playAnimation(AnimType.EFFECT, tgs, op, function(card, op){
 		});
 		this.queueAnimation(AnimType.TARGET, tgs, op, function(card, op){
@@ -490,7 +593,8 @@ Game.update = function() {
 	this.obj.lhand.update();
 	this.obj.loffline.update();
 	this.obj.ohand.update();
-	this.obj.ooffline.update();
+    this.obj.ooffline.update();
+    this.obj.promptsc.update();
     //for(i in duel.local.hand) {
     //    duel.local.hand[i].update();
     //}

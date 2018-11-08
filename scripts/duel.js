@@ -4,7 +4,9 @@ const DuelPhase = {
     DRAW : 1,
     EFFECT : 2,
     ACTION : 3,
-    BATTLE : 4
+    BATTLE : 4,
+    DAMAGE : 5,
+    END : 6
 };
 
 //Each half of the board is created in a side state. 
@@ -66,7 +68,17 @@ class SideState {
 	//Returns the indexed channel.
 	get_channel(index) {
 		return this.channels[index];
-	}
+    }
+    
+    getMembersinChannel(channel) {
+        if(channel == this.channels[0]) {
+            var mems = [mems[0], mems[1], mems[2]];
+            return mems;
+        } else {
+            var mems = [mems[3], mems[4], mems[5]];
+            return mems;
+        }
+    }
 }
 
 //Contains the data for a duel. This usually created by the client when connecting to a game.
@@ -124,6 +136,20 @@ class DuelState {
         if(parts[0] === "MOVE") {
             this.moveCard(this.local.slots[parts[1]].card, this.local.slots[parts[2]])
             return;
+        }
+    }
+
+    //Gets a list of cards with a specific filter
+    getFilteredList(loc, filter, op) {
+        var list = [];
+        if(loc == CardLocation.DECK) {
+            if(!op) {
+                var fl = this.player.deck.getFilteredList(filter);
+                return fl;
+            } else {
+                var fl = this.opponent.deck.getFilteredList(filter);
+                return fl;
+            }
         }
     }
 

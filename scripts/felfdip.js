@@ -32,6 +32,7 @@ class CardObject {
         this.obj.width = 104;
         this.obj.angle = 90;
         if(op) { this.obj.angle *= -1; }
+        this.obj.p = this;
         
         this.text = game.add.text(
             slot.obj.x, 
@@ -59,10 +60,27 @@ class CardObject {
         this.parent.add(this.obj);
     }
 
+    isMember() { return this.card.type == CardType.MEMBER; }
+    isChannel() { return this.card.type == CardType.CHANNEL; }
+    isMeme() { return this.card.type == CardType.MEME; }
+    isRole() { return this.card.type == CardType.ROLE; }
+
+    getName() { return this.card.name; }
+    getOriginalName() { return this.card.original_name; }
+    hasOriginalName() { return this.card.name == this.card.original_name; }
+
+    getAttack() { return this.card.atk; }
+    getDefense() { return this.card.def; }
+    getLevel() { return this.card.lvl; }
+
+    getMemeCategory() { return this.card.category; }
+
+    getChannelSubject() { return this.card.subject; }
+
     click() {
         var local = this.ls.cardsys.duel.local;
         var duel = this.ls.cardsys.duel;
-		if(Game.waitAnim) return;
+		if(Game.waitAnim || Game.inputLayer > 0) return;
         if(this.isOpponents) {
             if(!this.revealed) return;
             this.state.obj.pv.x = this.game.world.centerX;
@@ -213,7 +231,7 @@ class DeckObject {
     click() {
         var local = this.ls.cardsys.duel.local;
         var duel = this.ls.cardsys.duel;
-		if(Game.waitAnim) return;
+		if(Game.waitAnim || Game.inputLayer > 0) return;
         if(this.isOpponents) {
             this.draw();
 			return;
@@ -329,7 +347,7 @@ class HandObject {
         this.state = game.state.getCurrentState();
     }
 	
-	updateHandPositions() {
+	updateHandPositions(fn) {
 		var duration = 250;
         var local = this.ls.cardsys.duel.local;
         local.selected = null;
@@ -338,10 +356,17 @@ class HandObject {
 			var dest = {x: this.pos.x, y: (this.pos.y + (104 * (i - this.objs.length / 2)))}
 			//Client.chat.write("X=" + dest.x + ",Y=" + dest.y);
 			this.objs[i].obj.input.enabled = false;
-			var tween = this.game.add.tween(this.objs[i].obj).to(dest, duration, Phaser.Easing.Quadratic.InOut);
-			tween.onComplete.addOnce(function(obj, tween) {
-				obj.input.enabled = true;
-			});
+            var tween = this.game.add.tween(this.objs[i].obj).to(dest, duration, Phaser.Easing.Quadratic.InOut);
+            if(i >= this.objs.length - 1) {
+                tween.onComplete.addOnce(function(obj, tween) {
+                    fn(obj.p);
+                    obj.input.enabled = true;
+                });
+            } else {
+                tween.onComplete.addOnce(function(obj, tween) {
+                    obj.input.enabled = true;
+                });
+            }
 			tween.start();
 			tweens.push(tween);
 
@@ -501,6 +526,151 @@ class OfflineObject {
 		for(i in this.objs) {
 			this.objs[i].update();
 		}
+    }
+}
+
+
+class CardSelectObject {
+    constructor(c, op, parent) {
+        var game = Client.game;
+        this.parent = parent;
+        this.isOpponents = op;
+        this.obj = game.add.button(
+            -1000, 
+            500, 
+            'cards',
+            this.click,
+            this
+        );
+        //this.obj.anchor.setTo(0.5, 0.5);
+        this.obj.height = 281;
+        this.obj.width = 201;
+        this.obj.angle = 0;
+        this.card = c;
+    }
+
+    setSelected(b) {
+        this.selected = b;
+    }
+
+    click() {
+        this.parent.selected = this;
+    }
+
+    update() {
+        this.obj.frame = this.card.index - 1;
+        if(this.parent.selected === this) {
+            this.obj.tint = 0x7F7FFF;
+        } else {
+            this.obj.tint = 0xFFFFFF;
+        }
+    }
+}
+
+class SelectCardPrompt {
+    constructor(pos) {
+        var game = Client.game;
+        this.pos = pos;
+        this.onConfirm = function(c){};
+        this.selected = null;
+        this.objs = [];
+        this.back = game.add.tileSprite(pos.x, pos.y, pos.width, pos.height, 'promptsc', 2, ui);
+        this.back.y += pos.height;
+
+        this.text = game.add.text(pos.text.x, pos.text.y, "", {
+            font: pos.text.pxsize + "px Impact",
+            fill: "#FFFFFF",
+            align: "center"
+        });
+        this.text.y += pos.height;
+
+        this.confirmButton = game.add.button(
+            this.pos.button.x,
+            this.pos.button.y,
+            'buttons3',
+            function() {
+                if(this.selected !== null) {
+                    this.hide(function(pr){
+                        pr.p.hidden = true;
+                        Game.inputLayer = 0;
+                        pr.p.onConfirm(pr.p.selected.card);
+                    });
+                }
+            },
+            this
+        );
+        this.confirmButton.p = this;
+        this.confirmButton.frame = 4;
+        this.confirmButton.y += pos.height;
+        this.scroll = 0;
+        this.hidden = true;
+    }
+
+    setMsg(msg) {
+        this.text.setText(msg);
+    }
+
+    clear() {
+        this.objs = [];
+        this.selected = null;
+    }
+
+    add(c) {
+        var nb = new CardSelectObject(c, false, this);
+        this.objs.push(nb);
+    }
+
+    getSelected() { 
+        return this.selected; 
+    }
+
+    setConfirmCallback(onConfirm) {
+        this.onConfirm = onConfirm;
+    }
+
+    show() {
+        var game = Client.game;
+        var tween = game.add.tween(this.back).to( { y: this.pos.y }, 100, Phaser.Easing.Linear.None, true, 0);
+        var tween2 = game.add.tween(this.text).to( { y: this.pos.text.y }, 100, Phaser.Easing.Linear.None, true, 0);
+        var tween3 = game.add.tween(this.confirmButton).to( { y: this.pos.button.y }, 100, Phaser.Easing.Linear.None, true, 0);
+        tween.start();
+        tween2.start();
+        tween3.start();
+        this.hidden = false;
+    }
+
+    hide(onFinish) {
+        var game = Client.game;
+        var tween = game.add.tween(this.back).to( { y: this.pos.y + this.pos.height }, 100, Phaser.Easing.Linear.None, true, 0);
+        var tween2 = game.add.tween(this.text).to( { y: this.pos.text.y + this.pos.height }, 100, Phaser.Easing.Linear.None, true, 0);
+        var tween3 = game.add.tween(this.confirmButton).to( { y: this.pos.button.y + this.pos.height }, 100, Phaser.Easing.Linear.None, true, 0);
+        tween.start();
+        tween2.start();
+        tween3.onComplete.addOnce(function(obj, tween){
+            onFinish(obj);
+        });
+        tween3.start();
+    }
+
+    calcButtonPosition(index) {
+        //var xx = this.pos.card.x + (this.pos.card.width * index) - (this.scroll * this.pos.card.width);
+        var xx = this.pos.card.x + (this.pos.card.width * index);
+        var pos = {
+            //x: xx + 230,
+            x: 10 + (202 * index),
+            y: (this.pos.card.y - 141) + (this.back.y - this.pos.y)
+        }
+        return pos;
+    }
+
+    update() {
+        if(this.hidden) return;
+        for(i in this.objs) {
+            var pos = this.calcButtonPosition(i);
+            this.objs[i].obj.x = pos.x;
+            this.objs[i].obj.y = pos.y;
+            this.objs[i].update();
+        }
     }
 }
 

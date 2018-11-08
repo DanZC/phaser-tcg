@@ -7,35 +7,75 @@ const EffectFrequency = {
     ONSTREAM: 5
 };
 
+const EffectType = {
+    AUTO : 0,
+    ACTIVATE : 1,
+    TRIGGER : 2,
+    TRIGGER_F : 3,
+    CHAIN : 4,
+    CONTINUOUS : 5
+}
+
+const EffectRange = {
+    NONE : 0b0,
+    CHANNEL_ZONES : 0b1,
+    MEMBER_ZONE_CURRENT : 0b10,
+    MEMBER_ZONE_OPPOSITE : 0b100,
+    MEMBER_ZONES: 0b110,
+    MEME_ZONES : 0b1000,
+    FIELD : 0b1111,
+    OFFLINE : 0b10000,
+    FIELD_OFFLINE : 0b11111,
+    DECK : 0b100000,
+    ALL : 0b111111
+}
+
+const EffectCode = {
+    NONE : 0,
+    UPDATE_ATK : 1,
+    UPDATE_DEF : 2,
+    UPDATE_MAX_HP : 4,
+    UPDATE_LEVEL : 8,
+    ADD_CARD_FROM_DECK : 16,
+    ADD_CARD_FROM_OFFLINE : 32,
+    ADD_CARD_FROM_FIELD : 64
+}
+
+const EffectSide = {
+    SELF : 0,
+    OPPONENT : 1,
+    BOTH : 2
+}
+
 CardEffect = {};
 
-CardEffect[0] = function(state, card) {
-    Client.chat.write("DEBUG: No effect.");
-}
-
-CardEffect[1] = function(state, card) {
-    Client.chat.write("DEBUG: Bikdip Glory.");
-    var local = state.local;
-    if(card.flags.hasTakenDamage !== true) {
-        var n = getRandomInt(0, local.members.length - 1);
-        for(i=0;i<2;i++) {
-            var stat = getRandomInt(0, 2);
-            switch(stat) {
-                case 0:
-                    card.boost('hp', 1);
-                    card.currentHP += 1;
-                    break;
-                case 1:
-                    card.boost('atk', 1);
-                    break;
-                case 2:
-                    card.boost('def', 1);
-                    break;
-            }
-        }
+class Effect {
+    constructor() {
+        this.duel = Game.getCurrentDuel();
+        this.type = EffectType.ACTIVATE;
+        this.range = EffectRange.FIELD;
+        this.range_side = EffectSide.SELF;
+        this.code = EffectCode.NONE;
+        this.value = function(e,c){};
+        this.action = function(e,c,val,filter){};
+        this.afilter = function(e,c){};
     }
-}
 
-CardEffect[2] = function(state, card) {
-    Client.chat.write("DEBUG: No effect.");
+    setRange(rg, sides) {
+        this.range = rg;
+        this.range_side = sides;
+    }
+
+    setType(ty) {
+        this.type = ty;
+    }
+
+    setValue(fn) {
+        this.value = fn;
+    }
+
+    setAction(act, filter) {
+        this.action = act;
+        this.afilter = filter;
+    }
 }

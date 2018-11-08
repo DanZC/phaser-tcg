@@ -15,7 +15,24 @@ const AnimType = {
 	DESTROY: 4,
 	BOUNCE: 5,
 	ATTACK: 6,
-	TOPGRAVE: 7
+    TOPGRAVE: 7,
+    FLIPUP: 8,
+    FLIPDOWN: 9,
+    REVEAL: 10
+};
+
+const CardLocation = {
+    NONE : 0b0,
+    CHANNEL_ZONES : 0b1,
+    MEMBER_ZONE_CURRENT : 0b10,
+    MEMBER_ZONE_OPPOSITE : 0b100,
+    MEMBER_ZONES: 0b110,
+    MEME_ZONES : 0b1000,
+    FIELD : 0b1111,
+    OFFLINE : 0b10000,
+    FIELD_OFFLINE : 0b11111,
+    DECK : 0b100000,
+    ALL : 0b111111
 };
 
 //The bottom left-most card in cards.png. It is the same texture rect used for facedown cards.
@@ -63,6 +80,8 @@ class Card {
         this.role = null; //Role applied to card, if applicable
         this.obj = null;
         this.currentHP = 0;
+        this.name = "";
+        this.original_name = "";
         this.mod = {
             hp: 0,
             atk: 0,
@@ -92,7 +111,25 @@ class Card {
         for(var prop in protocard) {
             this[prop] = protocard[prop]; //Copies over the properties from the protocard
         }
+        this.original_name = this.name;
     }
+
+    isMember() { return this.type == CardType.MEMBER; }
+    isChannel() { return this.type == CardType.CHANNEL; }
+    isMeme() { return this.type == CardType.MEME; }
+    isRole() { return this.type == CardType.ROLE; }
+
+    getName() { return this.name; }
+    getOriginalName() { return this.original_name; }
+    hasOriginalName() { return this.name == this.card.original_name; }
+
+    getAttack() { return this.atk; }
+    getDefense() { return this.def; }
+    getLevel() { return this.lvl; }
+
+    getMemeCategory() { return this.category; }
+    
+    getChannelSubject() { return this.subject; }
 }
 
 class Deck {
@@ -138,6 +175,26 @@ class Deck {
         return this.card[this.card.length - 1]
     }
 
+    //Returns a filtered list of cards in the deck
+    getFilteredList(filter) {
+        var fl = [];
+        for(i in this.card) {
+            var c = this.card[i];
+            if(filter(c))
+                fl.push(c);
+        }
+        return fl;
+    }
+
+    //Removes a card from the deck.
+    remove(card) {
+        for(i in this.card) {
+            var c = this.card[i];
+            if(c === card)
+                this.card.splice(i, 1);
+        }
+    }
+
 	//Shuffles the deck.
     shuffle() {
         var len = this.card.length;
@@ -149,10 +206,10 @@ class Deck {
         }
     }
 	
-	//Sorts deck
-	sort() {
-		this.card.sort(function(a,b){ return a.index - b.index; });
-	}
+    //Sorts deck
+    sort() {
+        this.card.sort(function(a,b){ return a.index - b.index; });
+    }
 
 	//Removes the card at the top of the deck and returns it.
     draw() {
