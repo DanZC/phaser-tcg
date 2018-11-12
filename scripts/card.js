@@ -18,7 +18,8 @@ const AnimType = {
     TOPGRAVE: 7,
     FLIPUP: 8,
     FLIPDOWN: 9,
-    REVEAL: 10
+    REVEAL: 10,
+    BEGIN: 99
 };
 
 const CardLocation = {
@@ -63,6 +64,7 @@ const MemeCategory = {
     VRT : 3
 }
 
+//Unused
 const CardStatus = {
     OFFLINE : 0,
     ONLINE : 1,
@@ -79,7 +81,9 @@ class Card {
         this.index = 0;
         this.role = null; //Role applied to card, if applicable
         this.obj = null;
+        this.attacks = 1;
         this.currentHP = 0;
+        this.currentHPCTR = this.currentHP;
         this.name = "";
         this.original_name = "";
         this.mod = {
@@ -94,6 +98,7 @@ class Card {
         this.index = index;
         this.update();
         this.currentHP = this.hp;
+        this.currentHPCTR = this.currentHP;
     }
 
     boost(stat, amt) {
@@ -109,9 +114,12 @@ class Card {
     update() {
         var protocard = CardIndex[this.index];
         for(var prop in protocard) {
-            this[prop] = protocard[prop]; //Copies over the properties from the protocard
+            if('prop' !== 'name') {
+                this[prop] = protocard[prop]; //Copies over the properties from the protocard
+            }
         }
-        this.original_name = this.name;
+        if(protocard !== undefined)
+            this.original_name = protocard['name'];
     }
 
     isMember() { return this.type == CardType.MEMBER; }
@@ -130,6 +138,17 @@ class Card {
     getMemeCategory() { return this.category; }
     
     getChannelSubject() { return this.subject; }
+
+    damage(dmg) { 
+        this.currentHP = this.hp - dmg; 
+        if(this.currentHP <= 0) {
+            this.currentHP = 0;
+            return true;
+        }
+        return false;
+    }
+
+    resetAttacks() { this.attacks = 1; }
 }
 
 class Deck {

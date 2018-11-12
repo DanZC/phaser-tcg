@@ -20,6 +20,7 @@ var ai = require('child_process').fork('./ai.js', [], {
 });
 
 CardIndex = [];
+DummyDeck = [];
 
 var fs = require('fs');
 fs.readFile( __dirname + '/assets/cards.json', function (err, data) {
@@ -27,6 +28,12 @@ fs.readFile( __dirname + '/assets/cards.json', function (err, data) {
         throw err; 
     }
     CardIndex = data.toJSON();
+});
+fs.readFile( __dirname + '/assets/dummy_deck.json', function (err, data) {
+    if (err) {
+        throw err; 
+    }
+    DummyDeck = data.toJSON();
 });
 
 usedMatchIDs = [];
@@ -61,13 +68,323 @@ function copy(obj) {
     return copy;
 }
 
+function rcopy(obj) {
+    if (null == obj || "object" != typeof obj) return obj;
+    var copy = {};
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    }
+    return copy;
+}
+
 const DuelPhase = {
     WAIT : 0,
     DRAW : 1,
     EFFECT : 2,
     ACTION : 3,
-    BATTLE : 4
+    BATTLE : 4,
+    DAMAGE : 5,
+    END : 6
 };
+
+const ChannelType = {
+    NON : 0,
+    SRS : 1,
+    GMG : 2,
+    MDA : 3,
+    MTR : 4,
+    MEM : 5
+};
+
+//Bad "enum", because Javascript doesn't have bultin enums.
+const CardType = {
+    UNDEFINED : 0,
+    MEMBER : 1,
+    ROLE : 2,
+    CHANNEL : 3,
+    MEME : 4
+};
+
+const AnimType = {
+	NONE: 0,
+	TARGET: 1,
+	EFFECT: 2,
+	SHUFFLE: 3,
+	DESTROY: 4,
+	BOUNCE: 5,
+	ATTACK: 6,
+    TOPGRAVE: 7,
+    FLIPUP: 8,
+    FLIPDOWN: 9,
+    REVEAL: 10
+};
+
+const CardLocation = {
+    NONE : 0b0,
+    CHANNEL_ZONES : 0b1,
+    MEMBER_ZONE_CURRENT : 0b10,
+    MEMBER_ZONE_OPPOSITE : 0b100,
+    MEMBER_ZONES: 0b110,
+    MEME_ZONES : 0b1000,
+    FIELD : 0b1111,
+    OFFLINE : 0b10000,
+    FIELD_OFFLINE : 0b11111,
+    DECK : 0b100000,
+    ALL : 0b111111
+};
+
+//The bottom left-most card in cards.png. It is the same texture rect used for facedown cards.
+const UNDEFINED_CARD_INDEX = 159;
+
+const CardColor = {
+    NONE : 0,
+    RED : 1,
+    ORN : 2,
+    YLW : 3,
+    GRN : 4,
+    BLU : 5,
+    PPL : 6,
+    PNK : 7,
+    GRY : 8
+}
+
+const MemeCategory = {
+	NML : 0,
+	CTN : 1,
+    RSP : 2,
+    VRT : 3
+}
+
+//Unused
+const CardStatus = {
+    OFFLINE : 0,
+    ONLINE : 1,
+    IDLE : 2,
+    DONOTDISTURB : 3,
+    STREAMING : 4
+}
+
+class Card {
+    constructor() {
+        this.type = CardType.UNDEFINED;
+		this.category = MemeCategory.CTN;
+        this.status = CardStatus.ONLINE;
+        this.index = 0;
+        this.role = null; //Role applied to card, if applicable
+        this.obj = null;
+        this.attacks = 1;
+        this.currentHP = 0;
+        this.currentHPCTR = this.currentHP;
+        this.name = "";
+        this.original_name = "";
+        this.mod = {
+            hp: 0,
+            atk: 0,
+            def: 0
+        };
+    }
+
+	//Sets the card index.
+    set_index(index) {
+        this.index = index;
+        this.update();
+        this.currentHP = this.hp;
+        this.currentHPCTR = this.currentHP;
+    }
+
+    boost(stat, amt) {
+        this.mod[stat] += amt;
+    }
+
+    nerf(stat, amt) {
+        this.mod[stat] -= amt;
+    }
+
+    //Makes the instance card a copy of a card defined in CardIndex, giving the instance
+    //card the CardIndex's property values.
+    update() {
+        var protocard = CardIndex[this.index];
+        for(var prop in protocard) {
+            if('prop' !== 'name') {
+                this[prop] = protocard[prop]; //Copies over the properties from the protocard
+            }
+        }
+        if(protocard !== undefined)
+            this.original_name = protocard['name'];
+    }
+
+    isMember() { return this.type == CardType.MEMBER; }
+    isChannel() { return this.type == CardType.CHANNEL; }
+    isMeme() { return this.type == CardType.MEME; }
+    isRole() { return this.type == CardType.ROLE; }
+
+    getName() { return this.name; }
+    getOriginalName() { return this.original_name; }
+    hasOriginalName() { return this.name == this.card.original_name; }
+
+    getAttack() { return this.atk; }
+    getDefense() { return this.def; }
+    getLevel() { return this.lvl; }
+
+    getMemeCategory() { return this.category; }
+    
+    getChannelSubject() { return this.subject; }
+
+    damage(dmg) { 
+        this.currentHP = this.hp - dmg; 
+        if(this.currentHP <= 0) {
+            this.currentHP = 0;
+            return true;
+        }
+        return false;
+    }
+
+    resetAttacks() { this.attacks = 1; }
+}
+
+class Deck {
+    constructor() {
+        this.card = [];
+    }
+
+	//Creates a copy of the deck.
+    copy() {
+        var d = new Deck();
+        for(i in this.card) {
+            var c = new Card();
+            c.set_index(this.card[i].index);
+            d.add(c);
+        }
+        return d;
+    }
+
+	//Create a raw copy of a list of cards in the deck.
+    rawcopy() {
+        var d = [];
+        for(i in this.card) {
+            d.push(this.card[i].index);
+        }
+        return d;
+    }
+
+    fromJSON(json) {
+        for(i in json) {
+            var c = new Card();
+            c.set_index(json[i]);
+            this.add(c);
+        }
+    }
+
+	//Pushes a card into the deck.
+    add(card) {
+        this.card.push(card);
+    }
+
+	//Returns the top of the deck.
+    get_top() {
+        return this.card[this.card.length - 1]
+    }
+
+    //Returns a filtered list of cards in the deck
+    getFilteredList(filter) {
+        var fl = [];
+        for(i in this.card) {
+            var c = this.card[i];
+            if(filter(c))
+                fl.push(c);
+        }
+        return fl;
+    }
+
+    //Removes a card from the deck.
+    remove(card) {
+        for(i in this.card) {
+            var c = this.card[i];
+            if(c === card)
+                this.card.splice(i, 1);
+        }
+    }
+
+	//Shuffles the deck.
+    shuffle() {
+        var len = this.card.length;
+        for(i = len-1; i > 1; i--) {
+            var j = getRandomInt(0, i+1);
+            var c = this.card[j]; //Move reference into c
+            this.card[j] = this.card[i]; //J references I
+            this.card[i] = c;   //I references C
+        }
+    }
+	
+    //Sorts deck
+    sort() {
+        this.card.sort(function(a,b){ return a.index - b.index; });
+    }
+
+	//Removes the card at the top of the deck and returns it.
+    draw() {
+        return this.card.pop();
+    }
+
+	//Updates the cards.
+    update() {
+        for(var i in this.card) {
+            this.card[i].update();
+        }
+    }
+}
+
+function make_deck(rawDeck) {
+    var deck = new Deck();
+    for(i in rawDeck) {
+        var card = new Card();
+        card.set_index(rawDeck[i]);
+        deck.add(card);
+    }
+    return deck;
+}
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+const SlotType = {
+    UNDEFINED : 0,
+    MEMROLE : 1,
+    CHANNEL : 2,
+    MEME : 3,
+    DECK : 4,
+    OFFLINE : 5
+}
+
+class Slot {
+    constructor(type, id, owner) {
+        this.card = null;
+        this.id = id;
+        this.index = -1;
+        this.type = type;
+        this.owner = owner;
+        this.role = -1;
+        this.hp = 0;
+    }
+
+    set_card(c) {
+        this.card = c;
+        this.id = c.index
+        this.hp = c.currentHP;
+    }
+
+    is_empty() {
+        return this.card == null;
+    }
+
+    remove_card() {
+        this.card = null;
+        this.id = -1;
+    }
+}
 
 class MatchState {
     constructor() {
@@ -78,24 +395,24 @@ class MatchState {
             deck: [],
             hand: [],
             memes: [
-                {index: -1},
-                {index: -1},
-                {index: -1},
-                {index: -1},
-                {index: -1},
-                {index: -1}
+                new Slot(SlotType.MEME, 0, 'a'),
+                new Slot(SlotType.MEME, 1, 'a'),
+                new Slot(SlotType.MEME, 2, 'a'),
+                new Slot(SlotType.MEME, 3, 'a'),
+                new Slot(SlotType.MEME, 4, 'a'),
+                new Slot(SlotType.MEME, 5, 'a')
             ],
             members: [
-                {index: -1, role: -1},
-                {index: -1, role: -1},
-                {index: -1, role: -1},
-                {index: -1, role: -1},
-                {index: -1, role: -1},
-                {index: -1, role: -1}
+                new Slot(SlotType.MEMROLE, 0, 'a'),
+                new Slot(SlotType.MEMROLE, 1, 'a'),
+                new Slot(SlotType.MEMROLE, 2, 'a'),
+                new Slot(SlotType.MEMROLE, 3, 'a'),
+                new Slot(SlotType.MEMROLE, 4, 'a'),
+                new Slot(SlotType.MEMROLE, 5, 'a')
             ],
             channels: [
-                {index: -1, member: 0},
-                {index: -1, member: 0}
+                new Slot(SlotType.CHANNEL, 0, 'a'),
+                new Slot(SlotType.CHANNEL, 1, 'a')
             ],
             offline: []
         }
@@ -103,24 +420,24 @@ class MatchState {
             deck: [],
             hand: [],
             memes: [
-                {index: -1},
-                {index: -1},
-                {index: -1},
-                {index: -1},
-                {index: -1},
-                {index: -1}
+                new Slot(SlotType.MEME, 0, 'a'),
+                new Slot(SlotType.MEME, 1, 'a'),
+                new Slot(SlotType.MEME, 2, 'a'),
+                new Slot(SlotType.MEME, 3, 'a'),
+                new Slot(SlotType.MEME, 4, 'a'),
+                new Slot(SlotType.MEME, 5, 'a')
             ],
             members: [
-                {index: -1, role: -1},
-                {index: -1, role: -1},
-                {index: -1, role: -1},
-                {index: -1, role: -1},
-                {index: -1, role: -1},
-                {index: -1, role: -1}
+                new Slot(SlotType.MEMROLE, 0, 'b'),
+                new Slot(SlotType.MEMROLE, 1, 'b'),
+                new Slot(SlotType.MEMROLE, 2, 'b'),
+                new Slot(SlotType.MEMROLE, 3, 'b'),
+                new Slot(SlotType.MEMROLE, 4, 'b'),
+                new Slot(SlotType.MEMROLE, 5, 'b')
             ],
             channels: [
-                {index: -1, member: 0},
-                {index: -1, member: 0}
+                new Slot(SlotType.CHANNEL, 0, 'b'),
+                new Slot(SlotType.CHANNEL, 1, 'b')
             ],
             offline: []
         }
@@ -139,7 +456,7 @@ class AI {
         this.bot = bot;
     }
 
-    doTurn(state, id) {
+    calcMove(state, id) {
         var oid = 'b';
         if(id === 'b') oid = 'a';
         ai.send({
@@ -151,7 +468,8 @@ class AI {
                 self: copy(state[id]),
                 opponent: copy(state[oid]),
                 phase: state.phase
-            }
+            },
+            id: id
         })
     }
 }
@@ -169,6 +487,7 @@ class Match {
         usedMatchIDs.push(x);
         this.id = x;
         this.roomid = "M" + this.id.toString();
+        this.dead = false;
     }
 
     isReady() {
@@ -184,17 +503,31 @@ class Match {
         this.state.a.deck = this.a.deck;
         this.state.b.deck = this.b.deck;
         this.state.turn = this.b;
-        io.to(this.roomid).emit('matchmake end');
+        //io.to(this.roomid).emit('matchmake end', this.state);
         if(this.a.bot !== true) {
-            this.a.socket.emit('end turn');
+            io.sockets.connected[this.a.socketID].emit('matchmake end', copy(this.state.b));
+            io.sockets.connected[this.a.socketID].emit('end turn');
         }
-        if(this.b.bot === true) {
-            this.b.ai.doTurn(this.state, "b");
+        if(this.b.bot !== true) {
+            io.sockets.connected[this.b.socketID].emit('matchmake end', copy(this.state.b));
+        } else {
+            this.b.ai.calcMove(this.state, "b");
         }
     }
 
-    doMove() {
+    emit(moves) {
+        for(m in moves) {
+            io.to(this.roomid).emit('move get', moves[m]);
+        }
+    }
 
+    doMove(p, move) {
+        var parts = move.split(' ');
+        if(p === 'a') {
+            if(parts[0] === "DRAW") {
+                
+            }
+        }
     }
 
     sync() {
@@ -202,9 +535,10 @@ class Match {
     }
 
     disconnect(socket) {
-        io.to(this.roomid).emit('player left match', socket);
-        a.leave_match();
-        b.leave_match();
+        //io.to(this.roomid).emit('player left match', socket);
+        this.a.leave_match();
+        this.b.leave_match();
+        this.dead = true;
     }
 }
 
@@ -216,6 +550,18 @@ function randomDeck() {
         deck.push(n);
     }
     return deck;
+}
+
+function dummyDeck() {
+    var cards = 40;
+    var deck = [];
+    for(i = 0; i < cards; i++) {
+        var n = DummyDeck[i];
+        //var c = new Card();
+        //c.set_index(n);
+        //c.update();
+        deck.push(n);
+    }
 }
 
 function newMatch(a, b) {
@@ -236,7 +582,7 @@ class Player {
         this.socket = socket;
     }
 
-    leave_match() {}
+    leave_match() { this.match = null; }
 }
 
 class Bot {
@@ -249,7 +595,7 @@ class Bot {
         this.match = null,
         this.bot = true,
         this.socketID = -1;
-        this.deck = randomDeck();
+        this.deck = dummyDeck();
         this.ai = new AI();
         server.bots.push(this);
     }
@@ -274,18 +620,24 @@ server.matches = [];
 server.players = [];
 
 ai.on('message', function(data){
-if(data.type === 'handshake') {
-    console.log('Handshake with ai server.');
-} else if(data.type === 'ai callback') {
-    console.log('AI Callback.')
-}
+    if(data.type === 'handshake') {
+        console.log('Handshake with ai server.');
+    } else if(data.type === 'ai callback') {
+        var match = data.match;
+        var moves = data.moves;
+        console.log('AI Callback.');
+        for(m in moves) {
+            match.doMove(data.id, moves[m]);
+        }
+        match.emit(moves);
+    }
 });
 
 ai.on('close', (code) => {
     console.log('ai module closed with a code of ' + code);
-    ai = fork('./ai.js', [], {
-        stdio: 'pipe'
-    });
+    //ai = fork('./ai.js', [], {
+    //    stdio: 'pipe'
+    //});
 });
 
 io.on('connection',function(socket){
@@ -299,7 +651,8 @@ io.on('connection',function(socket){
             spectating: false,
             match: null,
             socketID: socket.id,
-            muted: false
+            muted: false,
+            leave_match: function() { this.match = null; this.inMatch = false; }
         };
         server.players.push(socket.player);
         socket.emit('allplayers',getAllPlayers());
@@ -322,7 +675,8 @@ io.on('connection',function(socket){
             spectating: false,
             match: null,
             socketID: socket.id,
-            muted: false
+            muted: false,
+            leave_match: function() { this.match = null; this.inMatch = false; }
         };
         server.players.push(socket.player);
         socket.emit('allplayers',getAllPlayers());
@@ -362,7 +716,8 @@ io.on('connection',function(socket){
         if(bot === null) {
             bot = new Bot();
         }
-        var match = newMatch(bot, socket.player);
+        var match = new Match(bot, socket.player);
+        match.id = server.lastMatchID++;
         server.matches[match.id] = match;
         socket.player.match = match;
         bot.match = match;
@@ -377,6 +732,14 @@ io.on('connection',function(socket){
             }
         });
         console.log("Player, " + socket.player.id + ", joined a match vs the AI.");
+    });
+
+    socket.on('leavegame',function(){
+        if(socket.player.match !== null) {
+            var match = socket.player.match;
+            match.disconnect(socket);
+        }
+        console.log("Player, " + socket.player.id + ", left a match.");
     });
 
     socket.on('matchmake enter',function(){

@@ -332,6 +332,7 @@ Game.create = function() {
         game.world.centerY + 77,
         'buttons3',
         function() {
+            Client.leaveGame();
             Client.game.state.start('Title',true,false,game);
             Client.cardsys.reset();
         },
@@ -368,6 +369,10 @@ Game.create = function() {
     );
 
     Client.chat.write("Joined an AI game.");
+    var tgts = [obj.close];
+    Game.playAnimation(AnimType.BEGIN, tgts, false, function(tg,op){
+
+    });
 };
 
 Game.getCurrentDuel = function() {
@@ -376,6 +381,14 @@ Game.getCurrentDuel = function() {
 
 Game.getLocalPlayer = function() {
     return this.cardsys.player;
+}
+
+Game.drawCard = function(op, n=1) {
+    if(!op) {
+        Game.obj.local.deck.draw();
+    } else {
+        Game.obj.opponent.deck.draw();
+    }
 }
 
 Game.updateHand = function() {
@@ -449,7 +462,31 @@ Game.isInHand = function(card, op) {
 	}
 }
 
-Game.playAnimation = function(animid, targets, op, callback) {
+//Sends a message to the server and waits for the opponent to chose a card to activate in response.
+Game.awaitCheckEffect = function(type, callback) {
+    //Client.sendCheckEffect(type, callback);
+    //Since the multiplayer is yet to be implemented, the effect/attack will go through without response from the opponent.
+    callback();
+}
+
+//Awards a prize token to a player
+Game.awardPrizeToken = function(op) {
+    if(!op) {
+        Game.getCurrentDuel().player.prizeTokens++;
+    } else {
+        Game.getCurrentDuel().opponent.prizeTokens++;
+    }
+}
+
+Game.isOnField = function(card, op) {
+	if(!op) {
+		return Game.obj.lhand.check(card);
+	} else {
+		return Game.obj.ohand.check(card);
+	}
+}
+
+Game.playAnimation = function(animid, targets, op, callback, value = 0) {
 	this.waitAnim = true;
 	this.animCB = callback;
 	if(typeof targets[0] !== 'undefined')
@@ -527,15 +564,128 @@ Game.playAnimation = function(animid, targets, op, callback) {
         });
         tween.chain(tween2);
         tween.start();
+	} else if(animid == AnimType.ATTACK) {
+        var attacker = targets[0].obj;
+        var attacktg = targets[1].obj;
+        var ox = attacker.x;
+        var oy = attacker.y;
+        //Client.sounds['hit2'].play();
+        var tween = null;
+        if(op) {
+            tween = game.add.tween(attacker).to( { x: attacktg.x - 201, y: attacktg.y }, 300, Phaser.Easing.Quadratic.In, false, 0);
+        } else {
+            tween = game.add.tween(attacker).to( { x: attacktg.x + 201, y: attacktg.y }, 300, Phaser.Easing.Quadratic.In, false, 0);
+        }
+        var tween2 = game.add.tween(attacker).to( { x: ox, y: oy }, 300, Phaser.Easing.Quadratic.Out, false, 0);
+		//var tween2 = game.add.tween(obj).to( { width: w }, 100, Phaser.Easing.Linear.None, false, 0);
+        tween.onComplete.addOnce(function(obj, tween){
+            Client.sounds['hit2'].play();
+        });
+        tween2.onComplete.addOnce(function(obj, tween){
+            Game.waitAnim = false;
+            if(cb !== undefined)
+				cb(Game.animTargets[0], op);
+			if(Game.animQueue.length > 0) {
+				var next = Game.animQueue.shift();
+				Game.playAnimation(next['animid'], next['targets'], next['op'], next['callback'], next['value']);
+			}
+        });
+        tween.chain(tween2);
+        tween.start();
+    } else if(animid == AnimType.DAMAGE) {
+        var tg = targets[0].obj;
+        var obj = game.add.text(
+            tg.x, 
+            tg.y, 
+            "-" + value, {
+            font: "16px Courier New",
+            fill: "#ff0000",
+            stroke: '#000000',
+            align: "left"
+        });
+        var tween = game.add.tween(obj).to( { y: tg.y + 180 }, 1000, Phaser.Easing.Linear.None, false, 0);
+        tween.onComplete.addOnce(function(obj, tween){
+            obj.x = -1000;
+            Game.waitAnim = false;
+            if(cb !== undefined)
+				cb(Game.animTargets[0], op);
+			if(Game.animQueue.length > 0) {
+				var next = Game.animQueue.shift();
+				Game.playAnimation(next['animid'], next['targets'], next['op'], next['callback'], next['value']);
+			}
+        });
+        tween.start();
+	} else if(animid == AnimType.BEGIN) {
+        var tg = targets[0];
+        var tween = game.add.tween(tg).to( { alpha: 1 }, 1, Phaser.Easing.Linear.None, false, 500);
+        var tween2 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
+        var tween3 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
+        var tween4 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
+        var tween5 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
+        var tween6 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
+        var tween7 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
+        var tween8 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
+        var tween9 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
+        var tween10 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
+        tween.onComplete.addOnce(function(obj, tween){
+            Game.drawCard(true);
+        });
+        tween2.onComplete.addOnce(function(obj, tween){
+            Game.drawCard(true);
+        });
+        tween3.onComplete.addOnce(function(obj, tween){
+            Game.drawCard(true);
+        });
+        tween4.onComplete.addOnce(function(obj, tween){
+            Game.drawCard(true);
+        });
+        tween5.onComplete.addOnce(function(obj, tween){
+            Game.drawCard(true);
+        });
+        tween6.onComplete.addOnce(function(obj, tween){
+            Game.drawCard(false);
+        });
+        tween7.onComplete.addOnce(function(obj, tween){
+            Game.drawCard(false);
+        });
+        tween8.onComplete.addOnce(function(obj, tween){
+            Game.drawCard(false);
+        });
+        tween9.onComplete.addOnce(function(obj, tween){
+            Game.drawCard(false);
+        });
+        tween10.onComplete.addOnce(function(obj, tween){
+            Game.drawCard(false);
+            Game.getCurrentDuel().draws = 0;
+            Game.getCurrentDuel().phase = 3;
+            Game.waitAnim = false;
+            if(cb !== undefined)
+				cb(Game.animTargets[0], op);
+			if(Game.animQueue.length > 0) {
+				var next = Game.animQueue.shift();
+				Game.playAnimation(next['animid'], next['targets'], next['op'], next['callback'], next['value']);
+			}
+        });
+        tween.chain(tween2);
+        tween2.chain(tween3);
+        tween3.chain(tween4);
+        tween4.chain(tween5);
+        tween5.chain(tween6);
+        tween6.chain(tween7);
+        tween7.chain(tween8);
+        tween8.chain(tween9);
+        tween9.chain(tween10);
+        tween.start();
 	}
 }
 
-Game.queueAnimation = function(animid, targets, op, callback) {
+Game.queueAnimation = function(animid, targets, op, callback, value=0) {
 	this.animQueue.push({
 		animid: animid, 
 		targets: targets, 
 		op: op, 
-		callback: callback
+        callback: callback,
+        value: value
 	});
 }
 
@@ -551,6 +701,27 @@ Game.sendToGrave = function(card, op) {
 		this.obj.loffline.updatePositions();
 	}
 	Client.chat.write("DEBUG: Sent to grave.");
+}
+
+Game.attack = function(c, s) {
+    Game.awaitCheckEffect(CheckEffectType.ATTACK, function() {
+        var targets = [c.slot, s];
+        var targets2 = [s];
+        var op = !s.isOpponents();
+        var damage = 0;
+        if(s.type === SlotType.MEMROLE) {
+            damage = calcDamage(c.getAttack(), s.card.getDefense());
+        }
+        Game.playAnimation(AnimType.ATTACK, targets, op, function(card, op) {
+        });
+        var hasBeenDestroyed = s.card.damage(damage);
+        Game.queueAnimation(AnimType.DAMAGE, targets2, op, function(card, op) {
+        }, damage);
+        if(hasBeenDestroyed) {
+            Game.sendToGrave(s.card, !op);
+            Game.awardPrizeToken(op);
+        }
+    });
 }
 
 Game.playCard = function(card, op) {

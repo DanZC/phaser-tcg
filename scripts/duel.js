@@ -106,7 +106,7 @@ class DuelState {
 		this.waiting = false;
 		
 		//The current phase
-        this.phase = DuelPhase.DRAW;
+        this.phase = DuelPhase.WAIT;
 		
 		//The current turn number.
 		this.turnNumber = 1;
@@ -130,12 +130,26 @@ class DuelState {
         card.move({x: slot.obj.x, y: slot.obj.y});
     }
 
+    //Draws a card from the deck
+    drawCard(op, n=1) {
+        Game.drawCard(op, n);
+    }
+
 	//Executes a move using a string. The string is formatted and sent by the server.
     doMove(move) {
         var parts = move.split(" ");
-        if(parts[0] === "MOVE") {
-            this.moveCard(this.local.slots[parts[1]].card, this.local.slots[parts[2]])
-            return;
+        if(parts[0] === "P0") {
+            if(parts[1] === "MOVE") {
+                this.moveCard(this.local.slots[parts[1]].card, this.local.slots[parts[2]])
+                return;
+            } else if(parts[1] === "DRAW") {
+                if(parts.length > 2) {
+                    this.drawCard(false);
+                } else {
+                    this.drawCard(false, parseInt(parts[2]));
+                }
+                return;
+            }
         }
     }
 

@@ -8,6 +8,17 @@ Client.load = false;
 Client.game = null;
 Client.cardsys = null;
 
+Client.checkEffectCallback = function(){};
+
+const CheckEffectType = {
+    ATTACK : 0,
+    ACTIVATEEFFECT : 1,
+    DISCARD : 2,
+    BATTLEPHASE : 3,
+    DAMAGESTEP : 4,
+    ENDTURN : 5
+};
+
 Client.chat = {};
 
 Client.chat.write = function(msg) {
@@ -41,6 +52,12 @@ Client.sendMove = function(move){
     //Client.socket.emit('move send', move);
 };
 
+Client.sendCheckEffect = function(type, callback){
+    Client.socket.emit('checkeffect', type);
+    Client.checkEffectCallback = callback;
+    //Client.socket.emit('move send', move);
+};
+
 Client.newGame = function(type, data) {
     if(type === GameType.AI) {
         Client.socket.emit('newaigame');
@@ -56,6 +73,10 @@ Client.newGame = function(type, data) {
     }
 
 };
+
+Client.leaveGame = function() {
+    Client.socket.emit('leavegame');
+}
 
 Client.socket.on('allplayers',function(data){
     console.log(data);
@@ -76,7 +97,9 @@ Client.socket.on('matchmake callback',function(data){
 Client.socket.on('matchmake end',function(data){
     Client.chat.clearAll();
     Client.chat.write("Creating a new AI game...");
-    Client.cardsys.duel = new DuelState(Client.cardsys.player, new Player());
+    var opponent = new Player();
+    opponent.deck = make_deck(data.deck);
+    Client.cardsys.duel = new DuelState(Client.cardsys.player, opponent);
     Client.game.state.start("Game",true,false,Client.game,{type: GameType.RandomMatch});
 });
 
@@ -84,6 +107,10 @@ Client.socket.on('move callback',function(x){
     if(x !== null) {
         //Client.cardsys.duel.remote.update(state.local);
     }
+});
+
+Client.socket.on('checkeffect none',function(){
+    Client.checkEffectCallback();
 });
 
 Client.socket.on('move get',function(state){

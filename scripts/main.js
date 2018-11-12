@@ -29,7 +29,8 @@ window.onload = function() {
 		game.load.audio('se_card3', 'assets/card3.wav');
 		game.load.audio('se_target', 'assets/target.wav');
 		game.load.audio('se_tograve', 'assets/tograve.wav');
-		game.load.audio('se_effect', 'assets/effect.wav');
+        game.load.audio('se_effect', 'assets/effect.wav');
+        game.load.audio('se_hit2', 'assets/hit2.wav');
     }
 
     function create () {
@@ -40,6 +41,7 @@ window.onload = function() {
         ls.sounds['effect'] = new Phaser.Sound(game, 'se_effect', 0.5);
 		ls.sounds['tograve'] = new Phaser.Sound(game, 'se_tograve');
         ls.sounds['target'] = new Phaser.Sound(game, 'se_target', 0.9);
+        ls.sounds['hit2'] = new Phaser.Sound(game, 'se_hit2', 0.9);
         CardIndex = game.cache.getJSON('card_data');
         for(i in CardIndex) {
             var c = CardIndex[i];
