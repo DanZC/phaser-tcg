@@ -404,6 +404,7 @@ Game.addToHand = function(card, op) {
 	}
 }
 
+//Opens up a prompt for the user to select a card from the list.
 Game.promptSelectCard = function(msg, loc, filter, callback) {
     var game = this.game;
     if(loc == CardLocation.DECK) {
@@ -421,6 +422,7 @@ Game.promptSelectCard = function(msg, loc, filter, callback) {
     }
 }
 
+//Adds a card to the hand, using a filter.
 Game.addCardToHand = function(loc, op, filter) {
     if(loc == CardLocation.DECK) {
         if(!op) {
@@ -454,6 +456,7 @@ Game.removeFromHand = function(card, op) {
 	}
 }
 
+//Checks whether a given card is in either player's hand.
 Game.isInHand = function(card, op) {
 	if(!op) {
 		return Game.obj.lhand.check(card);
@@ -478,6 +481,7 @@ Game.awardPrizeToken = function(op) {
     }
 }
 
+//Checks whether the card is on the field.
 Game.isOnField = function(card, op) {
 	if(!op) {
 		return Game.obj.lhand.check(card);
@@ -486,7 +490,8 @@ Game.isOnField = function(card, op) {
 	}
 }
 
-Game.playAnimation = function(animid, targets, op, callback, value = 0) {
+//Plays an animation given animation targets.
+Game.playAnimation = function(animid, targets, op, callback=function(card, op){}, value = 0) {
 	this.waitAnim = true;
 	this.animCB = callback;
 	if(typeof targets[0] !== 'undefined')
@@ -592,6 +597,38 @@ Game.playAnimation = function(animid, targets, op, callback, value = 0) {
         });
         tween.chain(tween2);
         tween.start();
+    } else if(animid == AnimType.TOGRAVE) {
+        var obj = targets[0].obj;
+        obj.inputEnabled = false;
+        Client.sounds['tograve'].play();
+        var tween = null;
+        if(op) {
+            var dest = {
+                x: Game.obj.ooffline.pos.x,
+                y: Game.obj.ooffline.pos.y
+            }
+            tween = game.add.tween(obj).to( dest, 250, Phaser.Easing.Quadratic.InOut, false, 0);
+        } else {
+            var dest = {
+                x: Game.obj.loffline.pos.x,
+                y: Game.obj.loffline.pos.y
+            }
+            tween = game.add.tween(obj).to( dest, 250, Phaser.Easing.Quadratic.InOut, false, 0);
+        }
+        //var tween2 = game.add.tween(obj).to( { x: ox, y: oy }, 300, Phaser.Easing.Quadratic.Out, false, 0);
+		//var tween2 = game.add.tween(obj).to( { width: w }, 100, Phaser.Easing.Linear.None, false, 0);
+        tween.onComplete.addOnce(function(obj, tween){
+            obj.inputEnabled = true;
+            Game.waitAnim = false;
+            Game.obj.loffline.updatePositions();
+            if(cb !== undefined)
+				cb(Game.animTargets[0], op);
+			if(Game.animQueue.length > 0) {
+				var next = Game.animQueue.shift();
+				Game.playAnimation(next['animid'], next['targets'], next['op'], next['callback'], next['value']);
+			}
+        });
+        tween.start();
     } else if(animid == AnimType.DAMAGE) {
         var tg = targets[0].obj;
         var obj = game.add.text(
@@ -679,16 +716,22 @@ Game.playAnimation = function(animid, targets, op, callback, value = 0) {
 	}
 }
 
-Game.queueAnimation = function(animid, targets, op, callback, value=0) {
+//Adds an animation to the Animation queue
+Game.queueAnimation = function(animid, targets, op, callback=function(card,op){}, value=0) {
+    //if(this.animQueue.length < 1) {
+    //    this.playAnimation(animid, targets, op, callback, value);
+    //    return;
+    //}
 	this.animQueue.push({
 		animid: animid, 
 		targets: targets, 
 		op: op, 
         callback: callback,
         value: value
-	});
+    });
 }
 
+//Sends a card to the grave
 Game.sendToGrave = function(card, op) {
 	if(!op) {
         this.obj.loffline.push(card);
@@ -696,13 +739,16 @@ Game.sendToGrave = function(card, op) {
 		    card.slot.card = null;
             card.slot = null;
         }
-		card.parent.bringToTop(card);
-		Client.sounds['tograve'].play();
-		this.obj.loffline.updatePositions();
+        card.parent.bringToTop(card);
+        var targets = [card];
+        this.queueAnimation(AnimType.TOGRAVE, targets, op);
+		//Client.sounds['tograve'].play();
+		//this.obj.loffline.updatePositions();
 	}
 	Client.chat.write("DEBUG: Sent to grave.");
 }
 
+//Attacks
 Game.attack = function(c, s) {
     Game.awaitCheckEffect(CheckEffectType.ATTACK, function() {
         var targets = [c.slot, s];
@@ -718,8 +764,9 @@ Game.attack = function(c, s) {
         Game.queueAnimation(AnimType.DAMAGE, targets2, op, function(card, op) {
         }, damage);
         if(hasBeenDestroyed) {
-            Game.sendToGrave(s.card, !op);
-            Game.awardPrizeToken(op);
+            Game.queueAnimation(AnimType.TOGRAVE, targets2, !op, function(card, op){
+                Game.awardPrizeToken(op);
+            });
         }
     });
 }
@@ -746,6 +793,7 @@ Game.playCard = function(card, op) {
 	}
 }
 
+//Updates the state of all objects in the scene.
 Game.update = function() {
     var ls = Client;
     var duel = ls.cardsys.duel;

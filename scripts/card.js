@@ -19,6 +19,8 @@ const AnimType = {
     FLIPUP: 8,
     FLIPDOWN: 9,
     REVEAL: 10,
+    TOGRAVE: 11,
+    CHANGECONTROL: 12,
     BEGIN: 99
 };
 

@@ -1,3 +1,4 @@
+//A container for data pertaining to the local card game state. Defines the decks stored locally as well as the local player data.
 class CardSystem {
     constructor() {
         this.deck = [random_deck()]; //Plan on having multiple decks available
@@ -14,6 +15,7 @@ class CardSystem {
     }
 }
 
+//An object representing a card. Clickable.
 class CardObject {
     constructor(slot, card, op, parent) {
         var d = card.index;
@@ -191,6 +193,7 @@ class CardObject {
     }
 }
 
+//An object representing the deck. 
 class DeckObject {
     constructor(slot, card, op, parent) {
         var d = card.index;
@@ -241,12 +244,12 @@ class DeckObject {
         var duel = this.ls.cardsys.duel;
 		if(Game.waitAnim || Game.inputLayer > 0) return;
         if(this.isOpponents) {
-            this.draw();
+            //this.draw();
 			return;
         }
         if(duel.phase === DuelPhase.DRAW) {
             if(this.slot.type === SlotType.DECK) {
-                if(duel.draws < 5) {
+                if(duel.draws < 1) {
                     this.draw();
                 }
             }
@@ -338,6 +341,7 @@ class DeckObject {
     }
 }
 
+//An object that controls the hand. Automatically spaces out cards and handles animation.
 class HandObject {
     constructor(p, op, parent) {
         var game = Client.game;
@@ -441,6 +445,7 @@ class HandObject {
     }
 }
 
+//An object that represents the Offline Space. Automatically controls animations.
 class OfflineObject {
     constructor(p, op, parent) {
         var game = Client.game;
@@ -537,12 +542,10 @@ class OfflineObject {
     }
 }
 
-
+//An object that represents a card selector button. Used in prompts.
 class CardSelectObject {
-    constructor(c, op, parent) {
+    constructor() {
         var game = Client.game;
-        this.parent = parent;
-        this.isOpponents = op;
         this.obj = game.add.button(
             -1000, 
             500, 
@@ -550,10 +553,23 @@ class CardSelectObject {
             this.click,
             this
         );
-        //this.obj.anchor.setTo(0.5, 0.5);
         this.obj.height = 281;
         this.obj.width = 201;
         this.obj.angle = 0;
+    }
+
+    init(c, op, parent) {
+        var game = Client.game;
+        this.parent = parent;
+        this.isOpponents = op;
+        //this.obj = game.add.button(
+        //    -1000, 
+        //    500, 
+        //    'cards',
+        //    this.click,
+        //    this
+        //);
+        //this.obj.anchor.setTo(0.5, 0.5);
         this.card = c;
     }
 
@@ -575,6 +591,7 @@ class CardSelectObject {
     }
 }
 
+//An object that represents the select card prompt that allows the user to select a card. Handles the layout of the prompt and animations.
 class SelectCardPrompt {
     constructor(pos) {
         var game = Client.game;
@@ -582,6 +599,7 @@ class SelectCardPrompt {
         this.onConfirm = function(c){};
         this.selected = null;
         this.objs = [];
+        this.dobjs = [];
         this.back = game.add.tileSprite(pos.x, pos.y, pos.width, pos.height, 'promptsc', 2, ui);
         this.back.y += pos.height;
 
@@ -612,6 +630,11 @@ class SelectCardPrompt {
         this.confirmButton.y += pos.height;
         this.scroll = 0;
         this.hidden = true;
+
+        for(var i = 0; i < 40; i++) {
+            this.dobjs.push(new CardSelectObject());
+        }
+        this.dobjsid = 0;
     }
 
     setMsg(msg) {
@@ -620,12 +643,15 @@ class SelectCardPrompt {
 
     clear() {
         this.objs = [];
+        this.dobjsid = 0;
         this.selected = null;
     }
 
     add(c) {
-        var nb = new CardSelectObject(c, false, this);
+        var nb = this.dobjs[this.dobjsid];
+        nb.init(c, false, this);
         this.objs.push(nb);
+        this.dobjsid++;
     }
 
     getSelected() { 
@@ -662,7 +688,7 @@ class SelectCardPrompt {
 
     calcButtonPosition(index) {
         //var xx = this.pos.card.x + (this.pos.card.width * index) - (this.scroll * this.pos.card.width);
-        var xx = this.pos.card.x + (this.pos.card.width * index);
+        var xx = this.pos.card.x + (this.pos.card.width * index) - (this.scroll * this.pos.card.width * this.objs.length);
         var pos = {
             //x: xx + 230,
             x: 10 + (202 * index),
@@ -691,6 +717,7 @@ const ChannelType = {
     MEM : 5
 }
 
+//Returns a random number between min and max - 1 inclusive
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -704,7 +731,7 @@ function calcDamage(atk, def) {
     return dmg;
 }
 
-
+//Converts a raw array of numbers into a deck.
 function make_deck(rawDeck) {
     var deck = new Deck();
     for(i in rawDeck) {
@@ -772,6 +799,7 @@ function dummy_deck() {
     return deck;
 }
 
+//Initializes CardIndex with the JSON string str.
 function loadCardData(str) {
     CardIndex = JSON.parse(str);
 }
@@ -830,7 +858,7 @@ const SlotFrame = {
     OPEN : 2
 }
 
-//Card slot object.
+//An object representing a slot on the game board.
 class Slot {
     constructor(pos, type, op, channel) {
         this.type = type;

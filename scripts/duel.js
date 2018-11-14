@@ -81,7 +81,7 @@ class SideState {
     }
 }
 
-//Contains the data for a duel. This usually created by the client when connecting to a game.
+//Contains the data for a duel. This is usually created by the client when connecting to a game.
 class DuelState {
     constructor(player, opponent) {
 		//A reference to the local player.

@@ -21,6 +21,7 @@ const CheckEffectType = {
 
 Client.chat = {};
 
+//Appends a message to the chat.
 Client.chat.write = function(msg) {
     $('#messages').append(
         $('<li>').append(
@@ -35,14 +36,17 @@ Client.chat.writeDebug = function(msg) {
     );
 };
 
+//Clears all the messages in the chat.
 Client.chat.clearAll = function() {
     $('#messages').children().remove();
 };
 
+//Contacts the server and tells them that the client is a new player.
 Client.askNewPlayer = function(){
     Client.socket.emit('newplayer');
 };
 
+//Contacts the server and tells them that the client is a returning player.
 Client.askReturnPlayer = function(username){
     Client.socket.emit('oldplayer', username)
 };
@@ -58,6 +62,7 @@ Client.sendCheckEffect = function(type, callback){
     //Client.socket.emit('move send', move);
 };
 
+//Contacts the server, requesting that they be matched up with another player, a bot, or a random match.
 Client.newGame = function(type, data) {
     if(type === GameType.AI) {
         Client.socket.emit('newaigame');
@@ -74,6 +79,7 @@ Client.newGame = function(type, data) {
 
 };
 
+//Contacts the server, informing that they have left the game.
 Client.leaveGame = function() {
     Client.socket.emit('leavegame');
 }
