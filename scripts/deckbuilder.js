@@ -14,7 +14,7 @@ Builder.preload = function() {
     this.game.load.image('newcard', 'assets/new_card.png');
     this.game.load.image('back', 'assets/builderback.png');
     this.game.load.image('buttons2', 'assets/buttons2.png');
-    this.game.load.spritesheet('cards', 'assets/cards.png',412,562);
+    //this.game.load.spritesheet('cards', 'assets/cards.png',412,562);
     this.game.load.spritesheet('harrows', 'assets/harrows.png',32,32);
 };
 

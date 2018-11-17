@@ -28,7 +28,7 @@ Game.init = function(game, data){
 
 //Preloads data from files.
 Game.preload = function() {
-    this.game.load.spritesheet('cards', 'assets/cards.png',412,562);
+    //this.game.load.spritesheet('cards', 'assets/cards.png',412,562);
     this.game.load.spritesheet('cardmask', 'assets/cardmask.png',412,562);
     this.game.load.spritesheet('buttons3', 'assets/buttons3.png',248,77);
     this.game.load.spritesheet('battlebtn', 'assets/battlebtns.png',128,128);
@@ -409,10 +409,14 @@ Game.promptSelectCard = function(msg, loc, filter, callback) {
     var game = this.game;
     if(loc == CardLocation.DECK) {
         var cardList = Game.getCurrentDuel().getFilteredList(loc, filter, false);
+        if(cardList.length <= 0) {
+            callback(null);
+            return;
+        }
         var promptsc = Game.obj.promptsc;
         promptsc.clear();
         for(i in cardList) {
-            Client.chat.write(cardList[i].getName());
+            //Client.chat.write(cardList[i].getName());
             promptsc.add(cardList[i]);
         }
         promptsc.setMsg(msg);
@@ -427,6 +431,7 @@ Game.addCardToHand = function(loc, op, filter) {
     if(loc == CardLocation.DECK) {
         if(!op) {
             Game.promptSelectCard("Select a card to add to your hand.", loc, filter, function(c){
+                if(c === null) return;
                 var next = new CardObject(Game.obj.local.deck, c, false, Game.obj.local.deck.parent);
                 Game.getCurrentDuel().player.deck.remove(c);
                 next.revealed = false;
@@ -654,17 +659,42 @@ Game.playAnimation = function(animid, targets, op, callback=function(card, op){}
         tween.start();
 	} else if(animid == AnimType.BEGIN) {
         var tg = targets[0];
-        var tween = game.add.tween(tg).to( { alpha: 1 }, 1, Phaser.Easing.Linear.None, false, 500);
-        var tween2 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
-        var tween3 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
+        var tweens = [];
+        tweens.push(game.add.tween(tg).to( { alpha: 1 }, 1, Phaser.Easing.Linear.None, false, 500));
+        for(var ii = 1; ii < 11; ii++) {
+            tweens.push(game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0));
+        }
+        for(var ii = 1; ii < 5; ii++) {
+            tweens[ii].onComplete.addOnce(function(obj, tween){
+                Game.drawCard(true);
+            });
+        }
+        for(var ii = 5; ii < 9; ii++) {
+            tweens[ii].onComplete.addOnce(function(obj, tween){
+                Game.drawCard(false);
+            });
+        }
+        tweens[9].onComplete.addOnce(function(obj, tween){
+            Game.drawCard(false);
+            Game.getCurrentDuel().draws = 0;
+            Game.getCurrentDuel().phase = 3;
+            Game.waitAnim = false;
+            if(cb !== undefined)
+				cb(Game.animTargets[0], op);
+			if(Game.animQueue.length > 0) {
+				var next = Game.animQueue.shift();
+				Game.playAnimation(next['animid'], next['targets'], next['op'], next['callback'], next['value']);
+			}
+        });
+        /*var tween3 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
         var tween4 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
         var tween5 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
         var tween6 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
         var tween7 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
         var tween8 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
         var tween9 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
-        var tween10 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);
-        tween.onComplete.addOnce(function(obj, tween){
+        var tween10 = game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0);*/
+        /*tween.onComplete.addOnce(function(obj, tween){
             Game.drawCard(true);
         });
         tween2.onComplete.addOnce(function(obj, tween){
@@ -712,7 +742,11 @@ Game.playAnimation = function(animid, targets, op, callback=function(card, op){}
         tween7.chain(tween8);
         tween8.chain(tween9);
         tween9.chain(tween10);
-        tween.start();
+        */
+        for(var jj = 0; jj < 9; jj++) {
+            tweens[jj].chain(tweens[jj+1]);
+        }
+        tweens[0].start();
 	}
 }
 

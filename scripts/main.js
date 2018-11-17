@@ -22,7 +22,8 @@ window.onload = function() {
 
     function preload () {
         game.load.json('card_data','assets/cards.json');
-		game.load.json('dummy_deck','assets/dummy_deck.json');
+        game.load.json('dummy_deck','assets/dummy_deck.json');
+        game.load.spritesheet('cards', 'assets/cards.png',412,562);
 		game.load.audio('se_card0', 'assets/flip.wav');
 		game.load.audio('se_card1', 'assets/card1.wav');
 		game.load.audio('se_card2', 'assets/card2.wav');
