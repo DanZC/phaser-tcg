@@ -113,6 +113,20 @@ class DuelState {
 		
 		//The number of draws that have occurred this turn.
         this.draws = 0;
+
+        //Moves that are queued up.
+        this.moveQueue = [];
+
+        this.awaitMove = false;
+
+        this.moveEndCallback = function(duel){
+            if(duel.moveQueue.length > 0) {
+                var nextMove = duel.moveQueue.shift();
+                duel.doMove(nextMove);
+            } else {
+                duel.awaitMove = false;
+            }
+        };
     }
 
 	//Checks if a particular card is in the player's deck.
@@ -126,28 +140,56 @@ class DuelState {
     }
 
 	//Moves a card to another slot.
-    moveCard(card, slot) {
-        card.move({x: slot.obj.x, y: slot.obj.y});
+    moveCard(card, slot, cb=function(duel){}) {
+        card.move({x: slot.obj.x, y: slot.obj.y}, cb);
     }
 
     //Draws a card from the deck
-    drawCard(op, n=1) {
-        Game.drawCard(op, n);
+    drawCard(op, n=1, cb=function(duel){}) {
+        Game.drawCard(op, n, cb);
+    }
+
+    //Plays card
+    playCard(card, op, slot, cb=function(duel){}) {
+        var cobj = card;
+        card.move({x: slot.obj.x, y: slot.obj.y});
+        slot.card = cobj;
+        if(card.slot !== null) {
+            card.slot.card = null;
+        }
+        card.slot = slot;
+        Game.removeFromHand(card, false);
+        Game.updateHand();
+        Game.playCard(card, op, cb);
+    }
+
+    //Adds a move to the move queue. If the move queue is empty, will perform the move instead.
+    queueMove(move) {
+        if(this.moveQueue.length <= 0) {
+            this.doMove(move);
+            return;
+        } else {
+            this.moveQueue.push(move);
+        }
     }
 
 	//Executes a move using a string. The string is formatted and sent by the server.
     doMove(move) {
+        this.awaitMove = true;
         var parts = move.split(" ");
-        if(parts[0] === "P0") {
+        if(parts[0] === "P1") {
             if(parts[1] === "MOVE") {
-                this.moveCard(this.local.slots[parts[1]].card, this.local.slots[parts[2]])
+                this.moveCard(this.remote.slots[parts[2]].card, this.remote.slots[parts[3]], this.moveEndCallback);
                 return;
             } else if(parts[1] === "DRAW") {
                 if(parts.length > 2) {
-                    this.drawCard(false);
+                    this.drawCard(false, 1, this.moveEndCallback);
                 } else {
-                    this.drawCard(false, parseInt(parts[2]));
+                    this.drawCard(false, parseInt(parts[2]), this.moveEndCallback);
                 }
+                return;
+            } else if(parts[1] === "PLAY") {
+                this.playCard(this.remote.hand[parseInt(parts[2])], true, this.remote.slots[parts[3]], this.moveEndCallback);
                 return;
             }
         }

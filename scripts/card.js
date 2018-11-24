@@ -38,6 +38,10 @@ const CardLocation = {
     ALL : 0b111111
 };
 
+const CardFlag = {
+    NONE : 0
+}
+
 //The bottom left-most card in cards.png. It is the same texture rect used for facedown cards.
 const UNDEFINED_CARD_INDEX = 159;
 

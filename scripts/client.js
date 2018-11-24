@@ -119,8 +119,9 @@ Client.socket.on('checkeffect none',function(){
     Client.checkEffectCallback();
 });
 
-Client.socket.on('move get',function(state){
-    Client.cardsys.duel.remote.update(state.local);
+Client.socket.on('move get',function(move){
+    var m = "P1 " + move;
+    Client.cardsys.duel.queueMove(m);
 });
 
 Client.socket.on('request info', (fn) => {

@@ -79,3 +79,19 @@ class Effect {
         this.afilter = filter;
     }
 }
+
+class EffectChain {
+    constructor() {
+        this.link = [];
+    }
+
+    addToChain(effect) {
+        this.link.push(effect);
+    }
+
+    resolve() {
+        for(i in this.link) {
+            this.link[i].resolve();
+        }
+    }
+}

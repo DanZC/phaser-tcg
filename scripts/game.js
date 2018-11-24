@@ -37,6 +37,7 @@ Game.preload = function() {
     this.game.load.image('promptsc', 'assets/cardselectprompt.png');
     this.game.load.image('close', 'assets/close.png');
     this.game.load.image('logo', 'assets/back_test_new3.png');
+    this.game.load.image('wait', 'assets/wait.png');
 	this.game.load.json('duel_layout','assets/duel_layout.json');
 };
 
@@ -321,6 +322,8 @@ Game.create = function() {
     obj.pv.anchor.setTo(0.5, 0.5);
     obj.pv.x = -1000;
     obj.pv.frame = d.index;
+
+    this.waitico = game.add.sprite(15, 15, 'wait');
 
     //var battle_button = game.add.sprite(32,0, 'battlebtn');
 
@@ -661,10 +664,10 @@ Game.playAnimation = function(animid, targets, op, callback=function(card, op){}
         var tg = targets[0];
         var tweens = [];
         tweens.push(game.add.tween(tg).to( { alpha: 1 }, 1, Phaser.Easing.Linear.None, false, 500));
-        for(var ii = 1; ii < 11; ii++) {
+        for(var ii = 1; ii < 10; ii++) {
             tweens.push(game.add.tween(tg).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, false, 0));
         }
-        for(var ii = 1; ii < 5; ii++) {
+        for(var ii = 0; ii < 5; ii++) {
             tweens[ii].onComplete.addOnce(function(obj, tween){
                 Game.drawCard(true);
             });
@@ -805,7 +808,7 @@ Game.attack = function(c, s) {
     });
 }
 
-Game.playCard = function(card, op) {
+Game.playCard = function(card, op, cb=function(duel){}) {
 	if(card.card.type == CardType.MEME) {
 		Client.chat.write("DEBUG: The effect of " + card.card.name + " activates.");
 		this.playAnimation(AnimType.EFFECT, [card], op, function(card, op){
@@ -823,6 +826,7 @@ Game.playCard = function(card, op) {
 		this.playAnimation(AnimType.EFFECT, tgs, op, function(card, op){
 		});
 		this.queueAnimation(AnimType.TARGET, tgs, op, function(card, op){
+            cb(Client.cardsys.duel);
 		});
 	}
 }
@@ -848,6 +852,11 @@ Game.update = function() {
 	this.obj.ohand.update();
     this.obj.ooffline.update();
     this.obj.promptsc.update();
+    if(Client.cardsys.duel.awaitMove == true || Game.waitAnim == true) {
+        this.waitico.x = 25
+    } else {
+        this.waitico.x = -1000;
+    }
     //for(i in duel.local.hand) {
     //    duel.local.hand[i].update();
     //}

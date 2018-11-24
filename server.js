@@ -492,10 +492,10 @@ class Match {
 
     isReady() {
         return true;
-        if(this.a.deck.length !== 0 && this.b.deck.length !== 0) {
+        /*if(this.a.deck.length !== 0 && this.b.deck.length !== 0) {
             return true;
         }
-        return false;
+        return false;*/
     }
 
     start() {
@@ -746,6 +746,7 @@ io.on('connection',function(socket){
         socket.player.waitingForMatch = true;
         var p = getAllWaitingPlayers();
         var n = getRandomInt(0, p.length);
+        //We need more than 1 waiting player to matchmake.
         if(p.length > 1) {
             do {
                 n = getRandomInt(0, p.length);

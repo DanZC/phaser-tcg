@@ -147,7 +147,7 @@ class CardObject {
         Client.sendMove("DRAW");
     }
 
-    move(dest) {
+    move(dest, cb=function(duel){}) {
         //var distance = Phaser.Math.distance(this.obj.x, this.obj.y, dest.x, dest.y);
         var duration = 250;
         var local = this.ls.cardsys.duel.local;
@@ -162,6 +162,7 @@ class CardObject {
 
         var tween2 = this.game.add.tween(this.text).to(dest, duration, Phaser.Easing.Quadratic.InOut);
         tween2.onComplete.addOnce(function(obj, tween2) {
+            cb(Client.cardsys.duel);
         });
         tween2.start();
     }
