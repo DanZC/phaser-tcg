@@ -85,7 +85,9 @@ const DuelPhase = {
     DRAW : 1,
     EFFECT : 2,
     ACTION : 3,
-    BATTLE : 4
+    BATTLE : 4,
+    DAMAGE : 5,
+    END : 6
 };
 
 function isValid(index) {
@@ -157,10 +159,12 @@ if(m.type === 'ai'){
         }
         switch(state.phase) {
         case DuelPhase.DRAW:
-            for(i=0;i<5;i++) {
-                moves.append('DRAW');
-            }
-            break;
+            moves.append('DRAW 1');
+            moves.append('PHASE EFFECT');
+            return;
+        case DuelPhase.EFFECT:
+            moves.append('PHASE ACTION');
+            return;
         case DuelPhase.ACTION:
             //Do I have any channel cards in play?
             if(!hasActiveChannelCard(state.self)) {
@@ -171,6 +175,7 @@ if(m.type === 'ai'){
                     if(cinfo.type === CardType.CHANNEL) {
                         var c = getEmptySlot(state.self.channels);
                         moves.append('PLAY HAND${n} CH${c}');
+                        return moves;
                     }
                 }
             }
@@ -187,6 +192,7 @@ if(m.type === 'ai'){
                             if(cinfo.lvl > 1) {
                                 flags.playedHighLVLCard = true;
                             }
+                            return moves;
                         }
                     }
                 }
@@ -240,6 +246,9 @@ if(m.type === 'ai'){
                 }
             }
             moves.append('PHASE END');
+            break;
+        case DuelPhase.END:
+            moves.append('END TURN');
             break;
         }
         return moves;

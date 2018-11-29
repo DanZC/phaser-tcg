@@ -359,6 +359,52 @@ const SlotType = {
     OFFLINE : 5
 }
 
+const MoveType = {
+    SURRENDER : 0,
+    DRAW : 1,
+    PLAY : 2,
+    DISCARD : 3,
+    SENDTOGRAVE : 4,
+    PHASE : 5,
+    ATTACK : 6,
+    ACTIVATE : 7
+}
+
+//Parses a move command from a move command string.
+function parseMove(movestr) {
+    var pmove = {};
+    var parts = movestr.split(' ');
+    if(parts[0] == "DRAW") {
+        pmove.type = MoveType.DRAW;
+        if(parts.length > 1) {
+            pmove.value = parseInt(parts[1]);
+        } else {
+            pmove.value = 1;
+        }
+        return pmove;
+    }
+    if(parts[0] == "PLAY") {
+        pmove.type = MoveType.PLAY;
+        pmove.handid = parseInt(parts[1]);
+        if(parts[2].indexOf("MBR") == 0) {
+            pmove.slotty = SlotType.MEMROLE;
+        } else if(parts[2].indexOf("MEM") == 0) {
+            pmove.slotty = SlotType.MEME;
+        } else if(parts[2].indexOf("CH") == 0) {
+            pmove.slotty = SlotType.CHANNEL;
+        } else {
+            pmove.slotty = SlotType.MEME;
+        }
+        pmove.slotid = parseInt(parts[3]);
+        return pmove;
+    }
+    if(parts[0] == "DISCARD") {
+        pmove.type = MoveType.DISCARD;
+        pmove.handid = parseInt(parts[1]);
+        return pmove;
+    }
+}
+
 class Slot {
     constructor(type, id, owner) {
         this.card = null;
@@ -374,6 +420,10 @@ class Slot {
         this.card = c;
         this.id = c.index
         this.hp = c.currentHP;
+    }
+
+    get_card() {
+        return this.card;
     }
 
     is_empty() {
@@ -440,6 +490,44 @@ class MatchState {
                 new Slot(SlotType.CHANNEL, 1, 'b')
             ],
             offline: []
+        }
+    }
+
+    drawCard(side, n=1) {
+        side.hand.push(side.deck.pop());
+    }
+
+    playCard(side, handid, slotty, slotid) {
+        var c = side.hand[handid]
+        if(slotty === SlotType.MEMROLE) {
+            side.members[slotid].set_card(c);
+        } else if(slotty === SlotType.CHANNEL) {
+            side.channels[slotid].set_card(c);
+        } else if(slotty === SlotType.MEME) {
+            side.memes[slotid].set_card(c);
+        }
+        side.hand.splice(handid, 1);
+    }
+
+    sendToGrave(side, slotty, slotid) {
+        if(slotty === SlotType.MEMROLE) {
+            var s = side.members[slotid];
+            var c = s.get_card();
+            side.offline.push(c);
+            s.remove_card(c);
+            side.members.splice(slotid, 1);
+        } else if(slotty === SlotType.CHANNEL) {
+            var s = side.channels[slotid];
+            var c = s.get_card();
+            side.offline.push(c);
+            s.remove_card(c);
+            side.channels.splice(slotid, 1);
+        } else if(slotty === SlotType.MEME) {
+            var s = side.memes[slotid];
+            var c = s.get_card();
+            side.offline.push(c);
+            s.remove_card(c);
+            side.memes.splice(slotid, 1);
         }
     }
 }
@@ -522,10 +610,17 @@ class Match {
     }
 
     doMove(p, move) {
-        var parts = move.split(' ');
+        var m = parseMove(move);
         if(p === 'a') {
-            if(parts[0] === "DRAW") {
-                
+            switch(m.type) {
+            case MoveType.DRAW:
+                this.state.drawCard(this.state.a, m.value);
+                break;
+            case MoveType.PLAY:
+                this.state.playCard(this.state.a, m.handid, m.slotty, m.slotid);
+                break;
+            default:
+                break;
             }
         }
     }
@@ -747,6 +842,7 @@ io.on('connection',function(socket){
         var p = getAllWaitingPlayers();
         var n = getRandomInt(0, p.length);
         //We need more than 1 waiting player to matchmake.
+        console.log(p.length);
         if(p.length > 1) {
             do {
                 n = getRandomInt(0, p.length);
