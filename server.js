@@ -562,12 +562,22 @@ class AI {
     }
 }
 
+const MatchType = {
+    AI: 0,
+    RandomMatch: 1,
+    Spectate: 2,
+    MutualMatch: 3
+}
+
 class Match {
     constructor(a, b) {
         this.a = a;
         this.b = b;
         this.state = new MatchState();
         this.spectators = [];
+        this.readya = false;
+        this.readyb = false;
+        this.matchtype = MatchType.AI;
         var x = 0;
         do {
             x = getRandomInt(0, 2147483647);
@@ -579,7 +589,7 @@ class Match {
     }
 
     isReady() {
-        return true;
+        return this.readya && this.readyb;
         /*if(this.a.deck.length !== 0 && this.b.deck.length !== 0) {
             return true;
         }
@@ -593,11 +603,11 @@ class Match {
         this.state.turn = this.b;
         //io.to(this.roomid).emit('matchmake end', this.state);
         if(this.a.bot !== true) {
-            io.sockets.connected[this.a.socketID].emit('matchmake end', copy(this.state.b));
+            io.sockets.connected[this.a.socketID].emit('matchmake end', {opponent:copy(this.state.b), ty:this.matchtype, turn:false});
             io.sockets.connected[this.a.socketID].emit('end turn');
         }
         if(this.b.bot !== true) {
-            io.sockets.connected[this.b.socketID].emit('matchmake end', copy(this.state.b));
+            io.sockets.connected[this.b.socketID].emit('matchmake end', {opponent:copy(this.state.b), ty:this.matchtype, turn:true});
         } else {
             this.b.ai.calcMove(this.state, "b");
         }
@@ -691,6 +701,7 @@ class Bot {
         this.bot = true,
         this.socketID = -1;
         this.deck = dummyDeck();
+        this.ready = true;
         this.ai = new AI();
         server.bots.push(this);
     }
@@ -746,6 +757,7 @@ io.on('connection',function(socket){
             spectating: false,
             match: null,
             socketID: socket.id,
+            ready = false,
             muted: false,
             leave_match: function() { this.match = null; this.inMatch = false; }
         };
@@ -770,6 +782,7 @@ io.on('connection',function(socket){
             spectating: false,
             match: null,
             socketID: socket.id,
+            ready = false,
             muted: false,
             leave_match: function() { this.match = null; this.inMatch = false; }
         };
@@ -822,6 +835,8 @@ io.on('connection',function(socket){
             console.log('Received info from ' + socket.player.id + ".");
             socket.player.deck = info.deck;
             console.log('Deck length: ' + socket.player.deck.length);
+            socket.player.match.readyb = true;
+            socket.player.match.readya = true;
             if(socket.player.match.isReady()) {
                 socket.player.match.start();
             }
@@ -845,7 +860,7 @@ io.on('connection',function(socket){
         console.log(p.length);
         if(p.length > 1) {
             do {
-                n = getRandomInt(0, p.length);
+                n = getRandomInt(0, p.length - 1);
                 if(p[n] === socket.player) {
                     continue;
                 } else break;
@@ -853,14 +868,37 @@ io.on('connection',function(socket){
             var op = p[n];
             op.waitingForMatch = false;
             socket.player.waitingForMatch = false;
-            var match = newMatch(op, socket.player);
+            console.log("Match found! Match #" + socket.player.id + " vs #" + op.id + " created.");
+            var match = new Match(op, socket.player);
+            match.id = server.lastMatchID++;
             server.matches[match.id] = match;
             socket.player.match = match;
             op.match = match;
             var roomid = "M" + match.id.toString();
-            io.sockets.connected[op.socketID].join(roomid)
+            var osocket = io.sockets.connected[op.socketID];
+            osocket.join(roomid);
             socket.join(roomid);
-            io.to(roomid).emit('matchmake made');
+            socket.emit('matchmake made', {id:op.id, name:op.name});
+            osocket.emit('matchmake made', {id:socket.player.id, name:socket.player.name});
+            socket.emit('request info', (info) => {
+                console.log('Received info from ' + socket.player.id + ".");
+                socket.player.deck = info.deck;
+                console.log('Deck length: ' + socket.player.deck.length);
+                match.readyb = true;
+                if(match.isReady()) {
+                    match.start();
+                }
+            });
+            osocket.emit('request info', (info) => {
+                console.log('Received info from ' + osocket.player.id + ".");
+                osocket.player.deck = info.deck;
+                console.log('Deck length: ' + osocket.player.deck.length);
+                match.readya = true;
+                if(match.isReady()) {
+                    match.start();
+                }
+            });
+            //io.to(roomid).emit('matchmake made', {id:op.id});
         } else {
             socket.emit('matchmake wait');
             console.log("Player, " + socket.player.id + ", is waiting to be matched.");

@@ -371,7 +371,11 @@ Game.create = function() {
         this
     );
 
-    Client.chat.write("Joined an AI game.");
+    if(Game.type === GameType.AI) {
+        Client.chat.write("Joined an AI game.");
+    } else if(Game.type === GameType.RandomMatch) {
+        Client.chat.write("Joined random match vs @" + Client.cardsys.duel.opponent.name + ".")
+    }
     var tgts = [obj.close];
     Game.playAnimation(AnimType.BEGIN, tgts, false, function(tg,op){
 

@@ -102,11 +102,34 @@ Client.socket.on('matchmake callback',function(data){
 
 Client.socket.on('matchmake end',function(data){
     Client.chat.clearAll();
-    Client.chat.write("Creating a new AI game...");
     var opponent = new Player();
-    opponent.deck = make_deck(data.deck);
+    opponent.name = data.opponent.name;
+    opponent.deck = make_deck(data.opponent.deck);
     Client.cardsys.duel = new DuelState(Client.cardsys.player, opponent);
-    Client.game.state.start("Game",true,false,Client.game,{type: GameType.RandomMatch});
+    if(!data.turn) {
+        Client.cardsys.duel.turn = opponent;
+        Client.cardsys.duel.waiting = true;
+        Client.chat.write("It's your opponent's turn.");
+    }
+    if(data.ty == GameType.AI) {
+        Client.chat.write("Creating a new AI game...");
+        Client.game.state.start("Game",true,false,Client.game,{type: GameType.AI});
+    } else {
+        Client.chat.write("Starting match...");
+        Client.game.state.start("Game",true,false,Client.game,{type: GameType.RandomMatch});
+    }
+});
+
+Client.socket.on('matchmake made',function(data){
+    if(data.name !== "ANON")
+        Client.chat.write("Match found! Starting match vs @" + data.name + "...");
+    else
+        Client.chat.write("Match found! Starting match vs Player#" + data.id + "...");
+    /*var opponent = new Player();
+    opponent.name = data.name;
+    //opponent.deck = make_deck(data.deck);
+    Client.cardsys.duel = new DuelState(Client.cardsys.player, opponent);
+    Client.game.state.start("Game",true,false,Client.game,{type: GameType.RandomMatch});*/
 });
 
 Client.socket.on('move callback',function(x){
