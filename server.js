@@ -757,7 +757,7 @@ io.on('connection',function(socket){
             spectating: false,
             match: null,
             socketID: socket.id,
-            ready = false,
+            ready: false,
             muted: false,
             leave_match: function() { this.match = null; this.inMatch = false; }
         };
@@ -782,7 +782,7 @@ io.on('connection',function(socket){
             spectating: false,
             match: null,
             socketID: socket.id,
-            ready = false,
+            ready: false,
             muted: false,
             leave_match: function() { this.match = null; this.inMatch = false; }
         };
