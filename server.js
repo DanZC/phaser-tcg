@@ -862,7 +862,7 @@ io.on('connection',function(socket){
     socket.on('matchmake enter',function(){
         socket.player.waitingForMatch = true;
         var p = getAllWaitingPlayers();
-        var n = getRandomInt(0, p.length);
+        var n = getRandomInt(0, p.length - 1);
         //We need more than 1 waiting player to matchmake.
         console.log(p.length);
         if(p.length > 1) {
