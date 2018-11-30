@@ -603,11 +603,11 @@ class Match {
         this.state.turn = this.b;
         //io.to(this.roomid).emit('matchmake end', this.state);
         if(this.a.bot !== true) {
-            io.sockets.connected[this.a.socketID].emit('matchmake end', {opponent:copy(this.state.b), ty:this.matchtype, turn:false});
+            io.sockets.connected[this.a.socketID].emit('matchmake end', {opponent:copy(this.b), ty:this.matchtype, turn:false});
             io.sockets.connected[this.a.socketID].emit('end turn');
         }
         if(this.b.bot !== true) {
-            io.sockets.connected[this.b.socketID].emit('matchmake end', {opponent:copy(this.state.b), ty:this.matchtype, turn:true});
+            io.sockets.connected[this.b.socketID].emit('matchmake end', {opponent:copy(this.a), ty:this.matchtype, turn:true});
         } else {
             this.b.ai.calcMove(this.state, "b");
         }
