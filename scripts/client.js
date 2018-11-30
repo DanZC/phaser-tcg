@@ -153,6 +153,12 @@ Client.socket.on('request info', (fn) => {
     });
 });
 
+Client.socket.on('match disconnect',function(data){
+    Client.chat.write("The match was terminated. Reason: " + data.reason);
+    Client.game.state.start('Title',true,false,Client.game.game);
+    Client.cardsys.reset();
+});
+
 //When the client disconnects with the server.
 Client.socket.on('disconnect',function(){
     Client.chat.write("Oops... There seems to be a connection issue.");

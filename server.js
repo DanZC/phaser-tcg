@@ -641,6 +641,12 @@ class Match {
 
     disconnect(socket) {
         //io.to(this.roomid).emit('player left match', socket);
+        if(socket.id === this.a.socketID) {
+            io.sockets.connected[this.b.socketID].emit('match disconnect', {reason:"Disconnect"});
+        }
+        if(socket.id === this.b.socketID) {
+            io.sockets.connected[this.a.socketID].emit('match disconnect', {reason:"Disconnect"});
+        }
         this.a.leave_match();
         this.b.leave_match();
         this.dead = true;
@@ -837,6 +843,7 @@ io.on('connection',function(socket){
             console.log('Deck length: ' + socket.player.deck.length);
             socket.player.match.readyb = true;
             socket.player.match.readya = true;
+            socket.player.match.matchtype = MatchType.AI;
             if(socket.player.match.isReady()) {
                 socket.player.match.start();
             }
@@ -871,6 +878,7 @@ io.on('connection',function(socket){
             console.log("Match found! Match #" + socket.player.id + " vs #" + op.id + " created.");
             var match = new Match(op, socket.player);
             match.id = server.lastMatchID++;
+            match.matchtype = MatchType.RandomMatch;
             server.matches[match.id] = match;
             socket.player.match = match;
             op.match = match;
