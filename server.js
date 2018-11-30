@@ -598,6 +598,7 @@ class Match {
 
     start() {
         console.log("Starting match between " + this.a.name + " and " + this.b.name + "!");
+        console.log(this.a.deck.length);
         this.state.a.deck = this.a.deck;
         this.state.b.deck = this.b.deck;
         this.state.turn = this.b;
@@ -673,6 +674,7 @@ function dummyDeck() {
         //c.update();
         deck.push(n);
     }
+    return deck;
 }
 
 function newMatch(a, b) {
@@ -837,6 +839,7 @@ io.on('connection',function(socket){
         bot.match = match;
         var roomid = match.roomid;
         socket.join(roomid);
+        bot.deck = dummyDeck();
         socket.emit('request info', (info) => {
             console.log('Received info from ' + socket.player.id + ".");
             socket.player.deck = info.deck;
