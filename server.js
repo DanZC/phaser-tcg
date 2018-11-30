@@ -643,10 +643,14 @@ class Match {
     disconnect(socket) {
         //io.to(this.roomid).emit('player left match', socket);
         if(socket.id === this.a.socketID) {
-            io.sockets.connected[this.b.socketID].emit('match disconnect', {reason:"Disconnect"});
+            if(this.b.bot !== true) {
+                io.sockets.connected[this.b.socketID].emit('match disconnect', {reason:"Disconnect"});
+            }
         }
         if(socket.id === this.b.socketID) {
-            io.sockets.connected[this.a.socketID].emit('match disconnect', {reason:"Disconnect"});
+            if(this.a.bot !== true) {
+                io.sockets.connected[this.a.socketID].emit('match disconnect', {reason:"Disconnect"});
+            }
         }
         this.a.leave_match();
         this.b.leave_match();
