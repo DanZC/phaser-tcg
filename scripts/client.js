@@ -103,8 +103,8 @@ Client.socket.on('matchmake callback',function(data){
 Client.socket.on('matchmake end',function(data){
     Client.chat.clearAll();
     var opponent = new Player();
-    opponent.name = data.opponent.name;
-    Client.chat.write("DEBUG: " + data.opponent.name);
+    opponent.name = data.name;
+    Client.chat.write("DEBUG: " + data.name);
     opponent.deck = make_deck(data.opponent.deck);
     Client.cardsys.duel = new DuelState(Client.cardsys.player, opponent);
     if(!data.turn) {
