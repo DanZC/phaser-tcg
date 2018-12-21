@@ -2,7 +2,10 @@ window.onload = function() {
 
     var username = getCookie("username");
 
-    var game = new Phaser.Game(1500, 960, Phaser.AUTO, 'game', { preload: preload, create: create, update: update });
+	var osize = { x:1500, y:960 }
+	var oscale = { x:1500 / window.innerWidth, y:960 / window.innerHeight }
+	
+    var game = new Phaser.Game(osize.x, osize.y, Phaser.AUTO, 'game', { preload: preload, create: create, update: update });
     game.state.add('Game',Game);
     game.state.add('Title',Title);
     game.state.add('Builder',Builder);
@@ -42,7 +45,7 @@ window.onload = function() {
         ls.sounds['effect'] = new Phaser.Sound(game, 'se_effect', 0.4);
 		ls.sounds['tograve'] = new Phaser.Sound(game, 'se_tograve', 0.7);
         ls.sounds['target'] = new Phaser.Sound(game, 'se_target', 0.7);
-        ls.sounds['hit2'] = new Phaser.Sound(game, 'se_hit2', 0.7);
+        ls.sounds['hit2'] = new Phaser.Sound(game, 'se_hit2', 0.4);
         CardIndex = game.cache.getJSON('card_data');
         for(i in CardIndex) {
             var c = CardIndex[i];

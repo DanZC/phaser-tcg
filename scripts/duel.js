@@ -60,7 +60,8 @@ class SideState {
         }
         return mems;
     }
-	
+    
+    //Returns a reference to the list of cards in the hand.
 	getHand() {
 		return this.hand;
 	}
@@ -117,8 +118,13 @@ class DuelState {
         //Moves that are queued up.
         this.moveQueue = [];
 
+        //Whether the client is waiting for a move's animation to finish.
         this.awaitMove = false;
 
+        //Callback function used when a move is done executing.
+        //If the moveQueue is not empty, the function will immediately perform the next move in the queue.
+        //Otherwise, the awaitMove flag will be set to false.
+        //This callback can be overwritten with a different function.
         this.moveEndCallback = function(duel){
             if(duel.moveQueue.length > 0) {
                 var nextMove = duel.moveQueue.shift();
@@ -148,17 +154,25 @@ class DuelState {
     drawCard(op, n=1, cb=function(duel){}) {
         Game.drawCard(op, n, cb);
     }
+    
+    //Adds a card from the deck to the hand.
+    addCardToHand(loc, op, index, cb=function(duel){}) {
+        Game.addCardToHandI(loc, op, index, cb);
+    }
 
     //Plays card
     playCard(card, op, slot, cb=function(duel){}) {
         var cobj = card;
+        if(op) {
+            card.revealed = true;
+        }
         card.move({x: slot.obj.x, y: slot.obj.y});
         slot.card = cobj;
         if(card.slot !== null) {
             card.slot.card = null;
         }
         card.slot = slot;
-        Game.removeFromHand(card, false);
+        var j = Game.removeFromHand(card, op);
         Game.updateHand();
         Game.playCard(card, op, cb);
     }
@@ -166,6 +180,10 @@ class DuelState {
     //Adds a move to the move queue. If the move queue is empty, will perform the move instead.
     queueMove(move) {
         if(this.moveQueue.length <= 0) {
+            if(this.awaitMove) {
+                this.moveQueue.push(move);
+                return;
+            }
             this.doMove(move);
             return;
         } else {
@@ -177,19 +195,33 @@ class DuelState {
     doMove(move) {
         this.awaitMove = true;
         var parts = move.split(" ");
-        if(parts[0] === "P1") {
+        if(parts[0] === "R") {
             if(parts[1] === "MOVE") {
                 this.moveCard(this.remote.slots[parts[2]].card, this.remote.slots[parts[3]], this.moveEndCallback);
                 return;
             } else if(parts[1] === "DRAW") {
                 if(parts.length > 2) {
-                    this.drawCard(false, 1, this.moveEndCallback);
+                    this.drawCard(true, 1, this.moveEndCallback);
                 } else {
-                    this.drawCard(false, parseInt(parts[2]), this.moveEndCallback);
+                    this.drawCard(true, parseInt(parts[2]), this.moveEndCallback);
                 }
                 return;
             } else if(parts[1] === "PLAY") {
-                this.playCard(this.remote.hand[parseInt(parts[2])], true, this.remote.slots[parts[3]], this.moveEndCallback);
+                this.playCard(Game.getHand(parseInt(parts[2]), true), true, this.remote.slots[parts[3]], this.moveEndCallback);
+                return;
+            } else if(parts[1] === "PHASE") {
+                if(parts[2] === "END") {
+                    Client.chat.write("It's your turn.");
+                    this.turn = this.player;
+                    this.phase = DuelPhase.DRAW;
+                    this.turnNumber++;
+                    this.draws = 0;
+                }
+                else if(parts[2] === "BATTLE") {
+                    Client.chat.write("It's your opponent's battle phase.");
+                    this.phase = DuelPhase.BATTLE;
+                }
+                this.moveEndCallback(this);
                 return;
             }
         }
@@ -213,6 +245,16 @@ class DuelState {
     effectPhase() {
         Client.chat.write('DEBUG: Skipping effect phase...')
         this.phase = DuelPhase.ACTION;
+    }
+
+    //Battle phase
+    battlePhase() {
+        Client.chat.write('DEBUG: Entering battle phase...')
+    }
+
+    //End phase
+    endPhase() {
+        Client.chat.write('DEBUG: Ending turn...')
     }
 
 	//Does a series of moves in a list.

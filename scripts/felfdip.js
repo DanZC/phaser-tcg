@@ -88,6 +88,20 @@ class CardObject {
 		if(Game.waitAnim || Game.inputLayer > 0) return;
         if(this.isOpponents) {
             if(!this.revealed) return;
+            if(duel.phase == DuelPhase.BATTLE) {
+                var local = duel.local;
+                var cobj = local.selected.obj;
+                var c = local.selected;
+                if(local.selected == null) return;
+                var b = validAttackTarget(c, this.slot, duel)
+                Client.chat.write(`Valid: ${b}`);
+                if(b) {
+                    if(c.attacks > 0) {
+                        Game.attack(cobj, this.slot);
+                    }
+                }
+                return;
+            }
             this.state.obj.pv.x = this.game.world.centerX;
             this.state.obj.pv.y = this.game.world.centerY;
             this.state.obj.pv.key = 'cards';
@@ -119,7 +133,7 @@ class CardObject {
             local.selected = this.card;
         }
         if(this.slot !== null) {
-            Client.sendMove("SELECT " + this.slot.name);
+            //Client.sendMove("SELECT " + this.slot.name);
         }
     }
 
@@ -257,23 +271,26 @@ class DeckObject {
             return;
         }
         if(this.slot !== null) {
-            Client.sendMove("SURRENDER");
+            //Client.sendMove("SURRENDER");
         }
     }
 
-    draw() {
+    draw(cb=function(duel){}) {
         var duel = this.ls.cardsys.duel;
 		var game = this.ls.game;
-		var sounds = this.ls.sounds;
+        var sounds = this.ls.sounds;
+        if(duel.phase == DuelPhase.DRAW) {
+            Client.sendMove("DRAW 1");
+        }
         if(this.isOpponents) {
 			var next = new CardObject(this.slot, duel.opponent.deck.get_top(), this.isOpponents, this.parent);
-			next.revealed = false;
+		    next.revealed = true;
 			this.parent.bringToTop(next.obj);
 			//obj.remote.hand.push(next);
 			//obj.remote.hand.updateHandPositions();
 			duel.remote.hand.push(next);
 			Game.addToHand(next, this.isOpponents);
-			Game.updateHand();
+			Game.updateHand(cb);
 			var n = getRandomInt(1, 3);
 			if(n == 1) {
 				sounds['card1'].play();
@@ -297,7 +314,7 @@ class DeckObject {
 			//obj.local.hand.updateHandPositions();
             duel.local.hand.push(next);
 			Game.addToHand(next, this.isOpponents);
-			Game.updateHand();
+			Game.updateHand(cb);
 			var n = getRandomInt(1, 3);
 			if(n == 1) {
 				sounds['card1'].play();
@@ -311,11 +328,10 @@ class DeckObject {
 			duel.player.deck.draw();
             duel.draws++;
             if(duel.draws >= 1) {
-                duel.phase++;
+                duel.phase = DuelPhase.EFFECT;
                 duel.effectPhase();
             }
         }
-        Client.sendMove("DRAW");
     }
 
     move(dest) {
@@ -359,8 +375,12 @@ class HandObject {
         this.ls = Client;
         this.state = game.state.getCurrentState();
     }
+
+    get(index) {
+        return this.objs[index];
+    }
 	
-	updateHandPositions(fn) {
+	updateHandPositions(fn, fcb=function(duel){}) {
 		var duration = 250;
         var local = this.ls.cardsys.duel.local;
         local.selected = null;
@@ -373,6 +393,7 @@ class HandObject {
             if(i >= this.objs.length - 1) {
                 tween.onComplete.addOnce(function(obj, tween) {
                     fn(obj.p);
+                    fcb(Client.cardsys.duel);
                     obj.input.enabled = true;
                 });
             } else {
@@ -403,8 +424,9 @@ class HandObject {
 				j = i;
 		}
 		if(j !== -1) {
-			this.objs.splice(j, 1);
-		}
+            this.objs.splice(j, 1);
+        }
+        return j;
 		//this.parent.add(o.obj);
 	}
 	
@@ -832,13 +854,13 @@ function validSlot(card, slot, duel) {
 function validAttackTarget(card, slot, duel) {
     if(slot.empty()) return false;
     if(!slot.isOpponents) return false;
-    if(card.type !== CardType.MEMBER || !(card.type === CardType.MEME && card.category ===  MemeCategory.VRT)) {
+    if(card.type !== CardType.MEMBER && (card.type !== CardType.MEME || card.category !== MemeCategory.VRT)) {
         return false;
     }
     if(slot.type === SlotType.CHANNEL) {
         return true;
     }
-    if(slot.type === SlotType.MEMROLE && slot.card.type === CardType.MEMBER) {
+    if(slot.type === SlotType.MEMROLE && slot.card.card.type === CardType.MEMBER) {
         return true; 
     }
     return false;
@@ -925,13 +947,15 @@ class Slot {
                         }
                         cobj.slot = this;
                         local.selected = null;
-                        Game.removeFromHand(cobj, false);
+                        var j = Game.removeFromHand(cobj, false);
+                        var n = this.name;
                         Game.updateHand();
-                        Game.playCard(cobj);
+                        Client.sendMove("PLAY " + j + " " + n);
+                        Game.playCard(cobj, false);
                     }
                 }
             } else if(duel.phase === DuelPhase.BATTLE) {
-                if(Game.isOnField(duel.local.selected.obj, false)) {
+                //if(Game.isOnField(duel.local.selected.obj, false)) {
                     var local = duel.local;
                     var cobj = local.selected.obj;
                     var c = local.selected;
@@ -946,7 +970,7 @@ class Slot {
                             local.selected = null;
                         }
                     }
-                }
+                //}
             }
         }
     }

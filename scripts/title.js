@@ -14,6 +14,10 @@ Title.preload = function() {
 };
 
 Title.create = function() {
+    this.game.scale.pageAlignHorizontally = true;
+    this.game.scale.pageAlignVertically = true;
+    this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    this.game.stage.disableVisibilityChange = true;
     var title = this.game.add.image(this.game.world.centerX, this.game.world.centerY, 'title');
     title.anchor.setTo(0.5, 0.5);
     var bFM = this.game.add.button(

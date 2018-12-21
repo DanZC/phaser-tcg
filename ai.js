@@ -10,7 +10,7 @@ function copy(obj) {
     }
     return copy;
 }
-
+/*
 //Bad "enum", because Javascript doesn't have bultin enums.
 const CardType = {
     UNDEFINED : 0,
@@ -63,23 +63,6 @@ const CardColor = {
     GRY : 8
 }
 
-CardIndex = [];
-
-var fs = require('fs');
-fs.readFile( __dirname + '/assets/cards.json', function (err, data) {
-    if (err) {
-        throw err; 
-    }
-    CardIndex = data.toJSON();
-});
-
-//Damage calculation function
-function calcDamage(atk, def) {
-    var dmg = Math.round((atk * 1.5) - (def * 1.5));
-    if(dmg < 1) dmg = 1;
-    return dmg;
-}
-
 const DuelPhase = {
     WAIT : 0,
     DRAW : 1,
@@ -90,6 +73,26 @@ const DuelPhase = {
     END : 6
 };
 
+*/
+var { CardType, CardLocation, CardColor, DuelPhase, Card, Slot, UNDEFINED_CARD_INDEX } = require('./Card');
+
+CardIndex = require('./assets/cards.json');
+
+/*var fs = require('fs');
+fs.readFile( __dirname + '/assets/cards.json', function (err, data) {
+    if (err) {
+        throw err; 
+    }
+    CardIndex = data.toJSON();
+});*/
+
+//Damage calculation function
+function calcDamage(atk, def) {
+    var dmg = Math.round((atk * 1.5) - (def * 1.5));
+    if(dmg < 1) dmg = 1;
+    return dmg;
+}
+
 function isValid(index) {
     if(index < 0 || index > CardIndex.length) return false;
     return true;
@@ -97,7 +100,9 @@ function isValid(index) {
 
 function getInfo(index) {
     if(!isValid(index)) return {};
-    return CardIndex[index];
+    var info = copy(CardIndex[index]);
+    info.type = CardType[info.type];
+    return info;
 }
 
 function isEmpty(slot) {
@@ -116,11 +121,12 @@ function getEmptySlot(arr) {
 
 function getAvailableMemberSlot(sstate) {
     if(!isEmpty(sstate.channels[0])) {
-        return getEmptySlot([state.self.members[0], state.self.members[1], state.self.members[2]]);
+        return getEmptySlot([sstate.members[0], sstate.members[1], sstate.members[2]]);
     }
     if(!isEmpty(sstate.channels[1])) {
-        return getEmptySlot([state.self.members[0], state.self.members[1], state.self.members[2]]);
+        return getEmptySlot([sstate.members[0], sstate.members[1], sstate.members[2]]);
     }
+    return -1;
 }
 
 function getActiveMembers(sstate) {
@@ -159,12 +165,12 @@ if(m.type === 'ai'){
         }
         switch(state.phase) {
         case DuelPhase.DRAW:
-            moves.append('DRAW 1');
-            moves.append('PHASE EFFECT');
-            return;
+            moves.push('DRAW 1');
+            moves.push('PHASE EFFECT');
+            break;
         case DuelPhase.EFFECT:
-            moves.append('PHASE ACTION');
-            return;
+            moves.push('PHASE ACTION');
+            break;
         case DuelPhase.ACTION:
             //Do I have any channel cards in play?
             if(!hasActiveChannelCard(state.self)) {
@@ -172,9 +178,10 @@ if(m.type === 'ai'){
                 for(n in state.self.hand) {
                     var card = state.self.hand[n];
                     var cinfo = getInfo(card.index);
-                    if(cinfo.type === CardType.CHANNEL) {
+                    console.log(`${cinfo.name} : ${cinfo.type}`);
+                    if(cinfo.type == CardType.CHANNEL) {
                         var c = getEmptySlot(state.self.channels);
-                        moves.append('PLAY HAND${n} CH${c}');
+                        moves.push(`PLAY ${n} CH${c}`);
                         return moves;
                     }
                 }
@@ -188,7 +195,7 @@ if(m.type === 'ai'){
                     if(cinfo.lvl <= 1 || !flags.playedHighLVLCard) {
                         var c = getAvailableMemberSlot(state.self);
                         if(c != -1) {
-                            moves.append('PLAY HAND${n} MBR${c}');
+                            moves.push(`PLAY ${n} MBR${c}`);
                             if(cinfo.lvl > 1) {
                                 flags.playedHighLVLCard = true;
                             }
@@ -197,11 +204,11 @@ if(m.type === 'ai'){
                     }
                 }
             }
-            moves.append('PHASE BATTLE');
+            moves.push('PHASE BATTLE');
             break;
         case DuelPhase.BATTLE:
             //Do I have any active members on the field?
-            var members = getActiveMembers(state.self);
+            /*var members = getActiveMembers(state.self);
             for(m in members) {
                 var n = members[m];
                 var c = state.self.members[n];
@@ -244,21 +251,23 @@ if(m.type === 'ai'){
                 if(pref !== -1) {
                     moves.append('ATTACK MBR${n} MBR{prefV}');
                 }
-            }
-            moves.append('PHASE END');
+            }*/
+            moves.push('PHASE END');
             break;
         case DuelPhase.END:
-            moves.append('END TURN');
+            moves.push('END TURN');
             break;
         }
         return moves;
     }
     var moves = doAI(m.state);
     emit('ai callback', { 
-        match: m.match, 
+        match: m.match.id, 
         moves: copy(moves),
         id: m.id
     });
 }});
 
 process.send({type: 'handshake'});
+
+process.stdin.resume();

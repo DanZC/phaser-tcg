@@ -50,12 +50,15 @@ Game.create = function() {
     Game.inputLayer = 0;
 
     this.cardsys = cardsys;
+    cardsys.player.deck.shuffle();
     cardsys.player.deck.update();
-	cardsys.player.deck.shuffle();
+    cardsys.duel.opponent.deck.update();
     var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
     logo.anchor.setTo(0.5, 0.5);
     var d = cardsys.player.deck.get_top();
     var d2 = cardsys.duel.opponent.deck.get_top();
+
+    //The following block of code instantiates the positions/coordinates of the objects from the values defined in assets/duel_layout.json
 	var deckpos = [{
         x : DuelLayout.layers[1].objects[1].x,
         y : DuelLayout.layers[1].objects[1].y
@@ -193,7 +196,10 @@ Game.create = function() {
             y: DuelLayout.layers[3].objects[3].y
         }
     }
-	//Client.chat.write("DEBUG: DECK PLACED AT X=" + deckpos[0].x);
+    //Client.chat.write("DEBUG: DECK PLACED AT X=" + deckpos[0].x);
+    
+    //The following chunk of code instantiates game objects with coordinates defined in the previous section.
+    //This setup allows the objects to render and organizes them.
     slots = game.add.group(game.world, "slots", false, false, false);
     var sdl = new Slot(deckpos[0], SlotType.DECK, false);
     cardsys.duel.local.slots['DECK'] = sdl;
@@ -325,6 +331,29 @@ Game.create = function() {
 
     this.waitico = game.add.sprite(15, 15, 'wait');
 
+    obj.phasebtn = game.add.button(
+        200, 
+        16, 
+        'buttons3',
+        function() {
+            var duel = Client.cardsys.duel;
+            if(duel.turn !== Client.cardsys.player) return;
+            if(duel.phase == DuelPhase.ACTION) {
+                duel.phase = DuelPhase.BATTLE;
+                Client.sendMove('PHASE BATTLE');
+                duel.battlePhase();
+                return;
+            }
+            if(duel.phase == DuelPhase.BATTLE) {
+                duel.phase = DuelPhase.END;
+                Client.sendMove('PHASE END');
+                duel.endPhase();
+                return;
+            }
+        },
+        this
+    );
+
     //var battle_button = game.add.sprite(32,0, 'battlebtn');
 
     var prompt = game.add.sprite(game.world.centerX, game.world.centerY, 'prompt1');
@@ -371,36 +400,46 @@ Game.create = function() {
         this
     );
 
+    //This section prints a message to the chat, informing the player of the successful connection to the game.
     if(Game.type === GameType.AI) {
         Client.chat.write("Joined an AI game.");
     } else if(Game.type === GameType.RandomMatch) {
         Client.chat.write("Joined random match vs @" + Client.cardsys.duel.opponent.name + ".")
     }
+
+    //This plays the opening animation, in which, each players draws 5 cards.
+    //tgts is merely a placeholder since there is no object being manipulated by the function.
+    //Rather, the animation is a sequence of function calls that are spaced out over a period of a few hundred ms.
     var tgts = [obj.close];
     Game.playAnimation(AnimType.BEGIN, tgts, false, function(tg,op){
-
     });
 };
 
+//Gets the current duel.
 Game.getCurrentDuel = function() {
     return this.cardsys.duel;
 }
 
+//Gets the player object representing the local client player.
 Game.getLocalPlayer = function() {
     return this.cardsys.player;
 }
 
-Game.drawCard = function(op, n=1) {
+//Draws a card from either player's deck.
+//n specifies the number of cards to draw (default 1).
+Game.drawCard = function(op, n=1, cb=function(duel){}) {
     if(!op) {
-        Game.obj.local.deck.draw();
+        Game.obj.local.deck.draw(cb);
     } else {
-        Game.obj.opponent.deck.draw();
+        Game.obj.opponent.deck.draw(cb);
     }
 }
 
-Game.updateHand = function() {
-	Game.obj.lhand.updateHandPositions(function(c){});
-	Game.obj.ohand.updateHandPositions(function(c){});
+//Performs an update to the hand object.
+//Usually done when an object is moved from the hand to another location.
+Game.updateHand = function(cb=function(duel){}) {
+	Game.obj.lhand.updateHandPositions(function(c){},cb);
+	Game.obj.ohand.updateHandPositions(function(c){},cb);
 }
 
 Game.addToHand = function(card, op) {
@@ -409,6 +448,14 @@ Game.addToHand = function(card, op) {
 	} else {
 		Game.obj.ohand.push(card);
 	}
+}
+
+Game.getHand = function(index, op) {
+    if(!op) {
+        return Game.obj.lhand.get(index);
+    } else {
+        return Game.obj.ohand.get(index);
+    }
 }
 
 //Opens up a prompt for the user to select a card from the list.
@@ -440,7 +487,7 @@ Game.addCardToHand = function(loc, op, filter) {
             Game.promptSelectCard("Select a card to add to your hand.", loc, filter, function(c){
                 if(c === null) return;
                 var next = new CardObject(Game.obj.local.deck, c, false, Game.obj.local.deck.parent);
-                Game.getCurrentDuel().player.deck.remove(c);
+                var i = Game.getCurrentDuel().player.deck.remove(c);
                 next.revealed = false;
                 Game.obj.local.deck.parent.bringToTop(next.obj);
                 Client.sounds['card0'].play();
@@ -455,6 +502,32 @@ Game.addCardToHand = function(loc, op, filter) {
                     //Game.queueAnimation(AnimType.FLIPDOWN, tgts, false, function(card, op){
                     //});
                 });
+                Client.sendMove('ADDTOHAND DECK ' + i);
+            });
+        }
+    }
+}
+
+Game.addCardToHandI = function(loc, op, index, cb=function(duel){}) {
+    if(loc == CardLocation.DECK) {
+        if(op) {
+            if(i == -1) return;
+            var c = Game.getCurrentDuel().opponent.deck.removei(index);
+            var next = new CardObject(Game.obj.remote.deck, c, true, Game.obj.remote.deck.parent);
+            next.revealed = false;
+            Game.obj.remote.deck.parent.bringToTop(next.obj);
+            Client.sounds['card0'].play();
+            next.slot = null;
+            Game.addToHand(next, true);
+            Game.obj.lhand.updateHandPositions(function(n){
+                var tgts = [n];
+                Game.playAnimation(AnimType.FLIPUP, tgts, true, function(card, op){
+                });
+                Game.queueAnimation(AnimType.TARGET, tgts, true, function(card, op){
+                });
+                Game.queueAnimation(AnimType.FLIPDOWN, tgts, true, function(card, op){
+                    cb(Game.getCurrentDuel());
+                });
             });
         }
     }
@@ -462,9 +535,9 @@ Game.addCardToHand = function(loc, op, filter) {
 
 Game.removeFromHand = function(card, op) {
 	if(!op) {
-		Game.obj.lhand.remove(card);
+		return Game.obj.lhand.remove(card);
 	} else {
-		Game.obj.ohand.remove(card);
+		return Game.obj.ohand.remove(card);
 	}
 }
 
@@ -477,11 +550,17 @@ Game.isInHand = function(card, op) {
 	}
 }
 
-//Sends a message to the server and waits for the opponent to chose a card to activate in response.
+//Sends a message to the server and waits for the opponent to choose a card to activate in response.
 Game.awaitCheckEffect = function(type, callback) {
     //Client.sendCheckEffect(type, callback);
     //Since the multiplayer is yet to be implemented, the effect/attack will go through without response from the opponent.
     callback();
+}
+
+//Sends a message to the server and waits for the opponent to choose a target for an effect activation.
+//Returns with an object descibing the player's decision.
+Game.awaitPlayerDecision = function(callback=function(data){}) {
+    Client.awaitOpponentDecision(callback);
 }
 
 //Awards a prize token to a player
@@ -510,7 +589,7 @@ Game.playAnimation = function(animid, targets, op, callback=function(card, op){}
 		this.animTargets = targets;
 	var obj = Game.obj;
 	var game = this.game;
-	var cb = callback;
+    var cb = callback;
 	if(animid == AnimType.EFFECT) {
 		obj.pv.alpha = 0;
 		obj.pv.inputEnabled = false;
@@ -583,17 +662,23 @@ Game.playAnimation = function(animid, targets, op, callback=function(card, op){}
         tween.start();
 	} else if(animid == AnimType.ATTACK) {
         var attacker = targets[0].obj;
+        var attackertxt = targets[0].card.obj.text;
         var attacktg = targets[1].obj;
         var ox = attacker.x;
         var oy = attacker.y;
+        Client.chat.write(`${attacker.x}, ${attacker.y} => ${attacktg.x}, ${attacktg.y}`);
         //Client.sounds['hit2'].play();
         var tween = null;
+        var tween3 = null;
         if(op) {
-            tween = game.add.tween(attacker).to( { x: attacktg.x - 201, y: attacktg.y }, 300, Phaser.Easing.Quadratic.In, false, 0);
+            tween = game.add.tween(attacker).to( { x: attacktg.x + 101, y: attacktg.y }, 200, Phaser.Easing.Quadratic.In, false, 0);
+            tween3 = game.add.tween(attackertxt).to( { x: attacktg.x + 101, y: attacktg.y }, 200, Phaser.Easing.Quadratic.In, false, 0);
         } else {
-            tween = game.add.tween(attacker).to( { x: attacktg.x + 201, y: attacktg.y }, 300, Phaser.Easing.Quadratic.In, false, 0);
+            tween = game.add.tween(attacker).to( { x: attacktg.x - 101, y: attacktg.y }, 200, Phaser.Easing.Quadratic.In, false, 0);
+            tween3 = game.add.tween(attackertxt).to( { x: attacktg.x - 101, y: attacktg.y }, 200, Phaser.Easing.Quadratic.In, false, 0);
         }
-        var tween2 = game.add.tween(attacker).to( { x: ox, y: oy }, 300, Phaser.Easing.Quadratic.Out, false, 0);
+        var tween2 = game.add.tween(attacker).to( { x: ox, y: oy }, 200, Phaser.Easing.Quadratic.Out, false, 0);
+        var tween4 = game.add.tween(attackertxt).to( { x: ox, y: oy }, 200, Phaser.Easing.Quadratic.Out, false, 0);
 		//var tween2 = game.add.tween(obj).to( { width: w }, 100, Phaser.Easing.Linear.None, false, 0);
         tween.onComplete.addOnce(function(obj, tween){
             Client.sounds['hit2'].play();
@@ -609,6 +694,8 @@ Game.playAnimation = function(animid, targets, op, callback=function(card, op){}
         });
         tween.chain(tween2);
         tween.start();
+        tween3.chain(tween4);
+        tween3.start();
     } else if(animid == AnimType.TOGRAVE) {
         var obj = targets[0].obj;
         obj.inputEnabled = false;
@@ -647,12 +734,13 @@ Game.playAnimation = function(animid, targets, op, callback=function(card, op){}
             tg.x, 
             tg.y, 
             "-" + value, {
-            font: "16px Courier New",
+            font: "32px Courier New",
             fill: "#ff0000",
             stroke: '#000000',
             align: "left"
         });
-        var tween = game.add.tween(obj).to( { y: tg.y + 180 }, 1000, Phaser.Easing.Linear.None, false, 0);
+        obj.strokeThickness = 4;
+        var tween = game.add.tween(obj).to( { y: tg.y + 200 }, 1000, Phaser.Easing.Linear.None, false, 0);
         tween.onComplete.addOnce(function(obj, tween){
             obj.x = -1000;
             Game.waitAnim = false;
@@ -684,7 +772,7 @@ Game.playAnimation = function(animid, targets, op, callback=function(card, op){}
         tweens[9].onComplete.addOnce(function(obj, tween){
             Game.drawCard(false);
             Game.getCurrentDuel().draws = 0;
-            Game.getCurrentDuel().phase = 3;
+            Game.getCurrentDuel().phase = DuelPhase.ACTION;
             Game.waitAnim = false;
             if(cb !== undefined)
 				cb(Game.animTargets[0], op);
@@ -791,17 +879,20 @@ Game.sendToGrave = function(card, op) {
 
 //Attacks
 Game.attack = function(c, s) {
+    Client.chat.write("DEBUG: Attack.");
     Game.awaitCheckEffect(CheckEffectType.ATTACK, function() {
-        var targets = [c.slot, s];
+        var targets = [c, s.card];
         var targets2 = [s];
-        var op = !s.isOpponents();
+        var op = !s.isOpponents;
         var damage = 0;
         if(s.type === SlotType.MEMROLE) {
             damage = calcDamage(c.getAttack(), s.card.getDefense());
         }
         Game.playAnimation(AnimType.ATTACK, targets, op, function(card, op) {
+            var local = Client.cardsys.duel.local;
+            local.selected = null;
         });
-        var hasBeenDestroyed = s.card.damage(damage);
+        var hasBeenDestroyed = s.card.card.damage(damage);
         Game.queueAnimation(AnimType.DAMAGE, targets2, op, function(card, op) {
         }, damage);
         if(hasBeenDestroyed) {
@@ -814,13 +905,13 @@ Game.attack = function(c, s) {
 
 Game.playCard = function(card, op, cb=function(duel){}) {
 	if(card.card.type == CardType.MEME) {
-		Client.chat.write("DEBUG: The effect of " + card.card.name + " activates.");
+        Client.chat.write("DEBUG: The effect of " + card.card.name + " activates.");
 		this.playAnimation(AnimType.EFFECT, [card], op, function(card, op){
 			if(card.card.category !== MemeCategory.CTN) {
                 Game.sendToGrave(card, op);
-                Game.addCardToHand(CardLocation.DECK, false, function(c){return c.isMeme();});
+                //Game.addCardToHand(CardLocation.DECK, false, function(c){return c.isMeme();});
             } else {
-                Game.addCardToHand(CardLocation.DECK, false, function(c){return c.isMeme();});
+                //Game.addCardToHand(CardLocation.DECK, false, function(c){return c.isMeme();});
             }
 		});
 	}
@@ -832,6 +923,26 @@ Game.playCard = function(card, op, cb=function(duel){}) {
 		this.queueAnimation(AnimType.TARGET, tgs, op, function(card, op){
             cb(Client.cardsys.duel);
 		});
+    }
+    if(card.card.type == CardType.MEMBER) {
+		//Client.chat.write("DEBUG: The effect of " + card.card.name + " activates.");
+        var tgs = [card];
+        this.playAnimation(AnimType.EFFECT, tgs, op, function(card, op){
+            cb(Client.cardsys.duel);
+		});
+		//this.queueAnimation(AnimType.TARGET, tgs, op, function(card, op){
+        //    
+		//});
+	}
+    if(card.card.type == CardType.ROLE) {
+		Client.chat.write("DEBUG: The effect of " + card.card.name + " activates.");
+		var tgs = [card];
+		this.playAnimation(AnimType.EFFECT, tgs, op, function(card, op){
+            cb(Client.cardsys.duel);
+		});
+		//this.queueAnimation(AnimType.TARGET, tgs, op, function(card, op){
+        //    
+		//});
 	}
 }
 
@@ -861,6 +972,21 @@ Game.update = function() {
     } else {
         this.waitico.x = -1000;
     }
+    if(Game.getCurrentDuel().turn !== Game.getLocalPlayer()) {
+        this.obj.phasebtn.frame = 3;
+    }
+    else {
+        var duel = Client.cardsys.duel;
+        if(duel.phase == DuelPhase.ACTION) {
+            this.obj.phasebtn.frame = 5;
+        }
+        else if(duel.phase == DuelPhase.BATTLE) {
+            this.obj.phasebtn.frame = 0;
+        }
+        else {
+            this.obj.phasebtn.frame = 3;
+        }
+    }
     //for(i in duel.local.hand) {
     //    duel.local.hand[i].update();
     //}
@@ -870,5 +996,5 @@ Game.update = function() {
 };
 
 /*Game.render = function() {
-	
+    
 }*/

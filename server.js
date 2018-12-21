@@ -15,26 +15,27 @@ app.get('/',function(req,res){
     res.sendFile(__dirname+'/index.html');
 });
 
-var ai = require('child_process').fork('./ai.js', [], {
+var cp = require('child_process');
+var ai = cp.fork('./ai.js', [], {
     stdio: 'pipe'
 });
 
-CardIndex = [];
-DummyDeck = [];
+CardIndex = require('./assets/cards');
+DummyDeck = require('./assets/dummy_deck');
 
 var fs = require('fs');
-fs.readFile( __dirname + '/assets/cards.json', function (err, data) {
+/*fs.readFile( __dirname + '/assets/cards.json', function (err, data) {
     if (err) {
         throw err; 
     }
     CardIndex = data.toJSON();
-});
-fs.readFile( __dirname + '/assets/dummy_deck.json', function (err, data) {
+});*/
+/*fs.readFile( __dirname + '/assets/dummy_deck.json', function (err, data) {
     if (err) {
         throw err; 
     }
     DummyDeck = data.toJSON();
-});
+});*/
 
 usedMatchIDs = [];
 
@@ -275,6 +276,14 @@ class Deck {
         }
     }
 
+    fromRaw(raw) {
+        for(i in raw) {
+            var c = new Card();
+            c.set_index(raw[i]);
+            this.add(c);
+        }
+    }
+
 	//Pushes a card into the deck.
     add(card) {
         this.card.push(card);
@@ -395,7 +404,22 @@ function parseMove(movestr) {
         } else {
             pmove.slotty = SlotType.MEME;
         }
-        pmove.slotid = parseInt(parts[3]);
+        pmove.slotid = parts[2];
+        return pmove;
+    }
+    if(parts[0] == "PHASE") {
+        pmove.type = MoveType.PHASE;
+        if(parts[1].indexOf("BATTLE") == 0) {
+            pmove.value = DuelPhase.BATTLE;
+        } else if(parts[1].indexOf("END") == 0) {
+            pmove.value = DuelPhase.END;
+        } else if(parts[1].indexOf("EFFECT") == 0) {
+            pmove.value = DuelPhase.EFFECT;
+        } else if(parts[1].indexOf("ACTION") == 0) {
+            pmove.value = DuelPhase.ACTION;
+        } else {
+            pmove.value = DuelPhase.END;
+        }
         return pmove;
     }
     if(parts[0] == "DISCARD") {
@@ -418,7 +442,7 @@ class Slot {
 
     set_card(c) {
         this.card = c;
-        this.id = c.index
+        this.index = c.index;
         this.hp = c.currentHP;
     }
 
@@ -432,17 +456,17 @@ class Slot {
 
     remove_card() {
         this.card = null;
-        this.id = -1;
+        this.index = -1;
     }
 }
 
 class MatchState {
     constructor() {
-        this.turn = null;
+        this.turn = 'a';
         this.phase = DuelPhase.DRAW;
         this.draws = 0;
         this.a = {
-            deck: [],
+            deck: new Deck(),
             hand: [],
             memes: [
                 new Slot(SlotType.MEME, 0, 'a'),
@@ -467,7 +491,7 @@ class MatchState {
             offline: []
         }
         this.b = {
-            deck: [],
+            deck: new Deck(),
             hand: [],
             memes: [
                 new Slot(SlotType.MEME, 0, 'a'),
@@ -494,40 +518,81 @@ class MatchState {
     }
 
     drawCard(side, n=1) {
-        side.hand.push(side.deck.pop());
+        for(var i = 0; i < n; i++) {
+            var c = side.deck.draw();
+            side.hand.push(c);
+        }
+    }
+
+    print() {
+        var str = '';
+        str += "A's HAND:\n"
+        Console.log(str);
     }
 
     playCard(side, handid, slotty, slotid) {
-        var c = side.hand[handid]
+        var sid = this.getIdFromSlotId(slotid);
+        var c = side.hand[handid];
         if(slotty === SlotType.MEMROLE) {
-            side.members[slotid].set_card(c);
+            side.members[sid].set_card(c);
         } else if(slotty === SlotType.CHANNEL) {
-            side.channels[slotid].set_card(c);
+            side.channels[sid].set_card(c);
         } else if(slotty === SlotType.MEME) {
-            side.memes[slotid].set_card(c);
+            side.memes[sid].set_card(c);
         }
         side.hand.splice(handid, 1);
     }
 
+    changePhase(side, value) {
+        this.phase = value;
+    }
+
+    getIdFromSlotId(id) {
+        id.trim();
+        if(id.indexOf("MBR") == 0) {
+            var nid = parseInt(id.substr(3, 1));
+            if(nid !== null) {
+                return nid;
+            }
+        } else if(id.indexOf("MEM") == 0) {
+            var nid = parseInt(id.substr(3, 1));
+            if(nid !== null) {
+                return nid;
+            }
+        } else if(id.indexOf("CH") == 0) {
+            var nid = parseInt(id.substr(2, 1));
+            if(nid !== null) {
+                return nid;
+            }
+        } else {
+            var nid = parseInt(id.substr(3, 1));
+            if(nid !== null) {
+                return nid;
+            }
+        }
+        return 0;
+    }
+
     sendToGrave(side, slotty, slotid) {
+        var sid = this.getIdFromSlotId(slotid);
         if(slotty === SlotType.MEMROLE) {
-            var s = side.members[slotid];
+            var s = side.members[sid];
             var c = s.get_card();
             side.offline.push(c);
             s.remove_card(c);
-            side.members.splice(slotid, 1);
+            side.members.splice(sid, 1);
         } else if(slotty === SlotType.CHANNEL) {
-            var s = side.channels[slotid];
+            var s = side.channels[sid];
             var c = s.get_card();
             side.offline.push(c);
             s.remove_card(c);
-            side.channels.splice(slotid, 1);
+            side.channels.splice(sid, 1);
         } else if(slotty === SlotType.MEME) {
-            var s = side.memes[slotid];
+            var s = side.memes[sid];
             var c = s.get_card();
             side.offline.push(c);
             s.remove_card(c);
-            side.memes.splice(slotid, 1);
+            side.memes.splice(sid, 1);
         }
     }
 }
@@ -547,6 +612,7 @@ class AI {
     calcMove(state, id) {
         var oid = 'b';
         if(id === 'b') oid = 'a';
+        console.log("ID = " + this.bot.match.id);
         ai.send({
             type: 'ai',
             match: {
@@ -558,7 +624,9 @@ class AI {
                 phase: state.phase
             },
             id: id
-        })
+        }, function(error) {
+            console.error(error);
+        });
     }
 }
 
@@ -598,18 +666,26 @@ class Match {
 
     start() {
         console.log("Starting match between " + this.a.name + " and " + this.b.name + "!");
-        console.log(this.a.deck.length);
-        this.state.a.deck = this.a.deck;
-        this.state.b.deck = this.b.deck;
-        this.state.turn = this.b;
+        this.state.a.deck = new Deck();
+        this.state.a.deck.fromRaw(this.a.deck);
+        this.state.a.deck.update();
+        this.state.b.deck = new Deck();
+        this.state.b.deck.fromRaw(this.b.deck);
+        this.state.b.deck.update();
+        this.state.turn = 'b';
         //io.to(this.roomid).emit('matchmake end', this.state);
         if(this.a.bot !== true) {
-            io.sockets.connected[this.a.socketID].emit('matchmake end', {opponent:copy(this.state.b), name: this.b.name, ty:this.matchtype, turn:false});
+            let opdeck = this.state.b.deck.rawcopy();
+            io.sockets.connected[this.a.socketID].emit('matchmake end', {opponent:{deck:opdeck}, name: this.b.name, ty:this.matchtype, turn:false});
             io.sockets.connected[this.a.socketID].emit('end turn');
         }
         if(this.b.bot !== true) {
-            io.sockets.connected[this.b.socketID].emit('matchmake end', {opponent:copy(this.state.a), name: this.a.name, ty:this.matchtype, turn:true});
-        } else {
+            let opdeck = this.state.a.deck.rawcopy();
+            io.sockets.connected[this.b.socketID].emit('matchmake end', {opponent:{deck:opdeck}, name: this.a.name, ty:this.matchtype, turn:true});
+        }
+        this.state.drawCard(this.state.a, 5);
+        this.state.drawCard(this.state.b, 5);
+        if(this.b.bot) {
             this.b.ai.calcMove(this.state, "b");
         }
     }
@@ -622,13 +698,39 @@ class Match {
 
     doMove(p, move) {
         var m = parseMove(move);
-        if(p === 'a') {
+        if(true) {
             switch(m.type) {
             case MoveType.DRAW:
-                this.state.drawCard(this.state.a, m.value);
+                this.state.drawCard(this.state[p], m.value);
                 break;
             case MoveType.PLAY:
-                this.state.playCard(this.state.a, m.handid, m.slotty, m.slotid);
+                this.state.playCard(this.state[p], m.handid, m.slotty, m.slotid);
+                break;
+            case MoveType.PHASE:
+                this.state.changePhase(this.state[p], m.value);
+                if(this.state.phase == DuelPhase.END) {
+                    this.state.phase = DuelPhase.DRAW;
+                    console.log("TURN:" + this.state.turn);
+                    var tp = this[this.state.turn];
+                    if(tp.bot !== true) {
+                        io.sockets.connected[tp.socketID].emit('end turn');
+                    }
+                    if(this.state.turn.startsWith('a')) {
+                        this.state.turn = 'b';
+                        var tp = this[this.state.turn];
+                        if(tp.bot !== true)
+                            io.sockets.connected[tp.socketID].emit('begin turn');
+                        else
+                            this.b.ai.calcMove(this.state, "b");
+                    } else {
+                        this.state.turn = 'a';
+                        var tp = this[this.state.turn];
+                        if(tp.bot !== true)
+                            io.sockets.connected[tp.socketID].emit('begin turn');
+                        else
+                            this.a.ai.calcMove(this.state, "a");
+                    }
+                }
                 break;
             default:
                 break;
@@ -673,6 +775,7 @@ function dummyDeck() {
     var deck = [];
     for(i = 0; i < cards; i++) {
         var n = DummyDeck[i];
+        //var n = 1;
         //var c = new Card();
         //c.set_index(n);
         //c.update();
@@ -714,7 +817,7 @@ class Bot {
         this.socketID = -1;
         this.deck = dummyDeck();
         this.ready = true;
-        this.ai = new AI();
+        this.ai = new AI(this);
         server.bots.push(this);
     }
 
@@ -741,21 +844,38 @@ ai.on('message', function(data){
     if(data.type === 'handshake') {
         console.log('Handshake with ai server.');
     } else if(data.type === 'ai callback') {
-        var match = data.match;
-        var moves = data.moves;
+        //console.log(data);
+        //console.log(server.matches);
+        var match = server.matches[data.data.match];
+        var moves = data.data.moves;
         console.log('AI Callback.');
         for(m in moves) {
-            match.doMove(data.id, moves[m]);
+            console.log("P" + data.data.id + " " + moves[m]);
+            match.doMove(data.data.id, moves[m]);
         }
         match.emit(moves);
+        if(match.state.turn.startsWith(data.data.id)) {
+            match[data.data.id].ai.calcMove(match.state, data.data.id);
+        }
     }
 });
 
 ai.on('close', (code) => {
     console.log('ai module closed with a code of ' + code);
-    //ai = fork('./ai.js', [], {
+    ai = cp.fork('./ai.js', [], {
+        stdio: 'pipe'
+    });
+});
+
+ai.stdout.on('data', (data) => {
+    console.log(`ai stdout: ${data}`);
+    //ai = cp.fork('./ai.js', [], {
     //    stdio: 'pipe'
     //});
+});
+
+ai.stderr.on('data', (data) => {
+    console.error(`ai stderr: ${data}`);
 });
 
 io.on('connection',function(socket){
@@ -843,9 +963,13 @@ io.on('connection',function(socket){
         bot.match = match;
         var roomid = match.roomid;
         socket.join(roomid);
-        bot.deck = dummyDeck();
+        var dummy = new Deck();
+        dummy.fromRaw(dummyDeck());
+        dummy.shuffle();
+        bot.deck = dummy.rawcopy();
         socket.emit('request info', (info) => {
             console.log('Received info from ' + socket.player.id + ".");
+            //socket.player.deck = new Deck();
             socket.player.deck = info.deck;
             console.log('Deck length: ' + socket.player.deck.length);
             socket.player.match.readyb = true;
@@ -932,11 +1056,18 @@ io.on('connection',function(socket){
 
     socket.on('move send',function(move){
         console.log("Player, " + socket.player.id + ", did move, '" + move + "'");
+        //Since verifying moves is yet to be implemented, the move will be automatically assumed to be valid.
         //var data = verifyMove(socket.player.match, move);
         var data = { good:true };
+        var match = socket.player.match;
+        var p = 'a'
+        if(match.b.bot != true) {
+            if(socket.id == match.b.socketID)
+                p = 'b'
+        }
         if(data.good) {
-            socket.to(socket.player.match.roomid).broadcast.emit('move get',move);
-            socket.player.match.doMove(move);
+            socket.to(socket.player.match.roomid).broadcast.emit('move get',"R " + move);
+            socket.player.match.doMove(p, move);
             socket.emit('move callback', move);
         } else {
             socket.emit('move callback', null);

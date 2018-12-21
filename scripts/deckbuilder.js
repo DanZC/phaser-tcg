@@ -7,6 +7,7 @@ Builder.selected = 0;
 Builder.init = function(game){
     this.game = game;
     this.game.stage.disableVisibilityChange = true;
+    //Sets the deck to a copy of the deck defined in Cardsys.
 	this.deck = Client.cardsys.deck[0].copy();
 };
 
@@ -29,7 +30,8 @@ Builder.create = function() {
     Builder.menu = game.add.group(game.world, "menu", false, false, false);
     Builder.cards = game.add.group(game.world, "cards", false, false, false);
     obj = [];
-	
+    
+    //Sorts the deck used by the deckbuilder such that cards with lower index numbers appear before cards with higher index numbers.
 	this.deck.sort();
     //var deck = Client.cardsys.deck[0];
     if(this.deck.card.length >= 40) {

@@ -9,6 +9,7 @@ Client.game = null;
 Client.cardsys = null;
 
 Client.checkEffectCallback = function(){};
+Client.awaitOpponentCallback = function(data){};
 
 const CheckEffectType = {
     ATTACK : 0,
@@ -51,9 +52,10 @@ Client.askReturnPlayer = function(username){
     Client.socket.emit('oldplayer', username)
 };
 
+//Sends a move command to the server.
 Client.sendMove = function(move){
-    Client.chat.write('DEBUG:' + move);
-    //Client.socket.emit('move send', move);
+    //Client.chat.write('DEBUG:' + move);
+    Client.socket.emit('move send', move);
 };
 
 Client.sendCheckEffect = function(type, callback){
@@ -61,6 +63,10 @@ Client.sendCheckEffect = function(type, callback){
     Client.checkEffectCallback = callback;
     //Client.socket.emit('move send', move);
 };
+
+Client.awaitOpponentDecision = function(callback) {
+    //Client.socket.emit('requestdecision', type);
+}
 
 //Contacts the server, requesting that they be matched up with another player, a bot, or a random match.
 Client.newGame = function(type, data) {
@@ -106,6 +112,8 @@ Client.socket.on('matchmake end',function(data){
     opponent.name = data.name;
     Client.chat.write("DEBUG: " + data.name);
     opponent.deck = make_deck(data.opponent.deck);
+    console.log(data);
+    //opponent.deck = data.opponent.deck;
     Client.cardsys.duel = new DuelState(Client.cardsys.player, opponent);
     if(!data.turn) {
         Client.cardsys.duel.turn = opponent;
@@ -144,14 +152,31 @@ Client.socket.on('checkeffect none',function(){
 });
 
 Client.socket.on('move get',function(move){
-    var m = "P1 " + move;
-    Client.cardsys.duel.queueMove(m);
+    var m = "R " + move;
+    Client.chat.write("DEBUG: Received move from server: '" + m + "'!");
+    //if(Client.cardsys.duel.awaitMove) {
+        Client.cardsys.duel.queueMove(m);
+    //} else {
+    //    Client.cardsys.duel.doMove(m);
+    //}
 });
 
 Client.socket.on('request info', (fn) => {
     fn({
         deck: Client.cardsys.player.deck.rawcopy()
     });
+});
+
+Client.socket.on('end turn', function(){
+    Client.chat.write("DEBUG: It's your opponent's turn.");
+    var duel = Client.cardsys.duel;
+    duel.turn = duel.opponent;
+});
+
+Client.socket.on('begin turn', function(){
+    Client.chat.write("DEBUG: It's your turn.");
+    //var duel = Client.cardsys.duel;
+    //duel.turn = Client.cardsys.duel.player;
 });
 
 Client.socket.on('match disconnect',function(data){

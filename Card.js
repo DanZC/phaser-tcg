@@ -1,3 +1,24 @@
+const DuelPhase = {
+    WAIT : 0,
+    DRAW : 1,
+    EFFECT : 2,
+    ACTION : 3,
+    BATTLE : 4,
+    DAMAGE : 5,
+    END : 6
+};
+exports.DuelPhase = DuelPhase;
+
+const ChannelType = {
+    NON : 0,
+    SRS : 1,
+    GMG : 2,
+    MDA : 3,
+    MTR : 4,
+    MEM : 5
+};
+exports.ChannelType = ChannelType;
+
 //Bad "enum", because Javascript doesn't have bultin enums.
 const CardType = {
     UNDEFINED : 0,
@@ -6,6 +27,7 @@ const CardType = {
     CHANNEL : 3,
     MEME : 4
 };
+exports.CardType = CardType;
 
 const AnimType = {
 	NONE: 0,
@@ -18,11 +40,9 @@ const AnimType = {
     TOPGRAVE: 7,
     FLIPUP: 8,
     FLIPDOWN: 9,
-    REVEAL: 10,
-    TOGRAVE: 11,
-    CHANGECONTROL: 12,
-    BEGIN: 99
+    REVEAL: 10
 };
+exports.AnimType = AnimType;
 
 const CardLocation = {
     NONE : 0b0,
@@ -37,19 +57,11 @@ const CardLocation = {
     DECK : 0b100000,
     ALL : 0b111111
 };
-
-const CardFlag = {
-    NONE : 0
-}
+exports.CardLocation = CardLocation;
 
 //The bottom left-most card in cards.png. It is the same texture rect used for facedown cards.
 const UNDEFINED_CARD_INDEX = 159;
-
-//Empty list populated at runtime by the cards defined in assets/cards.json
-CardIndex = []
-
-//Empty list populated at runtime by the deck defined in assets/dummy_deck.json
-DummyDeck = []
+exports.UNDEFINED_CARD_INDEX = UNDEFINED_CARD_INDEX;
 
 const CardColor = {
     NONE : 0,
@@ -62,6 +74,7 @@ const CardColor = {
     PNK : 7,
     GRY : 8
 }
+exports.CardColor = CardColor;
 
 const MemeCategory = {
 	NML : 0,
@@ -69,6 +82,7 @@ const MemeCategory = {
     RSP : 2,
     VRT : 3
 }
+exports.MemeCategory = MemeCategory;
 
 //Unused
 const CardStatus = {
@@ -78,10 +92,8 @@ const CardStatus = {
     DONOTDISTURB : 3,
     STREAMING : 4
 }
+exports.CardStatus = CardStatus;
 
-//Card data object.
-//Represents the core data for each card.
-//The default values for many fields will be overwritten when the card is set to an index defined in CardIndex
 class Card {
     constructor() {
         this.type = CardType.UNDEFINED;
@@ -89,28 +101,12 @@ class Card {
         this.status = CardStatus.ONLINE;
         this.index = 0;
         this.role = null; //Role applied to card, if applicable
-
-        //The associated visual object this card is connected to.
         this.obj = null;
-
         this.attacks = 1;
         this.currentHP = 0;
         this.currentHPCTR = this.currentHP;
-
-        //The given name of a card.
-        //The name of a card can be overwritten by certain effects.
-        //Some effects check a card's identity through its name.
-        //The original name is constant after the card is instantiated with the values from CardIndex.
         this.name = "";
         this.original_name = "";
-
-        //A list of flags a card has.
-        //Each flag is a string. If a specific string is not in this list, a card is treated as not having that associated flag.
-        this.flags = [];
-
-        //Stat modification values.
-        //These values modify the base stats of a card.
-        //Used for specific effects.
         this.mod = {
             hp: 0,
             atk: 0,
@@ -147,39 +143,23 @@ class Card {
             this.original_name = protocard['name'];
     }
 
-    //Card Type check methods.
-    //Used for convenience in effect programming.
     isMember() { return this.type == CardType.MEMBER; }
     isChannel() { return this.type == CardType.CHANNEL; }
     isMeme() { return this.type == CardType.MEME; }
     isRole() { return this.type == CardType.ROLE; }
 
-    //Flag methods
-    //Manipulates the flags associated with each card.
-    //Certain flags have special meaning, and some functions will check for specific flags.
-    addFlag(f) { this.flags.push(f); }
-    hasFlag(f) { return f in this.flags; }
-    removeFlag(f) { this.flags.splice(this.flags.findIndex(function(value, index, obj){ return this.value === f; }), 1); }
-    isTargetable() { return !(this.hasFlag('NONTARGETABLE')); }
-    isAttackable() { return !(this.hasFlag('NONATTACKABLE')); }
-
-    //Card name query methods
     getName() { return this.name; }
     getOriginalName() { return this.original_name; }
     hasOriginalName() { return this.name == this.card.original_name; }
 
-    //Stat methods
     getAttack() { return this.atk; }
     getDefense() { return this.def; }
     getLevel() { return this.lvl; }
 
-    //Card Type specific methods.
     getMemeCategory() { return this.category; }
     
     getChannelSubject() { return this.subject; }
 
-    //Reduces the current HP of a card by dmg. 
-    //Returns whether the card's current HP has been set to 0 (i.e. destroyed).
     damage(dmg) { 
         this.currentHP = this.hp - dmg; 
         if(this.currentHP <= 0) {
@@ -191,10 +171,8 @@ class Card {
 
     resetAttacks() { this.attacks = 1; }
 }
+exports.Card = Card;
 
-//Abstract data type for a deck of cards.
-//When a deck is created, its contents are empty.
-//This class provides methods for shuffling, copying, sorting, and instantiating from JSON.
 class Deck {
     constructor() {
         this.card = [];
@@ -228,6 +206,14 @@ class Deck {
         }
     }
 
+    fromRaw(raw) {
+        for(i in raw) {
+            var c = new Card();
+            c.set_index(raw[i]);
+            this.add(c);
+        }
+    }
+
 	//Pushes a card into the deck.
     add(card) {
         this.card.push(card);
@@ -249,21 +235,13 @@ class Deck {
         return fl;
     }
 
-    //Removes a card from the deck. Returns the index of the removed card.
+    //Removes a card from the deck.
     remove(card) {
         for(i in this.card) {
             var c = this.card[i];
-            if(c === card) {
+            if(c === card)
                 this.card.splice(i, 1);
-                return i;
-            }
         }
-        return -1;
-    }
-
-    //Removes a card from the deck using an index number. Returns the card at the specified index.
-    removei(index) {
-        return this.card.splice(index, 1);
     }
 
 	//Shuffles the deck.
@@ -294,9 +272,76 @@ class Deck {
         }
     }
 }
+exports.Deck = Deck;
+
+function make_deck(rawDeck) {
+    var deck = new Deck();
+    for(i in rawDeck) {
+        var card = new Card();
+        card.set_index(rawDeck[i]);
+        deck.add(card);
+    }
+    return deck;
+}
+exports.make_deck = make_deck;
 
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
+exports.getRandomInt = getRandomInt;
+
+const SlotType = {
+    UNDEFINED : 0,
+    MEMROLE : 1,
+    CHANNEL : 2,
+    MEME : 3,
+    DECK : 4,
+    OFFLINE : 5
+}
+exports.SlotType = SlotType;
+
+const MoveType = {
+    SURRENDER : 0,
+    DRAW : 1,
+    PLAY : 2,
+    DISCARD : 3,
+    SENDTOGRAVE : 4,
+    PHASE : 5,
+    ATTACK : 6,
+    ACTIVATE : 7
+}
+exports.MoveType = MoveType;
+
+class Slot {
+    constructor(type, id, owner) {
+        this.card = null;
+        this.id = id;
+        this.index = -1;
+        this.type = type;
+        this.owner = owner;
+        this.role = -1;
+        this.hp = 0;
+    }
+
+    set_card(c) {
+        this.card = c;
+        this.id = c.index
+        this.hp = c.currentHP;
+    }
+
+    get_card() {
+        return this.card;
+    }
+
+    is_empty() {
+        return this.card == null;
+    }
+
+    remove_card() {
+        this.card = null;
+        this.id = -1;
+    }
+}
+exports.Slot = Slot;
