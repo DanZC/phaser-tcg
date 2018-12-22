@@ -698,21 +698,25 @@ Game.playAnimation = function(animid, targets, op, callback=function(card, op){}
         tween3.start();
     } else if(animid == AnimType.TOGRAVE) {
         var obj = targets[0].obj;
+        var objtxt = targets[0].card.obj.text;
         obj.inputEnabled = false;
         Client.sounds['tograve'].play();
         var tween = null;
+        var tweentxt = null;
         if(op) {
             var dest = {
                 x: Game.obj.ooffline.pos.x,
                 y: Game.obj.ooffline.pos.y
             }
             tween = game.add.tween(obj).to( dest, 250, Phaser.Easing.Quadratic.InOut, false, 0);
+            tweentxt = game.add.tween(objtxt).to( dest, 250, Phaser.Easing.Quadratic.InOut, false, 0);
         } else {
             var dest = {
                 x: Game.obj.loffline.pos.x,
                 y: Game.obj.loffline.pos.y
             }
             tween = game.add.tween(obj).to( dest, 250, Phaser.Easing.Quadratic.InOut, false, 0);
+            tweentxt = game.add.tween(objtxt).to( dest, 250, Phaser.Easing.Quadratic.InOut, false, 0);
         }
         //var tween2 = game.add.tween(obj).to( { x: ox, y: oy }, 300, Phaser.Easing.Quadratic.Out, false, 0);
 		//var tween2 = game.add.tween(obj).to( { width: w }, 100, Phaser.Easing.Linear.None, false, 0);
@@ -728,6 +732,7 @@ Game.playAnimation = function(animid, targets, op, callback=function(card, op){}
 			}
         });
         tween.start();
+        tweentxt.start();
     } else if(animid == AnimType.DAMAGE) {
         var tg = targets[0].obj;
         var obj = game.add.text(
@@ -882,7 +887,7 @@ Game.attack = function(c, s) {
     Client.chat.write("DEBUG: Attack.");
     Game.awaitCheckEffect(CheckEffectType.ATTACK, function() {
         var targets = [c, s.card];
-        var targets2 = [s];
+        var targets2 = [s.card];
         var op = !s.isOpponents;
         var damage = 0;
         if(s.type === SlotType.MEMROLE) {

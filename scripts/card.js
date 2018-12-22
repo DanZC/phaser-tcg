@@ -181,7 +181,7 @@ class Card {
     //Reduces the current HP of a card by dmg. 
     //Returns whether the card's current HP has been set to 0 (i.e. destroyed).
     damage(dmg) { 
-        this.currentHP = this.hp - dmg; 
+        this.currentHP = this.currentHP - dmg; 
         if(this.currentHP <= 0) {
             this.currentHP = 0;
             return true;
