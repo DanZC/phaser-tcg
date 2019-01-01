@@ -160,6 +160,11 @@ class DuelState {
         Game.addCardToHandI(loc, op, index, cb);
     }
 
+    //Adds a card from the deck to the hand.
+    attack(card, op, slot, cb=function(duel){}) {
+        Game.attack(card, slot, cb);
+    }
+
     //Plays card
     playCard(card, op, slot, cb=function(duel){}) {
         var cobj = card;
@@ -222,6 +227,9 @@ class DuelState {
                     this.phase = DuelPhase.BATTLE;
                 }
                 this.moveEndCallback(this);
+                return;
+            } else if(parts[1] === "ATTACK") {
+                this.attack(this.remote.slots[parts[2]].card, true, this.local.slots[parts[3]], this.moveEndCallback);
                 return;
             }
         }

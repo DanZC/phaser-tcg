@@ -97,6 +97,7 @@ class CardObject {
                 Client.chat.write(`Valid: ${b}`);
                 if(b) {
                     if(c.attacks > 0) {
+                        Client.sendMove("ATTACK " + cobj.slot.name + " " + this.slot.name);
                         Game.attack(cobj, this.slot);
                     }
                 }
@@ -203,7 +204,11 @@ class CardObject {
             } else if(this.hpCTR < this.card.currentHP) {
                 this.hpCTR++;
             }
-            this.text.text = "HP  " + this.hpCTR + "/ " + this.card.hp + "\nATK " + this.card.atk + "\nDEF " + this.card.def;
+            if(this.slot == null) {
+                this.text.text = "";
+            } else {
+                this.text.text = "HP  " + this.hpCTR + "/ " + this.card.hp + "\nATK " + this.card.atk + "\nDEF " + this.card.def;
+            }
         }
     }
 }
@@ -963,10 +968,10 @@ class Slot {
                         if(cobj.attacks > 0) {
                             Game.attack(c, this);
                             this.card = cobj;
-                            if(cobj.slot !== null) {
-                                cobj.slot.card = null;
-                            }
-                            cobj.slot = this;
+                            //if(cobj.slot !== null) {
+                            //    cobj.slot.card = null;
+                            //}
+                            //cobj.slot = this;
                             local.selected = null;
                         }
                     }

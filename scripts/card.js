@@ -93,7 +93,12 @@ class Card {
         //The associated visual object this card is connected to.
         this.obj = null;
 
+        //The number of attacks a specific card has left this turn.
+        //This number can be manipulated by effects to allow cards to attack more than once, or to prevent
+        //cards from attacking at all.
         this.attacks = 1;
+
+        
         this.currentHP = 0;
         this.currentHPCTR = this.currentHP;
 
@@ -162,6 +167,7 @@ class Card {
     removeFlag(f) { this.flags.splice(this.flags.findIndex(function(value, index, obj){ return this.value === f; }), 1); }
     isTargetable() { return !(this.hasFlag('NONTARGETABLE')); }
     isAttackable() { return !(this.hasFlag('NONATTACKABLE')); }
+    isDestroyable() { return !(this.hasFlag('NONDESTROYABLE')); }
 
     //Card name query methods
     getName() { return this.name; }
@@ -177,6 +183,23 @@ class Card {
     getMemeCategory() { return this.category; }
     
     getChannelSubject() { return this.subject; }
+
+    //Object methods
+    getObject() { return this.obj; }
+    hasObject() { return (this.obj !== null); }
+
+    getSlot() { 
+        if(this.obj !== null) 
+            return this.obj.slot; 
+        else 
+            return null; 
+    }
+    hasSlot() {
+        if(this.obj !== null)
+            return (this.obj.slot !== null);
+        else
+            return false;
+    }
 
     //Reduces the current HP of a card by dmg. 
     //Returns whether the card's current HP has been set to 0 (i.e. destroyed).

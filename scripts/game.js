@@ -50,7 +50,7 @@ Game.create = function() {
     Game.inputLayer = 0;
 
     this.cardsys = cardsys;
-    cardsys.player.deck.shuffle();
+    //cardsys.player.deck.shuffle();
     cardsys.player.deck.update();
     cardsys.duel.opponent.deck.update();
     var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
@@ -332,8 +332,8 @@ Game.create = function() {
     this.waitico = game.add.sprite(15, 15, 'wait');
 
     obj.phasebtn = game.add.button(
-        200, 
-        16, 
+        400, 
+        64, 
         'buttons3',
         function() {
             var duel = Client.cardsys.duel;
@@ -399,6 +399,16 @@ Game.create = function() {
         },
         this
     );
+
+    obj.turnnum = game.add.text(
+        0, 
+        64, 
+        "Turn: \nPrize Tokens: \n", {
+        font: "18px Courier New",
+        fill: "#888888",
+        stroke: '#ffffff',
+        align: "left"
+    });
 
     //This section prints a message to the chat, informing the player of the successful connection to the game.
     if(Game.type === GameType.AI) {
@@ -878,12 +888,21 @@ Game.sendToGrave = function(card, op) {
         this.queueAnimation(AnimType.TOGRAVE, targets, op);
 		//Client.sounds['tograve'].play();
 		//this.obj.loffline.updatePositions();
-	}
+	} else {
+        this.obj.ooffline.push(card);
+        if(card.slot !== null) {
+		    card.slot.card = null;
+            card.slot = null;
+        }
+        card.parent.bringToTop(card);
+        var targets = [card];
+        this.queueAnimation(AnimType.TOGRAVE, targets, op);
+    }
 	Client.chat.write("DEBUG: Sent to grave.");
 }
 
 //Attacks
-Game.attack = function(c, s) {
+Game.attack = function(c, s, cb=function(duel){}) {
     Client.chat.write("DEBUG: Attack.");
     Game.awaitCheckEffect(CheckEffectType.ATTACK, function() {
         var targets = [c, s.card];
@@ -898,11 +917,28 @@ Game.attack = function(c, s) {
             local.selected = null;
         });
         var hasBeenDestroyed = s.card.card.damage(damage);
-        Game.queueAnimation(AnimType.DAMAGE, targets2, op, function(card, op) {
-        }, damage);
+        if(s.card.card.isChannel()) hasBeenDestroyed = true;
         if(hasBeenDestroyed) {
+            Game.queueAnimation(AnimType.DAMAGE, targets2, op, function(card, op) {
+            }, damage);
+        } else {
+            Game.queueAnimation(AnimType.DAMAGE, targets2, op, function(card, op) {
+                cb(Client.cardsys.duel);
+            }, damage);
+        }
+        if(hasBeenDestroyed) {
+            s.card.parent.bringToTop(s.card);
             Game.queueAnimation(AnimType.TOGRAVE, targets2, !op, function(card, op){
-                Game.awardPrizeToken(op);
+                if(op)
+                    Game.obj.ooffline.push(card);
+                else
+                    Game.obj.loffline.push(card);
+                if(card.slot !== null) {
+                    card.slot.card = null;
+                    card.slot = null;
+                }
+                Game.awardPrizeToken(!op);
+                cb(Client.cardsys.duel);
             });
         }
     });
@@ -992,6 +1028,10 @@ Game.update = function() {
             this.obj.phasebtn.frame = 3;
         }
     }
+    var turnnumber = Game.getCurrentDuel().turnNumber;
+    var numPrizeTokens = Game.getLocalPlayer().prizeTokens;
+    var numPrizeTokens2 = Game.getCurrentDuel().opponent.prizeTokens;
+    this.obj.turnnum.setText(`Turn: ${turnnumber}\nPrize Tokens: ${numPrizeTokens}`);
     //for(i in duel.local.hand) {
     //    duel.local.hand[i].update();
     //}

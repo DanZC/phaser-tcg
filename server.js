@@ -78,6 +78,13 @@ function rcopy(obj) {
     return copy;
 }
 
+//Damage calculation function
+function calcDamage(atk, def) {
+    var dmg = Math.round((atk * 1.5) - (def * 1.5));
+    if(dmg < 1) dmg = 1;
+    return dmg;
+}
+
 const DuelPhase = {
     WAIT : 0,
     DRAW : 1,
@@ -277,7 +284,7 @@ class Deck {
     }
 
     fromRaw(raw) {
-        for(i in raw) {
+        for(var i in raw) {
             var c = new Card();
             c.set_index(raw[i]);
             this.add(c);
@@ -425,6 +432,28 @@ function parseMove(movestr) {
     if(parts[0] == "DISCARD") {
         pmove.type = MoveType.DISCARD;
         pmove.handid = parseInt(parts[1]);
+        return pmove;
+    }
+    if(parts[0] == "ATTACK") {
+        pmove.type = MoveType.ATTACK;
+        pmove.slotid = parts[1];
+        if(parts[1].indexOf("MBR") == 0) {
+            pmove.slotty = SlotType.MEMROLE;
+        } else if(parts[1].indexOf("MEM") == 0) {
+            pmove.slotty = SlotType.MEME;
+        } else {
+            pmove.slotty = SlotType.MEME;
+        }
+        pmove.slot2id = parts[2];
+        if(parts[2].indexOf("MBR") == 0) {
+            pmove.slot2ty = SlotType.MEMROLE;
+        } else if(parts[2].indexOf("MEM") == 0) {
+            pmove.slot2ty = SlotType.MEME;
+        } else if(parts[2].indexOf("CH") == 0) {
+            pmove.slot2ty = SlotType.CHANNEL;
+        } else {
+            pmove.slot2ty = SlotType.MEME;
+        }
         return pmove;
     }
 }
@@ -580,19 +609,38 @@ class MatchState {
             var c = s.get_card();
             side.offline.push(c);
             s.remove_card(c);
-            side.members.splice(sid, 1);
+            //side.members.splice(sid, 1);
         } else if(slotty === SlotType.CHANNEL) {
             var s = side.channels[sid];
             var c = s.get_card();
             side.offline.push(c);
             s.remove_card(c);
-            side.channels.splice(sid, 1);
+            //side.channels.splice(sid, 1);
         } else if(slotty === SlotType.MEME) {
             var s = side.memes[sid];
             var c = s.get_card();
             side.offline.push(c);
             s.remove_card(c);
-            side.memes.splice(sid, 1);
+            //side.memes.splice(sid, 1);
+        }
+    }
+
+    attack(side, op, slotty, slotid, slot2ty, slot2id) {
+        var sid = this.getIdFromSlotId(slotid);
+        var s2id = this.getIdFromSlotId(slot2id);
+        var atk = side.members[sid].get_card();
+        var def = op.members[s2id].get_card();
+        if(slotty === SlotType.MEME) {
+            atk = side.memes[sid].get_card();
+        }
+        if(slot2ty === SlotType.CHANNEL) {
+            def = op.memes[s2id].get_card();
+        }
+        var dmg = calcDamage(atk.getAttack(), def.getDefense());
+        var isDestroyed = atk.damage(dmg);
+        if(def.isChannel()) isDestroyed = true;
+        if(isDestroyed) {
+            this.sendToGrave(op, slot2ty, slot2id);
         }
     }
 }
@@ -698,6 +746,7 @@ class Match {
 
     doMove(p, move) {
         var m = parseMove(move);
+        var op = (p === 'a'? 'b' : 'a');
         if(true) {
             switch(m.type) {
             case MoveType.DRAW:
@@ -705,6 +754,9 @@ class Match {
                 break;
             case MoveType.PLAY:
                 this.state.playCard(this.state[p], m.handid, m.slotty, m.slotid);
+                break;
+            case MoveType.ATTACK:
+                this.state.attack(this.state[p], this.state[op], m.slotty, m.slotid, m.slot2ty, m.slot2id);
                 break;
             case MoveType.PHASE:
                 this.state.changePhase(this.state[p], m.value);
@@ -993,12 +1045,12 @@ io.on('connection',function(socket){
     socket.on('matchmake enter',function(){
         socket.player.waitingForMatch = true;
         var p = getAllWaitingPlayers();
-        var n = getRandomInt(0, p.length - 1);
+        var n = getRandomInt(0, p.length);
         //We need more than 1 waiting player to matchmake.
         console.log(p.length);
         if(p.length > 1) {
             do {
-                n = getRandomInt(0, p.length - 1);
+                n = getRandomInt(0, p.length);
                 if(p[n] === socket.player) {
                     continue;
                 } else break;
@@ -1014,6 +1066,7 @@ io.on('connection',function(socket){
             socket.player.match = match;
             op.match = match;
             var roomid = "M" + match.id.toString();
+            match.roomid = roomid;
             var osocket = io.sockets.connected[op.socketID];
             osocket.join(roomid);
             socket.join(roomid);
@@ -1066,7 +1119,7 @@ io.on('connection',function(socket){
                 p = 'b'
         }
         if(data.good) {
-            socket.to(socket.player.match.roomid).broadcast.emit('move get',"R " + move);
+            socket.to(socket.player.match.roomid).broadcast.emit('move get',move);
             socket.player.match.doMove(p, move);
             socket.emit('move callback', move);
         } else {

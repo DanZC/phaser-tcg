@@ -162,6 +162,7 @@ Client.socket.on('move get',function(move){
 });
 
 Client.socket.on('request info', (fn) => {
+    Client.cardsys.player.deck.shuffle();
     fn({
         deck: Client.cardsys.player.deck.rawcopy()
     });
@@ -175,6 +176,8 @@ Client.socket.on('end turn', function(){
 
 Client.socket.on('begin turn', function(){
     Client.chat.write("DEBUG: It's your turn.");
+    var duel = Client.cardsys.duel;
+    duel.turnNumber++;
     //var duel = Client.cardsys.duel;
     //duel.turn = Client.cardsys.duel.player;
 });
