@@ -239,7 +239,7 @@ class Card {
     getChannelSubject() { return this.subject; }
 
     damage(dmg) { 
-        this.currentHP = this.hp - dmg; 
+        this.currentHP = this.currentHP - dmg; 
         if(this.currentHP <= 0) {
             this.currentHP = 0;
             return true;
@@ -495,6 +495,7 @@ class MatchState {
         this.phase = DuelPhase.DRAW;
         this.draws = 0;
         this.a = {
+            prizeToken: 0,
             deck: new Deck(),
             hand: [],
             memes: [
@@ -520,6 +521,7 @@ class MatchState {
             offline: []
         }
         this.b = {
+            prizeToken: 0,
             deck: new Deck(),
             hand: [],
             memes: [
@@ -637,10 +639,12 @@ class MatchState {
             def = op.memes[s2id].get_card();
         }
         var dmg = calcDamage(atk.getAttack(), def.getDefense());
-        var isDestroyed = atk.damage(dmg);
+        var isDestroyed = def.damage(dmg);
         if(def.isChannel()) isDestroyed = true;
         if(isDestroyed) {
             this.sendToGrave(op, slot2ty, slot2id);
+            side.prizeToken++;
+            console.log(`Prize token awarded. ${side.prizeToken}`);
         }
     }
 }
@@ -669,7 +673,8 @@ class AI {
             state: {
                 self: copy(state[id]),
                 opponent: copy(state[oid]),
-                phase: state.phase
+                phase: state.phase,
+                turn: state.turn
             },
             id: id
         }, function(error) {
@@ -757,6 +762,17 @@ class Match {
                 break;
             case MoveType.ATTACK:
                 this.state.attack(this.state[p], this.state[op], m.slotty, m.slotid, m.slot2ty, m.slot2id);
+                if(this.state[p].prizeToken >= 3) {
+                    var ap = this[this.state.turn];
+                    console.log(`Player, ${this[p].name}, won.`);
+                    if(ap.bot !== true) {
+                        io.sockets.connected[ap.socketID].emit('match end', {won: true});
+                    }
+                    var dp = this[op];
+                    if(dp.bot !== true) {
+                        io.sockets.connected[dp.socketID].emit('match end', {won: false, winner:this[p].name});
+                    }
+                }
                 break;
             case MoveType.PHASE:
                 this.state.changePhase(this.state[p], m.value);

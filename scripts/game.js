@@ -38,6 +38,7 @@ Game.preload = function() {
     this.game.load.image('close', 'assets/close.png');
     this.game.load.image('logo', 'assets/back_test_new3.png');
     this.game.load.image('wait', 'assets/wait.png');
+    this.game.load.image('viewmask', 'assets/viewmask.png');
 	this.game.load.json('duel_layout','assets/duel_layout.json');
 };
 
@@ -337,6 +338,7 @@ Game.create = function() {
         'buttons3',
         function() {
             var duel = Client.cardsys.duel;
+            if(Game.inputLayer > 0) return;
             if(duel.turn !== Client.cardsys.player) return;
             if(duel.phase == DuelPhase.ACTION) {
                 duel.phase = DuelPhase.BATTLE;
@@ -409,6 +411,21 @@ Game.create = function() {
         stroke: '#ffffff',
         align: "left"
     });
+    
+    obj.viewmsk = game.add.sprite(0, 0, 'viewmask', 2, ui);
+    obj.viewmsk.alpha = 0;
+    
+    obj.msgtext = game.add.text(
+        game.world.centerX, 
+        game.world.centerY, 
+        "", {
+        font: "24px Courier New",
+        fill: "#bbbbbb",
+        stroke: '#000000',
+        align: "left"
+    });
+    obj.msgtext.alpha = 0;
+    obj.msgtext.anchor.setTo(0.5, 0.5);
 
     //This section prints a message to the chat, informing the player of the successful connection to the game.
     if(Game.type === GameType.AI) {
@@ -767,6 +784,22 @@ Game.playAnimation = function(animid, targets, op, callback=function(card, op){}
 			}
         });
         tween.start();
+    } else if(animid == AnimType.WIN) {
+        var tg = targets[0];
+        var txt = targets[1];
+        var tween = game.add.tween(tg).to( { alpha: 1 }, 1000, Phaser.Easing.Linear.None, false, 0);
+        var tween2 = game.add.tween(txt).to( { alpha: 1 }, 1000, Phaser.Easing.Linear.None, false, 0);
+        tween.onComplete.addOnce(function(obj, tween){
+            Game.waitAnim = false;
+            if(cb !== undefined)
+				cb(Game.animTargets[0], op);
+			if(Game.animQueue.length > 0) {
+				var next = Game.animQueue.shift();
+				Game.playAnimation(next['animid'], next['targets'], next['op'], next['callback'], next['value']);
+			}
+        });
+        tween.start();
+        tween2.start();
 	} else if(animid == AnimType.BEGIN) {
         var tg = targets[0];
         var tweens = [];
@@ -985,6 +1018,46 @@ Game.playCard = function(card, op, cb=function(duel){}) {
         //    
 		//});
 	}
+}
+
+Game.queueWin = function() {
+    if(Game.waitAnim) {
+        var msk = Game.obj.viewmsk;
+        var msktxt = Game.obj.msgtext;
+        msktxt.setText("You won the duel!");
+        var tgts = [msk, msktxt];
+        this.queueAnimation(AnimType.WIN, tgts, false, function(card, op){
+            Game.inputLayer++;
+        });
+    } else {
+        var msk = Game.obj.viewmsk;
+        var msktxt = Game.obj.msgtext;
+        msktxt.setText("You won the duel!");
+        var tgts = [msk, msktxt];
+        this.playAnimation(AnimType.WIN, tgts, false, function(card, op){
+            Game.inputLayer++;
+        });
+    }
+}
+
+Game.queueLoss = function(name) {
+    if(Game.waitAnim) {
+        var msk = Game.obj.viewmsk;
+        var msktxt = Game.obj.msgtext;
+        msktxt.setText(`${name} won the duel...`);
+        var tgts = [msk, msktxt];
+        this.queueAnimation(AnimType.WIN, tgts, false, function(card, op){
+            Game.inputLayer++;
+        });
+    } else {
+        var msk = Game.obj.viewmsk;
+        var msktxt = Game.obj.msgtext;
+        msktxt.setText(`${name} won the duel...`);
+        var tgts = [msk, msktxt];
+        this.playAnimation(AnimType.WIN, tgts, false, function(card, op){
+            Game.inputLayer++;
+        });
+    }
 }
 
 //Updates the state of all objects in the scene.

@@ -21,6 +21,9 @@ const AnimType = {
     REVEAL: 10,
     TOGRAVE: 11,
     CHANGECONTROL: 12,
+    WIN: 96,
+    LOSE: 97,
+    TIE: 98,
     BEGIN: 99
 };
 

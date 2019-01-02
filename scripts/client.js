@@ -177,7 +177,7 @@ Client.socket.on('end turn', function(){
 Client.socket.on('begin turn', function(){
     Client.chat.write("DEBUG: It's your turn.");
     var duel = Client.cardsys.duel;
-    duel.turnNumber++;
+    duel.nextTurn();
     //var duel = Client.cardsys.duel;
     //duel.turn = Client.cardsys.duel.player;
 });
@@ -186,6 +186,14 @@ Client.socket.on('match disconnect',function(data){
     Client.chat.write("The match was terminated. Reason: " + data.reason);
     Client.game.state.start('Title',true,false,Game.game);
     Client.cardsys.reset();
+});
+
+Client.socket.on('match end',function(data){
+    if(data.won) {
+        Game.queueWin();
+    } else {
+        Game.queueLoss(data.winner);
+    }
 });
 
 //When the client disconnects with the server.

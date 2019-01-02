@@ -12,6 +12,7 @@ class CardSystem {
         this.player.deck = this.deck[0].copy();
         this.duel = null;
         this.player.duel = this.duel;
+        this.player.prizeTokens = 0;
     }
 }
 
@@ -98,6 +99,7 @@ class CardObject {
                 if(b) {
                     if(c.attacks > 0) {
                         Client.sendMove("ATTACK " + cobj.slot.name + " " + this.slot.name);
+                        c.attacks--;
                         Game.attack(cobj, this.slot);
                     }
                 }
@@ -236,7 +238,7 @@ class DeckObject {
         this.text = game.add.text(
             slot.obj.x, 
             slot.obj.y, 
-            "HP   0/ 0\nATK  0\nDEF  0", {
+            "0", {
             font: "16px Courier New",
             fill: "#ffffff",
             stroke: '#000000',
@@ -359,7 +361,12 @@ class DeckObject {
 
     update() {
         this.obj.frame = UNDEFINED_CARD_INDEX;
-        this.text.text = "";
+        if(this.isOpponents) {
+            this.text.setText(`${Client.cardsys.duel.opponent.deck.card.length}`);
+        }
+        else {
+            this.text.setText(`${Client.cardsys.duel.player.deck.card.length}`);
+        }
     }
 }
 

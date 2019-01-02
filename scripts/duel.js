@@ -145,6 +145,30 @@ class DuelState {
         return false;
     }
 
+    //Returns a list of cards on the field.
+    getCardsOnField() {
+        var cards = []
+        for(i in this.local.slots) {
+            if(!this.local.slots[i].empty()) {
+                cards.push(this.local.slots[i].card);
+            }
+        }
+        for(i in this.remote.slots) {
+            if(!this.remote.slots[i].empty()) {
+                cards.push(this.remote.slots[i].card);
+            }
+        }
+        return cards;
+    }
+
+    nextTurn() {
+        this.turnNumber++;
+        var fcards = this.getCardsOnField();
+        for(var c in fcards) {
+            fcards[c].card.resetAttacks();
+        }
+    }
+
 	//Moves a card to another slot.
     moveCard(card, slot, cb=function(duel){}) {
         card.move({x: slot.obj.x, y: slot.obj.y}, cb);
@@ -219,7 +243,7 @@ class DuelState {
                     Client.chat.write("It's your turn.");
                     this.turn = this.player;
                     this.phase = DuelPhase.DRAW;
-                    this.turnNumber++;
+                    this.nextTurn();
                     this.draws = 0;
                 }
                 else if(parts[2] === "BATTLE") {
